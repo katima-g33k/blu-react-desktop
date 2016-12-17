@@ -1,8 +1,66 @@
 import React, { Component } from 'react';
-import { Button, Col, FormControl, Panel, Row } from 'react-bootstrap';
+import {
+  Button,
+  Checkbox,
+  Col,
+  FormControl,
+  FormGroup,
+  Panel,
+  Radio,
+  Row,
+} from 'react-bootstrap';
 import HTTP from '../lib/HTTP';
 import Table from './Table.js';
 
+const columns = {
+  member: [
+    {
+      key: 'no',
+      label: 'Numéro de membre',
+      id: true,
+    },
+    {
+      key: 'first_name',
+      label: 'Prénom',
+    },
+    {
+      key: 'last_name',
+      label: 'Nom',
+    },
+  ],
+  item: [
+    {
+      key: 'id',
+      id: true,
+    },
+    {
+      key: 'name',
+      label: 'Titre',
+    },
+    {
+      key: 'editor',
+      label: 'Éditeur',
+    },
+    {
+      key: 'edition',
+      label: 'Édition',
+    },
+    {
+      key: 'publication',
+      label: 'Année de parutation',
+    },
+    {
+      key: 'author',
+      label: 'Auteurs',
+      value(authors) {
+        if (!Array.isArray(authors)) {
+          return '';
+        }
+        return authors.map((author) => `${author.first_name} ${author.last_name}`).join(', ');
+      },
+    },
+  ],
+};
 export default class Search extends Component {
   constructor(props) {
     super(props);
@@ -10,40 +68,29 @@ export default class Search extends Component {
       isLoading: false,
       search: '',
       data: [],
-      columns: [
-        {
-          key: 'no',
-          label: 'Numéro de membre',
-          id: true,
-        },
-        {
-          key: 'first_name',
-          label: 'Prénom',
-        },
-        {
-          key: 'last_name',
-          label: 'Nom',
-        },
-      ],
+      columns: columns.member,
+      type: 'member',
+      archives: false,
     };
-    this.handleClick = this.handleClick.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.renderTable = this.renderTable.bind(this);
-    this.renderResults = this.renderResults.bind(this);
+    this.search = this.search.bind(this);
+    this.handleInput = this.handleInput.bind(this);
+    this.handleType = this.handleType.bind(this);
+    this.handleArchive = this.handleArchive.bind(this);
   }
 
-  handleChange(event) {
+  handleInput(event) {
     this.setState({ search: event.target.value });
   }
 
-  handleClick() {
+  search(event) {
+    event.preventDefault();
     this.setState({ isLoading: true });
     const data = {
       search: this.state.search,
-      deactivated: true,
+      deactivated: this.state.archives,
     };
 
-    HTTP.post('http://localhost/blu-api/member/search', data, (err, res) => {
+    HTTP.post(`http://localhost/blu-api/${this.state.type}/search`, data, (err, res) => {
       if (res) {
         this.setState({
           data: res,
@@ -53,33 +100,17 @@ export default class Search extends Component {
     });
   }
 
-  renderTable() {
-    return (
-      <Table striped bordered condensed hover>
-        <thead>
-          <tr>
-            <th>Numéro de membre</th>
-            <th>Prénom</th>
-            <th>Nom</th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.renderResults()}
-        </tbody>
-      </Table>
-    );
+  handleType(event) {
+    const type = event.target.value;
+    this.setState({
+      type,
+      columns: columns[type],
+      data: [],
+    });
   }
 
-  renderResults() {
-    return this.state.data.map((member) => {
-      return (
-        <tr key={member.no}>
-          <td>{member.no}</td>
-          <td>{member.first_name}</td>
-          <td>{member.last_name}</td>
-        </tr>
-      );
-    });
+  handleArchive() {
+    this.setState({ archives: !this.state.archives });
   }
 
   render() {
@@ -90,12 +121,29 @@ export default class Search extends Component {
             <form>
               <FormControl
                 type="search"
-                onChange={this.handleChange} />
+                onChange={this.handleInput} />
+                <FormGroup>
+                   <Radio
+                    name="type"
+                    value="member"
+                    inline
+                    checked={this.state.type === 'member'}
+                    onChange={this.handleType}>Membre</Radio>
+                   <Radio
+                    name="type"
+                    value="item"
+                    inline
+                    checked={this.state.type === 'item'}
+                    onChange={this.handleType}>Ouvrage</Radio>
+                 </FormGroup>
+              <Checkbox
+                onChange={this.handleArchive}
+                checked={this.state.archives}>Chercher dans les archives</Checkbox>
               <Button
                 bsStyle="primary"
                 type="submit"
                 disabled={this.state.isLoading}
-                onClick={!this.state.isLoading ? this.handleClick : null}>
+                onClick={!this.state.isLoading ? this.search : null}>
                 {this.state.isLoading ? 'Loading...' : 'Search'}
               </Button>
             </form>
@@ -103,7 +151,8 @@ export default class Search extends Component {
         </Row>
         <Row>
           <Col sm={12} md={10}>
-            <Table columns={this.state.columns} data={this.state.data} />
+            <h3>Résultats ({this.state.data.length})</h3>
+            <Table columns={this.state.columns} data={this.state.data} highlight={this.state.search} />
           </Col>
         </Row>
       </Panel>

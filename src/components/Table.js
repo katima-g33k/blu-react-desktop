@@ -5,8 +5,25 @@ export default class Table extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.style = {
+      highlight: {
+        backgroundColor: '#FFFF00',
+      },
+    };
+
+    this.highlightResult = this.highlightResult.bind(this);
     this.renderColumns = this.renderColumns.bind(this);
     this.renderRows = this.renderRows.bind(this);
+  }
+
+  highlightResult(value) {
+    const regex = new RegExp(`(${this.props.highlight})`, 'i');
+    return value.split(regex).map((string, index) => {
+      if (!regex.test(string)) {
+        return string;
+      }
+      return (<span style={this.style.highlight} key={index}>{string}</span>);
+    });
   }
 
   renderRows() {
@@ -23,7 +40,14 @@ export default class Table extends Component {
     return this.props.data.map((row) => {
       const columns = this.props.columns;
       const key = columns.filter((column) => column.id)[0].key;
-      const cells = columns.map((column) => <td key={column.key}>{row[column.key]}</td>);
+      const cells = columns.map((column) => {
+        if (!column.label) {
+          return null;
+        }
+
+        const value = column.value ? column.value(row[column.key]) : row[column.key];
+        return <td key={column.key}>{this.highlightResult(value)}</td>;
+      });
 
       return (
         <tr key={row[key]}>
@@ -35,7 +59,7 @@ export default class Table extends Component {
 
   renderColumns() {
     return this.props.columns.map((column) => {
-      return (<th key={column.key}>{column.label}</th>);
+      return column.label ? (<th key={column.key}>{column.label}</th>) : null;
     });
   }
 
@@ -58,4 +82,5 @@ export default class Table extends Component {
 Table.propTypes = {
   columns: React.PropTypes.array,
   data: React.PropTypes.array,
+  highlight: React.PropTypes.string,
 };
