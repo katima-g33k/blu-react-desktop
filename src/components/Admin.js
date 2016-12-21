@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Panel } from 'react-bootstrap';
+import I18n from '../lib/i18n/i18n';
 
 export default class Admin extends Component {
   constructor(props) {
@@ -8,6 +9,6 @@ export default class Admin extends Component {
   }
 
   render() {
-    return (<Panel header="Administration" />);
+    return (<Panel header={I18n.t('Admin.title')} />);
   }
 }

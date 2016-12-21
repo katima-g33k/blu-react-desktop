@@ -1,4 +1,5 @@
 import moment from 'moment';
+import I18n from './i18n/i18n';
 
 export const CommentColumns = [
   {
@@ -7,11 +8,11 @@ export const CommentColumns = [
   },
   {
     key: 'comment',
-    label: 'Commentaire',
+    label: I18n.t('TableColumns.comment.comment'),
   },
   {
     key: 'updated_at',
-    label: 'Date',
+    label: I18n.t('TableColumns.comment.date'),
     value(date) {
       return date ? moment(date).format('LL') : '';
     },
@@ -22,16 +23,16 @@ export const SearchColumns = {
   member: [
     {
       key: 'no',
-      label: 'Numéro de membre',
+      label: I18n.t('TableColumns.search.member.no'),
       id: true,
     },
     {
       key: 'first_name',
-      label: 'Prénom',
+      label: I18n.t('TableColumns.search.member.firstName'),
     },
     {
       key: 'last_name',
-      label: 'Nom',
+      label: I18n.t('TableColumns.search.member.lastName'),
     },
   ],
   item: [
@@ -41,23 +42,23 @@ export const SearchColumns = {
     },
     {
       key: 'name',
-      label: 'Titre',
+      label: I18n.t('TableColumns.search.item.title'),
     },
     {
       key: 'editor',
-      label: 'Éditeur',
+      label: I18n.t('TableColumns.search.item.editor'),
     },
     {
       key: 'edition',
-      label: 'Édition',
+      label: I18n.t('TableColumns.search.item.edition'),
     },
     {
       key: 'publication',
-      label: 'Année de parutation',
+      label: I18n.t('TableColumns.search.item.publication'),
     },
     {
       key: 'author',
-      label: 'Auteurs',
+      label: I18n.t('TableColumns.search.item.authors'),
       value(authors) {
         if (!Array.isArray(authors)) {
           return '';
@@ -75,40 +76,40 @@ export const MemberCopyColumns = [
   },
   {
     key: 'name',
-    label: 'Titre',
+    label: I18n.t('TableColumns.memberCopy.title'),
   },
   {
     key: 'editor',
-    label: 'Éditeur',
+    label: I18n.t('TableColumns.memberCopy.editor'),
   },
   {
     key: 'edition',
-    label: 'Édition',
+    label: I18n.t('TableColumns.memberCopy.edition'),
   },
   {
     key: 'added',
-    label: 'Mis en vente',
+    label: I18n.t('TableColumns.memberCopy.added'),
     value(transaction) {
       return transaction[0] ? moment(transaction[0].date).format('LL') : '';
     },
   },
   {
     key: 'sold',
-    label: 'Vendu',
+    label: I18n.t('TableColumns.memberCopy.sold'),
     value(transaction) {
       return transaction[0] ? moment(transaction[0].date).format('LL') : '';
     },
   },
   {
     key: 'paid',
-    label: 'Argent remis',
+    label: I18n.t('TableColumns.memberCopy.paid'),
     value(transaction) {
       return transaction[0] ? moment(transaction[0].date).format('LL') : '';
     },
   },
   {
     key: 'price',
-    label: 'Prix',
+    label: I18n.t('TableColumns.memberCopy.price'),
     value(prix) {
       return `${prix} $`;
     },

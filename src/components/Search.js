@@ -11,6 +11,7 @@ import {
 } from 'react-bootstrap';
 import HTTP from '../lib/HTTP';
 import Table from './Table.js';
+import I18n, { Translate } from '../lib/i18n/i18n';
 import { SearchColumns } from '../lib/TableColumns';
 
 export default class Search extends Component {
@@ -67,7 +68,7 @@ export default class Search extends Component {
 
   render() {
     return (
-      <Panel header="Search">
+      <Panel header={I18n.t('Search.title')}>
         <Row>
           <Col sm={10} md={10}>
             <form>
@@ -75,40 +76,53 @@ export default class Search extends Component {
                 type="search"
                 onChange={this.handleInput} />
                 <FormGroup>
-                   <Radio
+                  <Radio
                     name="type"
                     value="member"
                     inline
                     checked={this.state.type === 'member'}
-                    onChange={this.handleType}>Membre</Radio>
-                   <Radio
+                    onChange={this.handleType}
+                  >
+                    <Translate value="Search.filters.member" />
+                  </Radio>
+                  <Radio
                     name="type"
                     value="item"
                     inline
                     checked={this.state.type === 'item'}
-                    onChange={this.handleType}>Ouvrage</Radio>
-                 </FormGroup>
+                    onChange={this.handleType}
+                  >
+                    <Translate value="Search.filters.item" />
+                  </Radio>
+                </FormGroup>
               <Checkbox
                 onChange={this.handleArchive}
-                checked={this.state.archives}>Chercher dans les archives</Checkbox>
+                checked={this.state.archives}
+              >
+                <Translate value="Search.filters.archives" />
+              </Checkbox>
               <Button
                 bsStyle="primary"
                 type="submit"
                 disabled={this.state.isLoading}
-                onClick={!this.state.isLoading ? this.search : null}>
-                {this.state.isLoading ? 'Loading...' : 'Search'}
+                onClick={!this.state.isLoading ? this.search : null}
+              >
+                <Translate value={this.state.isLoading ? 'Search.loading' : 'Search.title'} />
               </Button>
             </form>
           </Col>
         </Row>
         <Row>
           <Col sm={12} md={10}>
-            <h3>Résultats ({this.state.data.length})</h3>
+            <h3>
+              <Translate value="Search.results.title" /> ({this.state.data.length})
+            </h3>
             <Table
               columns={this.state.columns}
               data={this.state.data}
               highlight={this.state.search}
-              placeholder="Aucun résultat"/>
+              placeholder={I18n.t('Search.results.none')}
+            />
           </Col>
         </Row>
       </Panel>

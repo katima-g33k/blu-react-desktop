@@ -5,6 +5,7 @@ import HTTP from '../lib/HTTP';
 import moment from 'moment';
 import { CommentColumns, MemberCopyColumns } from '../lib/TableColumns';
 import ProfileStats from './ProfileStats';
+import I18n, { Translate } from '../lib/i18n/i18n';
 
 const formatDate = (date) => {
   return date ? moment(date).format('LL') : '';
@@ -58,7 +59,11 @@ export default class MemberView extends Component {
     const state = member.city && member.city.state ? member.city.state.code : '';
     const address = street ? `${street}, ${city} (${state}) ${zip}` : '';
 
-    return (<p>Addresse : {address}</p>);
+    return (
+      <p>
+        <Translate value="MemberView.general.address" />: {address}
+      </p>
+    );
   }
 
   renderPhones() {
@@ -69,7 +74,11 @@ export default class MemberView extends Component {
       const number = phone.number.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
       const note = phone.note ? `(${phone.note})` : '';
 
-      return (<p key={`phone${index}`}>Téléphone {index + 1} : {number} {note}</p>);
+      return (
+        <p key={`phone${index}`}>
+          <Translate value="MemberView.general.phone" /> {index + 1}: {number} {note}
+        </p>
+      );
     });
   }
 
@@ -77,10 +86,16 @@ export default class MemberView extends Component {
     const member = this.state.member;
     return (
       <section>
-        <h4>Informations générales</h4>
-        <p>Numéro du compte : {member.no || ''}</p>
+        <h4>
+          <Translate value="MemberView.general.title" />
+        </h4>
+        <p>
+          <Translate value="MemberView.general.no" />: {member.no || ''}
+        </p>
         {this.renderAddress()}
-        <p>Courriel : {member.email || ''}</p>
+        <p>
+          <Translate value="MemberView.general.email" />: {member.email || ''}
+        </p>
         {this.renderPhones()}
       </section>
     );
@@ -90,11 +105,23 @@ export default class MemberView extends Component {
     const account = this.state.member ? this.state.member.account || {} : {};
     return (
       <section>
-        <h4>État du compte</h4>
-        <p>{`État d'activation : ${this.isActive() ? 'Actif' : 'Désactivé'}`}</p>
-        <p>{`Date d'inscription : ${formatDate(account.registration)}`}</p>
-        <p>Dernière activité : {formatDate(account.last_activity)}</p>
-        <p>Date de désactivation : {this.getDeactivationDate(account.last_activity)}</p>
+        <h4>
+          <Translate value="MemberView.account.title" />
+        </h4>
+        <p>
+          <Translate value="MemberView.account.activation" />{': '}
+          <Translate value={`MemberView.account.${this.isActive() ? 'active' : 'deactivated'}`} />
+        </p>
+        <p>
+          <Translate value="MemberView.account.registration" />: {formatDate(account.registration)}
+        </p>
+        <p>
+          <Translate value="MemberView.account.lastActivity" />: {formatDate(account.last_activity)}
+        </p>
+        <p>
+          <Translate value="MemberView.account.registration" />{': '}
+          {formatDate(this.getDeactivationDate(account.last_activity))}
+        </p>
       </section>
     );
   }
@@ -106,8 +133,14 @@ export default class MemberView extends Component {
 
     return (
       <section>
-        <h4>Notes et Commentaires</h4>
-        <Table columns={CommentColumns} data={comments} placeholder="Aucun commentaire"/>
+        <h4>
+          <Translate value="MemberView.comment.title" />
+        </h4>
+        <Table
+          columns={CommentColumns}
+          data={comments}
+          placeholder={I18n.t('MemberView.comment.none')}
+        />
       </section>
     );
   }
@@ -115,7 +148,9 @@ export default class MemberView extends Component {
   renderStats() {
     return (
       <section>
-        <h3>Statistiques</h3>
+        <h4>
+          <Translate value="MemberView.stats.title" />
+        </h4>
         <ProfileStats member={this.state.member}/>
       </section>
     );
@@ -140,8 +175,14 @@ export default class MemberView extends Component {
 
     return (
       <section>
-        <h4>Liste des exemplaires</h4>
-        <Table columns={MemberCopyColumns} data={copies} placeholder="Aucun exemplaire"/>
+        <h4>
+          <Translate value="MemberView.copies.title" />
+        </h4>
+        <Table
+          columns={MemberCopyColumns}
+          data={copies}
+          placeholder={I18n.t('MemberView.copies.none')}
+        />
       </section>
     );
   }
@@ -149,7 +190,7 @@ export default class MemberView extends Component {
   render() {
     const member = this.state.member;
     return (
-      <Panel header="Membre" bsStyle={this.isActive() ? 'default' : 'danger'}>
+      <Panel header={I18n.t('MemberView.title')} bsStyle={this.isActive() ? 'default' : 'danger'}>
         <h3> {`${member.first_name || ''} ${member.last_name || ''}`}</h3>
         {this.rendeGeneralInformation()}
         {this.renderAccountState()}

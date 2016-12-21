@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Transaction, { Type } from '../lib/Transaction';
+import { Translate } from '../lib/i18n/i18n';
 
 export default class ProfileStats extends Component {
   constructor(props) {
@@ -97,46 +98,56 @@ export default class ProfileStats extends Component {
     };
     if (this.state.stats) {
       return (
-        <table style={style.table} className="statsTable">
+        <table style={style.table}>
           <tbody>
             <tr>
-              <td colSpan={3} style={style.title}>Mise en Vente</td>
+              <td colSpan={3} style={style.title}>
+                <Translate value="ProfileStats.added" />
+              </td>
             </tr>
             <tr>
               <td colSpan={3} style={style.td}>
-                {this.state.stats.added.count} livres
+                {this.state.stats.added.count} <Translate value="ProfileStats.book" />
                 <br/>
                 ({this.state.stats.added.price} $)
               </td>
             </tr>
             <tr>
-              <td colSpan={2} style={style.title}>Vendu</td>
-              <td style={style.title}>À vendre</td>
+              <td colSpan={2} style={style.title}>
+                <Translate value="ProfileStats.sold" />
+              </td>
+              <td style={style.title}>
+                <Translate value="ProfileStats.toSell" />
+              </td>
             </tr>
             <tr>
               <td colSpan={2} style={style.td}>
-                {this.state.stats.sold.count} livres
+                {this.state.stats.sold.count} <Translate value="ProfileStats.book" />
                 <br/>
                 ({this.state.stats.sold.price} $)
               </td>
               <td rowSpan={3} style={style.td}>
-                {this.state.stats.toSell.count} livres
+                {this.state.stats.toSell.count} <Translate value="ProfileStats.book" />
                 <br/>
                 ({this.state.stats.toSell.price} $)
               </td>
             </tr>
             <tr>
-              <td style={style.title}>À Rembourser</td>
-              <td style={style.title}>Remboursé</td>
+              <td style={style.title}>
+                <Translate value="ProfileStats.toPay" />
+              </td>
+              <td style={style.title}>
+                <Translate value="ProfileStats.paid" />
+              </td>
             </tr>
             <tr>
               <td style={style.td}>
-                {this.state.stats.toPay.count} livres
+                {this.state.stats.toPay.count} <Translate value="ProfileStats.book" />
                 <br/>
                 ({this.state.stats.toPay.price} $)
               </td>
               <td style={style.td}>
-                {this.state.stats.paid.count} livres
+                {this.state.stats.paid.count} <Translate value="ProfileStats.book" />
                 <br/>
                 ({this.state.stats.paid.price} $)
               </td>

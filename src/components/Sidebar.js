@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
+import { Translate } from '../lib/i18n/i18n';
 
 export default class Sidebar extends Component {
   constructor(props) {
@@ -19,10 +20,18 @@ export default class Sidebar extends Component {
   render() {
     return (
       <Nav bsStyle="pills" stacked activeKey={this.state.page}>
-        <NavItem eventKey='search' title="search" href="/search">Recherche</NavItem>
-        <NavItem eventKey='item' href="/item">Ouvrage</NavItem>
-        <NavItem eventKey='member' href="/member">Membre</NavItem>
-        <NavItem eventKey='admin' href="/admin">Admin</NavItem>
+        <NavItem eventKey='search' href="/search">
+          <Translate value="Sidebar.search" />
+        </NavItem>
+        <NavItem eventKey='item' href="/item">
+          <Translate value="Sidebar.item" />
+        </NavItem>
+        <NavItem eventKey='member' href="/member">
+          <Translate value="Sidebar.member" />
+        </NavItem>
+        <NavItem eventKey='admin' href="/admin">
+          <Translate value="Sidebar.admin" />
+        </NavItem>
       </Nav>
     );
   }

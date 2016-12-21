@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Panel } from 'react-bootstrap';
+import I18n from '../lib/i18n/i18n';
 
 export default class ItemForm extends Component {
   constructor(props) {
@@ -8,6 +9,6 @@ export default class ItemForm extends Component {
   }
 
   render() {
-    return (<Panel header="Formulaire de l'ouvrage" />);
+    return (<Panel header={I18n.t('ItemForm.title')} />);
   }
 }
