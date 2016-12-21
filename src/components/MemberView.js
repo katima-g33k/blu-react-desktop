@@ -54,7 +54,7 @@ export default class MemberView extends Component {
   renderAddress() {
     const member = this.state.member;
     const street = member.address;
-    const zip = member.zip || '';
+    const zip = (member.zip || '').replace(/(.{3})(.{3})/, '$1 $2');
     const city = member.city ? member.city.name : '';
     const state = member.city && member.city.state ? member.city.state.code : '';
     const address = street ? `${street}, ${city} (${state}) ${zip}` : '';

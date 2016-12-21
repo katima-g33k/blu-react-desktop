@@ -107,7 +107,7 @@ export default class ProfileStats extends Component {
             </tr>
             <tr>
               <td colSpan={3} style={style.td}>
-                {this.state.stats.added.count} <Translate value="ProfileStats.book" />
+                {this.state.stats.added.count} <Translate value="ProfileStats.books" />
                 <br/>
                 ({this.state.stats.added.price} $)
               </td>
@@ -122,12 +122,12 @@ export default class ProfileStats extends Component {
             </tr>
             <tr>
               <td colSpan={2} style={style.td}>
-                {this.state.stats.sold.count} <Translate value="ProfileStats.book" />
+                {this.state.stats.sold.count} <Translate value="ProfileStats.books" />
                 <br/>
                 ({this.state.stats.sold.price} $)
               </td>
               <td rowSpan={3} style={style.td}>
-                {this.state.stats.toSell.count} <Translate value="ProfileStats.book" />
+                {this.state.stats.toSell.count} <Translate value="ProfileStats.books" />
                 <br/>
                 ({this.state.stats.toSell.price} $)
               </td>
@@ -142,12 +142,12 @@ export default class ProfileStats extends Component {
             </tr>
             <tr>
               <td style={style.td}>
-                {this.state.stats.toPay.count} <Translate value="ProfileStats.book" />
+                {this.state.stats.toPay.count} <Translate value="ProfileStats.books" />
                 <br/>
                 ({this.state.stats.toPay.price} $)
               </td>
               <td style={style.td}>
-                {this.state.stats.paid.count} <Translate value="ProfileStats.book" />
+                {this.state.stats.paid.count} <Translate value="ProfileStats.books" />
                 <br/>
                 ({this.state.stats.paid.price} $)
               </td>
