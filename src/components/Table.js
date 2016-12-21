@@ -35,10 +35,11 @@ export default class Table extends Component {
 
   renderRows() {
     if (this.props.data.length === 0) {
+      const style = { textAlign: 'center' };
       return (
         <tr>
-          <td colSpan={this.props.columns.length}>
-            Aucun résultat
+          <td colSpan={this.props.columns.length} style={style}>
+            {this.props.placeholder}
           </td>
         </tr>
       );
@@ -90,4 +91,5 @@ Table.propTypes = {
   columns: React.PropTypes.array,
   data: React.PropTypes.array,
   highlight: React.PropTypes.string,
+  placeholder: React.PropTypes.string,
 };

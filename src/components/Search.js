@@ -11,56 +11,8 @@ import {
 } from 'react-bootstrap';
 import HTTP from '../lib/HTTP';
 import Table from './Table.js';
+import { SearchColumns } from '../lib/TableColumns';
 
-const columns = {
-  member: [
-    {
-      key: 'no',
-      label: 'Numéro de membre',
-      id: true,
-    },
-    {
-      key: 'first_name',
-      label: 'Prénom',
-    },
-    {
-      key: 'last_name',
-      label: 'Nom',
-    },
-  ],
-  item: [
-    {
-      key: 'id',
-      id: true,
-    },
-    {
-      key: 'name',
-      label: 'Titre',
-    },
-    {
-      key: 'editor',
-      label: 'Éditeur',
-    },
-    {
-      key: 'edition',
-      label: 'Édition',
-    },
-    {
-      key: 'publication',
-      label: 'Année de parutation',
-    },
-    {
-      key: 'author',
-      label: 'Auteurs',
-      value(authors) {
-        if (!Array.isArray(authors)) {
-          return '';
-        }
-        return authors.map((author) => `${author.first_name} ${author.last_name}`).join(', ');
-      },
-    },
-  ],
-};
 export default class Search extends Component {
   constructor(props) {
     super(props);
@@ -68,7 +20,7 @@ export default class Search extends Component {
       isLoading: false,
       search: '',
       data: [],
-      columns: columns.member,
+      columns: SearchColumns.member,
       type: 'member',
       archives: false,
     };
@@ -104,7 +56,7 @@ export default class Search extends Component {
     const type = event.target.value;
     this.setState({
       type,
-      columns: columns[type],
+      columns: SearchColumns[type],
       data: [],
     });
   }
@@ -152,7 +104,11 @@ export default class Search extends Component {
         <Row>
           <Col sm={12} md={10}>
             <h3>Résultats ({this.state.data.length})</h3>
-            <Table columns={this.state.columns} data={this.state.data} highlight={this.state.search} />
+            <Table
+              columns={this.state.columns}
+              data={this.state.data}
+              highlight={this.state.search}
+              placeholder="Aucun résultat"/>
           </Col>
         </Row>
       </Panel>
