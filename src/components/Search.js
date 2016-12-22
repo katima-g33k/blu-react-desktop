@@ -14,6 +14,25 @@ import Table from './Table.js';
 import I18n, { Translate } from '../lib/i18n/i18n';
 import { SearchColumns } from '../lib/TableColumns';
 
+const actions = {
+  member: {
+    row: {
+      onClick(event) {
+        const id = event.target.parentNode.getAttribute('data-id');
+        location.href = `member/${id}`;
+      },
+    },
+  },
+  item: {
+    row: {
+      onClick(event) {
+        const id = event.target.parentNode.getAttribute('data-id');
+        location.href = `item/${id}`;
+      },
+    },
+  },
+};
+
 export default class Search extends Component {
   constructor(props) {
     super(props);
@@ -118,6 +137,7 @@ export default class Search extends Component {
               <Translate value="Search.results.title" /> ({this.state.data.length})
             </h3>
             <Table
+              actions={actions[this.state.type]}
               columns={this.state.columns}
               data={this.state.data}
               highlight={this.state.search}

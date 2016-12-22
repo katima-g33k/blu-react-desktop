@@ -14,13 +14,6 @@ export default class Table extends Component {
     this.highlightResult = this.highlightResult.bind(this);
     this.renderColumns = this.renderColumns.bind(this);
     this.renderRows = this.renderRows.bind(this);
-    this.selectRow = this.selectRow.bind(this);
-  }
-
-  selectRow(event) {
-    const type = 'member';
-    const id = event.target.parentNode.getAttribute('data-id');
-    location.href = `${type}/${id}`;
   }
 
   highlightResult(value) {
@@ -57,8 +50,16 @@ export default class Table extends Component {
         return <td key={column.key}>{this.highlightResult(value)}</td>;
       });
 
+      const rowActions = (this.props.actions || {}).row || {};
+      const onClick = rowActions.onClick;
+      const style = { cursor: onClick ? 'pointer' : 'default' };
       return (
-        <tr key={row[key]} data-id={row[key]} onClick={this.selectRow}>
+        <tr
+          key={row[key]}
+          data-id={row[key]}
+          onClick={onClick}
+          style={style}
+        >
           {cells}
         </tr>
       );
@@ -88,6 +89,7 @@ export default class Table extends Component {
 }
 
 Table.propTypes = {
+  actions: React.PropTypes.shape(),
   columns: React.PropTypes.array,
   data: React.PropTypes.array,
   highlight: React.PropTypes.string,

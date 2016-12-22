@@ -146,20 +146,20 @@ export default class MemberView extends Component {
   }
 
   renderStats() {
-    return (
+    return this.state.member && this.state.member.account ? (
       <section>
         <h4>
           <Translate value="MemberView.stats.title" />
         </h4>
-        <ProfileStats member={this.state.member}/>
+        <ProfileStats copies={this.state.member.account.copies}/>
       </section>
-    );
+    ) : null;
   }
 
   renderCopies() {
     const account = this.state.member.account || {};
     const copies = (account.copies || []).map((copy) => {
-      const c = {
+      return {
         id: copy.id,
         name: copy.item.name,
         editor: copy.item.editor,
@@ -169,8 +169,6 @@ export default class MemberView extends Component {
         sold: copy.transaction.filter((t) => t.code === 'SELL' || t.code === 'SELL_PARENT'),
         paid: copy.transaction.filter((t) => t.code === 'PAY'),
       };
-
-      return c;
     });
 
     return (
@@ -189,16 +187,20 @@ export default class MemberView extends Component {
 
   render() {
     const member = this.state.member;
-    return (
-      <Panel header={I18n.t('MemberView.title')} bsStyle={this.isActive() ? 'default' : 'danger'}>
-        <h3> {`${member.first_name || ''} ${member.last_name || ''}`}</h3>
+
+    return member ? (
+      <Panel
+        header={I18n.t('MemberView.title')}
+        bsStyle={this.isActive() ? 'default' : 'danger'}
+      >
+        <h3>{`${member.first_name} ${member.last_name}`}</h3>
         {this.rendeGeneralInformation()}
         {this.renderAccountState()}
         {this.renderComments()}
         {this.renderStats()}
         {this.renderCopies()}
       </Panel>
-    );
+    ) : null;
   }
 }
 

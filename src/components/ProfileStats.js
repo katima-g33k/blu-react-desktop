@@ -5,30 +5,16 @@ import { Translate } from '../lib/i18n/i18n';
 export default class ProfileStats extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      copies: props.copies || [],
+    };
     this.getCopies = this.getCopies.bind(this);
     this.getPrice = this.getPrice.bind(this);
     this.calculateStats = this.calculateStats.bind(this);
   }
 
-  componentWillReceiveProps(props) {
-    let copies;
-    if (props) {
-      if (props.member && props.member.account) {
-        copies = props.member.account.copies;
-      }
-
-      if (props.item) {
-        copies = props.item.copies;
-      }
-    }
-
-    if (copies) {
-      this.setState({
-        copies,
-        stats: this.calculateStats(copies),
-      });
-    }
+  componentWillMount() {
+    this.setState({ stats: this.calculateStats(this.state.copies) });
   }
 
   getCopies(copies, filters) {
@@ -96,72 +82,68 @@ export default class ProfileStats extends Component {
         border: '1px #000 solid',
       },
     };
-    if (this.state.stats) {
-      return (
-        <table style={style.table}>
-          <tbody>
-            <tr>
-              <td colSpan={3} style={style.title}>
-                <Translate value="ProfileStats.added" />
-              </td>
-            </tr>
-            <tr>
-              <td colSpan={3} style={style.td}>
-                {this.state.stats.added.count} <Translate value="ProfileStats.books" />
-                <br/>
-                ({this.state.stats.added.price} $)
-              </td>
-            </tr>
-            <tr>
-              <td colSpan={2} style={style.title}>
-                <Translate value="ProfileStats.sold" />
-              </td>
-              <td style={style.title}>
-                <Translate value="ProfileStats.toSell" />
-              </td>
-            </tr>
-            <tr>
-              <td colSpan={2} style={style.td}>
-                {this.state.stats.sold.count} <Translate value="ProfileStats.books" />
-                <br/>
-                ({this.state.stats.sold.price} $)
-              </td>
-              <td rowSpan={3} style={style.td}>
-                {this.state.stats.toSell.count} <Translate value="ProfileStats.books" />
-                <br/>
-                ({this.state.stats.toSell.price} $)
-              </td>
-            </tr>
-            <tr>
-              <td style={style.title}>
-                <Translate value="ProfileStats.toPay" />
-              </td>
-              <td style={style.title}>
-                <Translate value="ProfileStats.paid" />
-              </td>
-            </tr>
-            <tr>
-              <td style={style.td}>
-                {this.state.stats.toPay.count} <Translate value="ProfileStats.books" />
-                <br/>
-                ({this.state.stats.toPay.price} $)
-              </td>
-              <td style={style.td}>
-                {this.state.stats.paid.count} <Translate value="ProfileStats.books" />
-                <br/>
-                ({this.state.stats.paid.price} $)
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      );
-    }
 
-    return null;
+    return this.state.stats ? (
+      <table style={style.table}>
+        <tbody>
+          <tr>
+            <td colSpan={3} style={style.title}>
+              <Translate value="ProfileStats.added" />
+            </td>
+          </tr>
+          <tr>
+            <td colSpan={3} style={style.td}>
+              {this.state.stats.added.count} <Translate value="ProfileStats.books" />
+              <br/>
+              ({this.state.stats.added.price} $)
+            </td>
+          </tr>
+          <tr>
+            <td colSpan={2} style={style.title}>
+              <Translate value="ProfileStats.sold" />
+            </td>
+            <td style={style.title}>
+              <Translate value="ProfileStats.toSell" />
+            </td>
+          </tr>
+          <tr>
+            <td colSpan={2} style={style.td}>
+              {this.state.stats.sold.count} <Translate value="ProfileStats.books" />
+              <br/>
+              ({this.state.stats.sold.price} $)
+            </td>
+            <td rowSpan={3} style={style.td}>
+              {this.state.stats.toSell.count} <Translate value="ProfileStats.books" />
+              <br/>
+              ({this.state.stats.toSell.price} $)
+            </td>
+          </tr>
+          <tr>
+            <td style={style.title}>
+              <Translate value="ProfileStats.toPay" />
+            </td>
+            <td style={style.title}>
+              <Translate value="ProfileStats.paid" />
+            </td>
+          </tr>
+          <tr>
+            <td style={style.td}>
+              {this.state.stats.toPay.count} <Translate value="ProfileStats.books" />
+              <br/>
+              ({this.state.stats.toPay.price} $)
+            </td>
+            <td style={style.td}>
+              {this.state.stats.paid.count} <Translate value="ProfileStats.books" />
+              <br/>
+              ({this.state.stats.paid.price} $)
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    ) : null;
   }
 }
 
 ProfileStats.propTypes = {
-  member: React.PropTypes.shape(),
-  item: React.PropTypes.shape(),
+  copies: React.PropTypes.array,
 };

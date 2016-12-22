@@ -115,3 +115,42 @@ export const MemberCopyColumns = [
     },
   },
 ];
+
+export const ItemCopyColumns = [
+  {
+    key: 'id',
+    id: true,
+  },
+  {
+    key: 'member',
+    label: I18n.t('TableColumns.itemCopy.member'),
+  },
+  {
+    key: 'added',
+    label: I18n.t('TableColumns.itemCopy.added'),
+    value(transaction) {
+      return transaction[0] ? moment(transaction[0].date).format('LL') : '';
+    },
+  },
+  {
+    key: 'sold',
+    label: I18n.t('TableColumns.itemCopy.sold'),
+    value(transaction) {
+      return transaction[0] ? moment(transaction[0].date).format('LL') : '';
+    },
+  },
+  {
+    key: 'paid',
+    label: I18n.t('TableColumns.itemCopy.paid'),
+    value(transaction) {
+      return transaction[0] ? moment(transaction[0].date).format('LL') : '';
+    },
+  },
+  {
+    key: 'price',
+    label: I18n.t('TableColumns.itemCopy.price'),
+    value(prix) {
+      return `${prix} $`;
+    },
+  },
+];

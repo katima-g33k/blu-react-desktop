@@ -7,6 +7,32 @@ const fr = {
   },
   ItemView: {
     title: 'Ouvrage',
+    information: {
+      title: 'Informations',
+      authors: 'Auteur.e.s',
+      edition: 'Édition',
+      editor: 'Éditeur',
+      publication: 'Année de parution',
+      barcode: 'Code EAN13',
+      comment: 'Commentaire',
+    },
+    internalManagement: {
+      title: 'Gestion interne',
+      status: 'Statut',
+      valid: 'Valide',
+      outdated: 'Désuet',
+      removed: 'Retiré',
+      category: 'Catégorie',
+      subject: 'Matière',
+      storage: 'Caisses de rangement',
+    },
+    stats: {
+      title: 'Statistiques',
+    },
+    copies: {
+      title: 'Liste des exemplaires',
+      none: 'Aucun exemplaire',
+    },
   },
   MemberForm: {
     title: 'Formulaire du membre',
@@ -38,7 +64,7 @@ const fr = {
     },
     copies: {
       title: 'Liste des exemplaires',
-      none: '',
+      none: 'Aucun exemplaire',
     },
   },
   ProfileStats: {
@@ -86,6 +112,13 @@ const fr = {
     comment: {
       comment: 'Commentaire',
       date: 'Date',
+    },
+    itemCopy: {
+      member: 'Membre',
+      added: 'Mis en vente',
+      sold: 'Vendu',
+      paid: 'Argent remis',
+      price: 'Prix',
     },
     memberCopy: {
       title: 'Titre',
