@@ -23,9 +23,24 @@ export default class App extends Component {
       }
 
       if (event.key === 'À') {
-        const code = 2 + this.state.barcode.replace(/\D/g, '').slice(1, 9);
+        const code = this.state.barcode.replace(/\D/g, '');
+
+        switch (code.length) {
+          case 10:
+            const no = 2 + code.slice(1, 9);
+            // TODO: call member/exists
+            location.href = `/member/${no}`;
+            break;
+          case 13:
+            // TODO call  item/exists
+            const id = 0;
+            location.href = `/item/${id}`;
+            break;
+          default:
+            // TODO: Alert code not supported
+        }
+
         this.setState({ barcode: '' });
-        location.href = `/member/${code}`;
       }
 
       if (this.state.barcode.length > 25) {
