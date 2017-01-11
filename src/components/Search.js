@@ -86,6 +86,12 @@ export default class Search extends Component {
   }
 
   render() {
+    const tableMemberOptions = {
+      onRowClick(member) {
+        location.href = `member/${member.no}`;
+      },
+      noDataText: I18n.t('Search.results.none'),
+    };
     return (
       <Panel header={I18n.t('Search.title')}>
         <Row>
@@ -141,7 +147,7 @@ export default class Search extends Component {
               columns={this.state.columns}
               data={this.state.data}
               highlight={this.state.search}
-              placeholder={I18n.t('Search.results.none')}
+              options={tableMemberOptions}
             />
           </Col>
         </Row>

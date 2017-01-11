@@ -59,7 +59,7 @@ export default class App extends Component {
           <Col md={2}>
             <Sidebar />
           </Col>
-          <Col sm={12} md={8}>
+          <Col sm={12} md={10}>
             <Routes />
           </Col>
         </main>

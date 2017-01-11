@@ -1,15 +1,23 @@
 import React, { Component } from 'react';
-import { Panel } from 'react-bootstrap';
+import { Link } from 'react-router';
+import { Col, Glyphicon, Panel, Row } from 'react-bootstrap';
 import Table from './Table';
 import HTTP from '../lib/HTTP';
 import moment from 'moment';
 import { CommentColumns, MemberCopyColumns } from '../lib/TableColumns';
 import ProfileStats from './ProfileStats';
 import I18n, { Translate } from '../lib/i18n/i18n';
+import AlignedData from './AlignedData';
+import ActionPanel from './ActionPanel';
 
 const formatDate = (date) => {
   return date ? moment(date).format('LL') : '';
 };
+
+const border = {
+  borderRight: '1px #e0e0e0 solid',
+};
+
 
 export default class MemberView extends Component {
   constructor(props) {
@@ -26,6 +34,9 @@ export default class MemberView extends Component {
     this.renderComments = this.renderComments.bind(this);
     this.renderStats = this.renderStats.bind(this);
     this.renderCopies = this.renderCopies.bind(this);
+    this.addComment = this.addComment.bind(this);
+
+    this.renderActions = this.renderActions.bind(this);
   }
 
   componentWillMount() {
@@ -60,9 +71,9 @@ export default class MemberView extends Component {
     const address = street ? `${street}, ${city} (${state}) ${zip}` : '';
 
     return (
-      <p>
-        <Translate value="MemberView.general.address" />: {address}
-      </p>
+      <AlignedData
+        label={<Translate value="MemberView.general.address" />}
+        value={address} />
     );
   }
 
@@ -73,12 +84,13 @@ export default class MemberView extends Component {
     return phones.map((phone, index) => {
       const number = phone.number.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
       const note = phone.note ? `(${phone.note})` : '';
-
-      return (
-        <p key={`phone${index}`}>
-          <Translate value="MemberView.general.phone" /> {index + 1}: {number} {note}
-        </p>
+      const label = (
+        <span>
+          <Translate value="MemberView.general.phone" /> {index + 1}
+        </span>
       );
+
+      return (<AlignedData key={index} label={label} value={`${number} ${note}`} />);
     });
   }
 
@@ -89,13 +101,9 @@ export default class MemberView extends Component {
         <h4>
           <Translate value="MemberView.general.title" />
         </h4>
-        <p>
-          <Translate value="MemberView.general.no" />: {member.no || ''}
-        </p>
+        <AlignedData label={<Translate value="MemberView.general.no" />} value={member.no || ''} />
         {this.renderAddress()}
-        <p>
-          <Translate value="MemberView.general.email" />: {member.email || ''}
-        </p>
+        <AlignedData label={<Translate value="MemberView.general.email" />} value={member.email || ''} />
         {this.renderPhones()}
       </section>
     );
@@ -108,28 +116,47 @@ export default class MemberView extends Component {
         <h4>
           <Translate value="MemberView.account.title" />
         </h4>
-        <p>
-          <Translate value="MemberView.account.activation" />{': '}
-          <Translate value={`MemberView.account.${this.isActive() ? 'active' : 'deactivated'}`} />
-        </p>
-        <p>
-          <Translate value="MemberView.account.registration" />: {formatDate(account.registration)}
-        </p>
-        <p>
-          <Translate value="MemberView.account.lastActivity" />: {formatDate(account.last_activity)}
-        </p>
-        <p>
-          <Translate value="MemberView.account.registration" />{': '}
-          {formatDate(this.getDeactivationDate(account.last_activity))}
-        </p>
+        <AlignedData
+          label={<Translate value="MemberView.account.activation" />}
+          value={<Translate value={`MemberView.account.${this.isActive() ? 'active' : 'deactivated'}`} />}
+        />
+        <AlignedData
+          label={<Translate value="MemberView.account.registration" />}
+          value={formatDate(account.registration)}
+        />
+        <AlignedData
+          label={<Translate value="MemberView.account.lastActivity" />}
+          value={formatDate(account.last_activity)}
+        />
+        <AlignedData
+          label={<Translate value="MemberView.account.registration" />}
+          value={formatDate(this.getDeactivationDate(account.last_activity))}
+        />
       </section>
     );
+  }
+
+  addComment(event) {
+    event.preventDefault();
   }
 
   renderComments() {
     const member = this.state.member;
     const account = member.account || {};
     const comments = account.comment || [];
+    const footerStyle = {
+      textAlign: 'center',
+    };
+    const footer = (
+      <td
+        colSpan={2}
+        style={footerStyle}
+      >
+        <Link to="#" onClick={this.addComment}>
+          <Glyphicon glyph="plus" />
+        </Link>
+      </td>
+    );
 
     return (
       <section>
@@ -139,6 +166,7 @@ export default class MemberView extends Component {
         <Table
           columns={CommentColumns}
           data={comments}
+          footer={footer}
           placeholder={I18n.t('MemberView.comment.none')}
         />
       </section>
@@ -159,17 +187,27 @@ export default class MemberView extends Component {
   renderCopies() {
     const account = this.state.member.account || {};
     const copies = (account.copies || []).map((copy) => {
+      const soldT = copy.transaction.filter((t) => t.code === 'SELL' || t.code === 'SELL_PARENT')[0];
+      const sold = soldT ? moment(soldT.date) : null;
+      const paidT = copy.transaction.filter((t) => t.code === 'PAY')[0];
+      const paid = paidT ? moment(paidT.date) : null;
       return {
         id: copy.id,
         name: copy.item.name,
         editor: copy.item.editor,
         edition: copy.item.edition,
         price: copy.price,
-        added: copy.transaction.filter((t) => t.code === 'ADD'),
-        sold: copy.transaction.filter((t) => t.code === 'SELL' || t.code === 'SELL_PARENT'),
-        paid: copy.transaction.filter((t) => t.code === 'PAY'),
+        added: moment(copy.transaction.filter((t) => t.code === 'ADD')[0].date),
+        sold,
+        paid,
       };
     });
+
+    const options = {
+      onRowClick(item) {
+        location.href = `item/${item.id}`;
+      },
+    };
 
     return (
       <section>
@@ -180,26 +218,60 @@ export default class MemberView extends Component {
           columns={MemberCopyColumns}
           data={copies}
           placeholder={I18n.t('MemberView.copies.none')}
+          sortable
+          options={options}
         />
       </section>
     );
+  }
+
+  renderActions() {
+    const actions = [
+      {
+        label: 'Modifier',
+        href: `/member/form/${this.state.member.no}`,
+        style: 'primary',
+      },
+      {
+        label: 'Ajouter des livres',
+        onClick(event) {
+          event.preventDefault();
+        },
+        style: 'primary',
+      },
+    ];
+
+    return (<ActionPanel actions={actions} />);
   }
 
   render() {
     const member = this.state.member;
 
     return member ? (
-      <Panel
-        header={I18n.t('MemberView.title')}
-        bsStyle={this.isActive() ? 'default' : 'danger'}
-      >
-        <h3>{`${member.first_name} ${member.last_name}`}</h3>
-        {this.rendeGeneralInformation()}
-        {this.renderAccountState()}
-        {this.renderComments()}
-        {this.renderStats()}
-        {this.renderCopies()}
-      </Panel>
+      <Row>
+        <Col md={10}>
+          <Panel
+            header={I18n.t('MemberView.title')}
+            bsStyle={this.isActive() ? 'default' : 'danger'}
+          >
+            <h3>{`${member.first_name} ${member.last_name}`}</h3>
+            <Row>
+              <Col sm={12} md={6} style={border}>{this.rendeGeneralInformation()}</Col>
+              <Col sm={12} md={6}>{this.renderAccountState()}</Col>
+            </Row>
+            <hr/>
+            <Row>
+              <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
+              <Col sm={12} md={6}>{this.renderComments()}</Col>
+            </Row>
+            <hr/>
+            <Row>
+              <Col md={12}>{this.renderCopies()}</Col>
+            </Row>
+          </Panel>
+        </Col>
+        <Col md={2}>{this.renderActions()}</Col>
+      </Row>
     ) : null;
   }
 }

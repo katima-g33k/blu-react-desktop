@@ -1,19 +1,28 @@
 import moment from 'moment';
 import I18n from './i18n/i18n';
 
+const highlightResults = (cell, row, extra = {}) => {
+  const regex = new RegExp(`(${extra.highlight})`, 'i');
+
+  return cell.split(regex).map((string) => {
+    return regex.test(string) ? `<span class="highlight">${string}</span>` : string;
+  }).join('');
+};
+
 export const CommentColumns = [
   {
-    key: 'id',
-    id: true,
+    dataField: 'id',
+    isKey: true,
+    hidden: true,
   },
   {
-    key: 'comment',
+    dataField: 'comment',
     label: I18n.t('TableColumns.comment.comment'),
   },
   {
-    key: 'updated_at',
+    dataField: 'updated_at',
     label: I18n.t('TableColumns.comment.date'),
-    value(date) {
+    dataFormat(date) {
       return date ? moment(date).format('LL') : '';
     },
   },
@@ -22,95 +31,117 @@ export const CommentColumns = [
 export const SearchColumns = {
   member: [
     {
-      key: 'no',
+      dataField: 'no',
       label: I18n.t('TableColumns.search.member.no'),
-      id: true,
+      dataSort: true,
+      isKey: true,
+      dataFormat: highlightResults,
+      formatExtraData: { props: ['highlight'] },
     },
     {
-      key: 'first_name',
+      dataField: 'first_name',
       label: I18n.t('TableColumns.search.member.firstName'),
+      dataSort: true,
+      dataFormat: highlightResults,
+      formatExtraData: { props: ['highlight'] },
     },
     {
-      key: 'last_name',
+      dataField: 'last_name',
       label: I18n.t('TableColumns.search.member.lastName'),
+      dataSort: true,
+      dataFormat: highlightResults,
+      formatExtraData: { props: ['highlight'] },
     },
   ],
   item: [
     {
-      key: 'id',
-      id: true,
+      dataField: 'id',
+      isKey: true,
     },
     {
-      key: 'name',
+      dataField: 'name',
       label: I18n.t('TableColumns.search.item.title'),
+      dataSort: true,
+      dataFormat: highlightResults,
+      formatExtraData: { props: ['highlight'] },
     },
     {
-      key: 'editor',
+      dataField: 'editor',
       label: I18n.t('TableColumns.search.item.editor'),
+      dataSort: true,
+      dataFormat: highlightResults,
+      formatExtraData: { props: ['highlight'] },
     },
     {
-      key: 'edition',
+      dataField: 'edition',
       label: I18n.t('TableColumns.search.item.edition'),
+      dataSort: true,
+      dataFormat: highlightResults,
+      formatExtraData: { props: ['highlight'] },
     },
     {
-      key: 'publication',
+      dataField: 'publication',
       label: I18n.t('TableColumns.search.item.publication'),
+      dataSort: true,
+      dataFormat: highlightResults,
     },
     {
-      key: 'author',
+      dataField: 'author',
       label: I18n.t('TableColumns.search.item.authors'),
-      value(authors) {
+      dataFormat(authors) {
         if (!Array.isArray(authors)) {
           return '';
         }
         return authors.map((author) => `${author.first_name} ${author.last_name}`).join(', ');
       },
+      formatExtraData: { props: ['highlight'] },
     },
   ],
 };
 
 export const MemberCopyColumns = [
   {
-    key: 'id',
-    id: true,
+    dataField: 'id',
+    isKey: true,
+    hidden: true,
   },
   {
-    key: 'name',
+    dataField: 'name',
     label: I18n.t('TableColumns.memberCopy.title'),
   },
   {
-    key: 'editor',
+    dataField: 'editor',
     label: I18n.t('TableColumns.memberCopy.editor'),
   },
   {
-    key: 'edition',
+    dataField: 'edition',
     label: I18n.t('TableColumns.memberCopy.edition'),
   },
   {
-    key: 'added',
+    dataField: 'added',
     label: I18n.t('TableColumns.memberCopy.added'),
-    value(transaction) {
-      return transaction[0] ? moment(transaction[0].date).format('LL') : '';
+    dataFormat(date) {
+      return date === '' ? '' : moment(date).format('LL');
     },
   },
   {
-    key: 'sold',
+    dataField: 'sold',
     label: I18n.t('TableColumns.memberCopy.sold'),
-    value(transaction) {
-      return transaction[0] ? moment(transaction[0].date).format('LL') : '';
+    dataFormat(date) {
+      return date ? moment(date).format('LL') : '';
     },
   },
   {
-    key: 'paid',
+    dataField: 'paid',
     label: I18n.t('TableColumns.memberCopy.paid'),
-    value(transaction) {
-      return transaction[0] ? moment(transaction[0].date).format('LL') : '';
+    dataFormat(date) {
+      return date ? moment(date).format('LL') : '';
     },
   },
   {
-    key: 'price',
+    dataField: 'price',
     label: I18n.t('TableColumns.memberCopy.price'),
-    value(prix) {
+    dataFormat(prix) {
       return `${prix} $`;
     },
   },
@@ -118,38 +149,39 @@ export const MemberCopyColumns = [
 
 export const ItemCopyColumns = [
   {
-    key: 'id',
-    id: true,
+    dataField: 'id',
+    isKey: true,
+    hidden: true,
   },
   {
-    key: 'member',
+    dataField: 'member',
     label: I18n.t('TableColumns.itemCopy.member'),
   },
   {
-    key: 'added',
+    dataField: 'added',
     label: I18n.t('TableColumns.itemCopy.added'),
-    value(transaction) {
+    dataFormat(transaction) {
       return transaction[0] ? moment(transaction[0].date).format('LL') : '';
     },
   },
   {
-    key: 'sold',
+    dataField: 'sold',
     label: I18n.t('TableColumns.itemCopy.sold'),
-    value(transaction) {
+    dataFormat(transaction) {
       return transaction[0] ? moment(transaction[0].date).format('LL') : '';
     },
   },
   {
-    key: 'paid',
+    dataField: 'paid',
     label: I18n.t('TableColumns.itemCopy.paid'),
-    value(transaction) {
+    dataFormat(transaction) {
       return transaction[0] ? moment(transaction[0].date).format('LL') : '';
     },
   },
   {
-    key: 'price',
+    dataField: 'price',
     label: I18n.t('TableColumns.itemCopy.price'),
-    value(prix) {
+    dataFormat(prix) {
       return `${prix} $`;
     },
   },

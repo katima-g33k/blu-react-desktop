@@ -17,6 +17,7 @@ export default class Routes extends Component {
         </Route>
         <Route path="/search" component={Search} />
         <Route path="/member" component={MemberForm} />
+        <Route name="editMember" path="/member/form/:no" component={MemberForm} />
         <Route path="/member/:no" component={MemberView} />
         <Route path="/member/:no/edit" component={MemberForm} />
         <Route path="/item" component={ItemForm} />
