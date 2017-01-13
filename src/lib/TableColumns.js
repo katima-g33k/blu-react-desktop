@@ -1,3 +1,5 @@
+import React from 'react';
+import { Button, Glyphicon, Row } from 'react-bootstrap';
 import moment from 'moment';
 import I18n from './i18n/i18n';
 
@@ -57,6 +59,7 @@ export const SearchColumns = {
     {
       dataField: 'id',
       isKey: true,
+      hidden: true,
     },
     {
       dataField: 'name',
@@ -108,18 +111,25 @@ export const MemberCopyColumns = [
   {
     dataField: 'name',
     label: I18n.t('TableColumns.memberCopy.title'),
+    dataSort: true,
+    width: 400,
   },
   {
     dataField: 'editor',
     label: I18n.t('TableColumns.memberCopy.editor'),
+    dataSort: true,
   },
   {
     dataField: 'edition',
     label: I18n.t('TableColumns.memberCopy.edition'),
+    dataSort: true,
+    width: 85,
   },
   {
     dataField: 'added',
     label: I18n.t('TableColumns.memberCopy.added'),
+    dataSort: true,
+    width: 150,
     dataFormat(date) {
       return date === '' ? '' : moment(date).format('LL');
     },
@@ -127,6 +137,8 @@ export const MemberCopyColumns = [
   {
     dataField: 'sold',
     label: I18n.t('TableColumns.memberCopy.sold'),
+    dataSort: true,
+    width: 150,
     dataFormat(date) {
       return date ? moment(date).format('LL') : '';
     },
@@ -134,6 +146,8 @@ export const MemberCopyColumns = [
   {
     dataField: 'paid',
     label: I18n.t('TableColumns.memberCopy.paid'),
+    dataSort: true,
+    width: 150,
     dataFormat(date) {
       return date ? moment(date).format('LL') : '';
     },
@@ -141,8 +155,45 @@ export const MemberCopyColumns = [
   {
     dataField: 'price',
     label: I18n.t('TableColumns.memberCopy.price'),
+    dataSort: true,
+    width: 60,
     dataFormat(prix) {
       return `${prix} $`;
+    },
+  },
+  {
+    dataField: 'action',
+    label: 'Actions',
+    dataAlign: 'center',
+    width: 125,
+    dataFormat(cell, row) {
+      const cancelSell = (object) => {
+        const event = object.nativeEvent;
+        event.preventDefault();
+        console.log(object.nativeEvent);
+      };
+
+      if (row.paid) {
+        return '';
+      } else if (row.sold) {
+        return (
+          <Row>
+            <Button bsStyle='danger' onClick={cancelSell}>
+              <Glyphicon glyph="ban-circle" />
+            </Button>
+          </Row>
+        );
+      }
+
+      return (
+        <Row>
+          <Button bsStyle='success'>$</Button>
+          <Button>$$</Button>
+          <Button bsStyle='danger'>
+            <Glyphicon glyph="trash" />
+          </Button>
+        </Row>
+      );
     },
   },
 ];

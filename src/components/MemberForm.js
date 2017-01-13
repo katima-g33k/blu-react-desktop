@@ -1,17 +1,8 @@
 import React, { Component } from 'react';
-import {
-  Button,
-  ButtonToolbar,
-  Checkbox,
-  Col,
-  Form,
-  FormControl,
-  FormGroup,
-  ControlLabel,
-  Panel,
-} from 'react-bootstrap';
+import { Col, Panel } from 'react-bootstrap';
 import I18n from '../lib/i18n/i18n';
 import HTTP from '../lib/HTTP';
+import AutoForm from './AutoForm';
 
 const generalInputs = [
   {
@@ -101,10 +92,8 @@ export default class MemberForm extends Component {
     this.state = {
       states: [],
       member: {},
+      temp: contactInputs,
     };
-    this.renderFormGroup = this.renderFormGroup.bind(this);
-    this.renderOptions = this.renderOptions.bind(this);
-    this.onChange = this.onChange.bind(this);
   }
 
   componentWillMount() {
@@ -124,97 +113,22 @@ export default class MemberForm extends Component {
     }
   }
 
-  onChange(event) {
-    const member = this.state.member;
-    member[event.target.id] = event.target.value;
-    this.setState({ member });
-  }
-
-  renderOptions() {
-    return this.state.states.map((option) => {
-      return (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      );
-    });
-  }
-
-  renderFormGroup(inputs) {
-    return inputs.map((input) => {
-      const keys = input.key.split('.');
-      let value = this.state.member;
-      keys.forEach((key) => {
-        value = value ? value[key] : value;
-      });
-
-      if (input.type === 'checkbox') {
-        return (
-          <FormGroup key={input.key} controlId={input.key}>
-            <Col smOffset={2} mdOffset={3} sm={10} md={9}>
-              {this.state.member[input.key] ? (
-                <Checkbox checked onChange={this.onChange}>{input.label}</Checkbox>
-              ) : (
-                <Checkbox onChange={this.onChange}>{input.label}</Checkbox>
-              )}
-            </Col>
-          </FormGroup>
-        );
-      }
-
-      return (
-        <FormGroup key={input.key} controlId={input.key}>
-          <Col componentClass={ControlLabel} sm={2} md={3}>
-            {input.label}
-          </Col>
-          <Col sm={10} md={9}>
-            {input.type === 'select' ? (
-              <FormControl
-                componentClass={input.type}
-                value={input.default}
-                onChange={this.onChange}
-              >
-                {this.renderOptions()}
-              </FormControl>
-            ) : (
-              <FormControl
-                type={input.type}
-                placeholder={input.placeholder || ''}
-                onChange={this.onChange}
-                value={value}
-              />
-            )}
-          </Col>
-        </FormGroup>
-      );
-    });
-  }
-
   render() {
-    return !this.props.params.no || this.state.member ? (
+    const options = {
+      horizontal: true,
+    };
+    return (
       <Panel header={I18n.t('MemberForm.title')}>
         <Col md={8}>
-          <Form horizontal>
-            <h3>Modifier un membre</h3>
-            {this.renderFormGroup(generalInputs)}
-            <h4>Adresse postale</h4>
-            {this.renderFormGroup(contactInputs)}
-            <FormGroup>
-              <Col smOffset={2} mdOffset={3} sm={10} md={9}>
-                <ButtonToolbar>
-                  <Button bsStyle="danger">
-                    Annuler
-                  </Button>
-                  <Button type="submit" bsStyle="success">
-                    Enregistrer
-                  </Button>
-                </ButtonToolbar>
-              </Col>
-            </FormGroup>
-          </Form>
+          <AutoForm
+            schema={generalInputs}
+            data={this.state.member}
+            title={!this.props.params.no ? 'Ajouter un membre' : 'Modifier un membre'}
+            options={options}
+          />
         </Col>
       </Panel>
-    ) : null;
+    );
   }
 }
 

@@ -35,13 +35,8 @@ export default class Table extends Component {
       }
       return (
         <TableHeaderColumn
-          dataField={column.dataField}
-          dataSort={column.dataSort}
-          isKey={column.isKey}
+          {...column}
           key={column.dataField + index}
-          dataFormat={column.dataFormat}
-          formatExtraData={formatExtraData}
-          hidden={column.hidden}
         >
           {column.label}
         </TableHeaderColumn>
