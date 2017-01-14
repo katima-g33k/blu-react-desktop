@@ -8,6 +8,7 @@ import {
   FormControl,
   FormGroup,
   ControlLabel,
+  Row,
 } from 'react-bootstrap';
 
 export default class AutoForm extends Component {
@@ -18,7 +19,7 @@ export default class AutoForm extends Component {
       schema: props.schema || [],
     };
 
-    this.renderSection = this.renderSection.bind(this);
+    this.renderSections = this.renderSections.bind(this);
     this.renderCheckbox = this.renderCheckbox.bind(this);
     this.renderOptions = this.renderOptions.bind(this);
     this.renderSelect = this.renderSelect.bind(this);
@@ -26,6 +27,10 @@ export default class AutoForm extends Component {
     this.renderActions = this.renderActions.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onCheckChange = this.onCheckChange.bind(this);
+    this.getValue = this.getValue.bind(this);
+    this.renderFields = this.renderFields.bind(this);
+    this.renderInline = this.renderInline.bind(this);
+    this.renderField = this.renderField.bind(this);
   }
 
   componentWillReceiveProps(props) {
@@ -35,26 +40,61 @@ export default class AutoForm extends Component {
     });
   }
 
-  onChange(event) {
-    const data = this.state.data;
-    data[event.target.id] = event.target.value;
+  getValue(key) {
+    const keys = key.split('.');
+
+    if (keys.length === 1) {
+      return this.state.data[key];
+    }
+
+    let value = this.state.data;
+    keys.forEach((k) => {
+      value = value[k] ? value[k] : value;
+    });
+
+    return typeof value === 'object' ? '' : value;
+  }
+
+  onChange(event, inputOnChange) {
+    const data = inputOnChange || this.state.data;
+
+    if (!inputOnChange) {
+      data[event.target.id] = event.target.value;
+    }
+
     this.setState({ data });
   }
 
-  onCheckChange(event) {
-    const data = this.state.data;
-    data[event.target.id] = event.target.checked;
+  onCheckChange(event, inputOnChange) {
+    const data = inputOnChange || this.state.data;
+
+    if (!inputOnChange) {
+      data[event.target.id] = event.target.checked;
+    }
+
     this.setState({ data });
   }
 
-  renderCheckbox(input, index) {
+  renderCheckbox(input) {
+    const checked = !!this.getValue(input.key);
+    const data = this.state.data;
+    const onChange = this.onCheckChange;
+    const actions = {
+      onChange(event) {
+        if (input.onChange) {
+          onChange(event, input.onChange(event, data));
+        } else {
+          onChange(event);
+        }
+      },
+    };
     return (
-      <FormGroup key={index}>
+      <FormGroup key={input.key}>
         <Col smOffset={2} mdOffset={3} sm={10} md={9}>
           <Checkbox
             id={input.key}
-            onChange={this.onCheckChange}
-            checked={!!this.state.data[input.key]}
+            onChange={actions.onChange}
+            checked={checked}
           >
             {input.label}
           </Checkbox>
@@ -76,17 +116,28 @@ export default class AutoForm extends Component {
     });
   }
 
-  renderSelect(input, index) {
+  renderSelect(input) {
+    const data = this.state.data;
+    const onChange = this.onChange;
+    const actions = {
+      onChange(event) {
+        if (input.onChange) {
+          onChange(event, input.onChange(event, data));
+        } else {
+          onChange(event);
+        }
+      },
+    };
     return (
-      <FormGroup key={index} controlId={input.key}>
+      <FormGroup key={input.key} controlId={input.key}>
         <Col componentClass={ControlLabel} sm={2} md={3}>
           {input.label}
         </Col>
         <Col sm={10} md={9}>
           <FormControl
-            componentClass={input.type}
-            value={input.default}
-            onChange={this.onChange}
+            componentClass='select'
+            value={this.getValue(input.key) || input.default}
+            onChange={actions.onChange}
           >
             {this.renderOptions(input.options)}
           </FormControl>
@@ -95,10 +146,22 @@ export default class AutoForm extends Component {
     );
   }
 
-  renderInput(input, index) {
-    const value = this.state.data[input.key];
+  renderInput(input) {
+    const data = this.state.data;
+    const value = input.value ? input.value(this.getValue(input.key), data) : this.getValue(input.key);
+    const onChange = this.onChange;
+    const actions = {
+      onChange(event) {
+        if (input.onChange) {
+          onChange(event, input.onChange(event, data));
+        } else {
+          onChange(event);
+        }
+      },
+    };
+    // const
     return (
-      <FormGroup key={index} controlId={input.key}>
+      <FormGroup key={input.key} controlId={input.key}>
         <Col componentClass={ControlLabel} sm={2} md={3}>
           {input.label}
         </Col>
@@ -106,7 +169,7 @@ export default class AutoForm extends Component {
           <FormControl
             type={input.type}
             placeholder={input.placeholder}
-            onChange={this.onChange}
+            onChange={actions.onChange}
             value={value}
           />
         </Col>
@@ -114,31 +177,67 @@ export default class AutoForm extends Component {
     );
   }
 
-  renderSection(fields) {
-    return fields.map((input, index) => {
-      const keys = input.key.split('.');
-      let value = this.state.data;
-      keys.forEach((key) => {
-        value = value ? value[key] : value;
-      });
+  renderInline(fields) {
+    const width = Math.floor(12 / fields.length);
+    const inlineFields = fields.map((field) => {
+      return (<Col md={width}>{this.renderField(field)}</Col>);
+    });
 
-      if (input.type === 'checkbox') {
-        return this.renderCheckbox(input, index);
-      }
+    return (
+      <Col>{inlineFields}</Col>
+    );
+  }
 
-      if (input.type === 'select') {
-        return this.renderSelect(input, index);
-      }
+  renderField(field) {
+    const keys = field.key.split('.');
+    let value = this.state.data;
+    keys.forEach((key) => {
+      value = value ? value[key] : value;
+    });
 
-      return this.renderInput(input, index);
+    if (field.type === 'checkbox') {
+      return this.renderCheckbox(field);
+    }
+
+    if (field.type === 'select') {
+      return this.renderSelect(field);
+    }
+
+    return this.renderInput(field);
+  }
+
+  renderFields(fields) {
+    return fields.map((field) => {
+      return field.inline ? this.renderInline(field.inline) : this.renderField(field);
+    });
+  }
+
+  renderSections(sections) {
+    return sections.map((section, index) => {
+      return (
+        <FormGroup key={`section${index}`}>
+          {section.title ? (
+            <Col componentClass={section.titleClass || 'h2'}>
+              {section.title}
+            </Col>
+          ) : ''}
+          {this.renderFields(section.fields)}
+          <hr/>
+        </FormGroup>
+      );
     });
   }
 
   renderActions(actions) {
+    const data = this.state.data;
     const buttons = actions.map((action, index) => {
+      const onClick = (event) => {
+        action.onClick(event, data);
+      };
       return (
         <Button
           key={`action${index}`}
+          onClick={onClick}
           {...action.options}
         >
           {action.label}
@@ -159,19 +258,18 @@ export default class AutoForm extends Component {
 
   render() {
     return (
-      <Form {...this.props.options}>
-        <h3>{this.props.title}</h3>
-        {this.renderSection(this.props.schema)}
+      <Form {...this.state.schema.options}>
+        <Col componentClass={this.state.schema.titleClass || 'h1'}>
+          {this.state.schema.title}
+        </Col>
+        {this.renderSections(this.state.schema.sections)}
+        {this.renderActions(this.state.schema.actions)}
       </Form>
     );
   }
 }
 
 AutoForm.propTypes = {
-  actions: React.PropTypes.shape(),
   data: React.PropTypes.shape(),
-  options: React.PropTypes.shape(),
-  schema: React.PropTypes.array,
-  title: React.PropTypes.string,
-  titleClass: React.PropTypes.string,
+  schema: React.PropTypes.shape(),
 };
