@@ -30,10 +30,19 @@ const schema = {
           placeholder: 'Nom',
         },
         {
-          key: 'no',
-          type: 'number',
-          label: 'Numéro de membre',
-          placeholder: '200000000',
+          inline: [
+            {
+              key: 'no',
+              type: 'number',
+              label: 'Numéro de membre',
+              placeholder: '200000000',
+            },
+            {
+              label: 'Pas de numéro',
+              key: 'noNo',
+              type: 'checkbox',
+            },
+          ],
         },
       ],
     },

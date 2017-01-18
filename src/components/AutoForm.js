@@ -4,11 +4,10 @@ import {
   ButtonToolbar,
   Checkbox,
   Col,
+  ControlLabel,
   Form,
   FormControl,
   FormGroup,
-  ControlLabel,
-  Row,
 } from 'react-bootstrap';
 
 export default class AutoForm extends Component {
@@ -16,7 +15,7 @@ export default class AutoForm extends Component {
     super(props);
     this.state = {
       data: props.data || {},
-      schema: props.schema || [],
+      schema: props.schema || {},
     };
 
     this.renderSections = this.renderSections.bind(this);
@@ -31,6 +30,7 @@ export default class AutoForm extends Component {
     this.renderFields = this.renderFields.bind(this);
     this.renderInline = this.renderInline.bind(this);
     this.renderField = this.renderField.bind(this);
+    this.renderOptgroups = this.renderOptgroups.bind(this);
   }
 
   componentWillReceiveProps(props) {
@@ -40,16 +40,16 @@ export default class AutoForm extends Component {
     });
   }
 
-  getValue(key) {
-    const keys = key.split('.');
+  getValue(dotNotation) {
+    const keys = dotNotation.split('.');
 
     if (keys.length === 1) {
-      return this.state.data[key];
+      return this.state.data[dotNotation];
     }
 
     let value = this.state.data;
-    keys.forEach((k) => {
-      value = value[k] ? value[k] : value;
+    keys.forEach((key) => {
+      value = value[key] ? value[key] : value;
     });
 
     return typeof value === 'object' ? '' : value;
@@ -116,6 +116,19 @@ export default class AutoForm extends Component {
     });
   }
 
+  renderOptgroups(optgroups) {
+    return optgroups.map((optgroup, index) => {
+      return (
+        <optgroup
+          key={`optgroup${index}`}
+          label={optgroup.label}
+        >
+          {this.renderOptions(optgroup.options)}
+        </optgroup>
+      );
+    });
+  }
+
   renderSelect(input) {
     const data = this.state.data;
     const onChange = this.onChange;
@@ -128,6 +141,7 @@ export default class AutoForm extends Component {
         }
       },
     };
+
     return (
       <FormGroup key={input.key} controlId={input.key}>
         <Col componentClass={ControlLabel} sm={2} md={3}>
@@ -139,7 +153,7 @@ export default class AutoForm extends Component {
             value={this.getValue(input.key) || input.default}
             onChange={actions.onChange}
           >
-            {this.renderOptions(input.options)}
+            {input.optgroups ? this.renderOptgroups(input.optgroups) : this.renderOptions(input.options || [])}
           </FormControl>
         </Col>
       </FormGroup>
@@ -159,7 +173,7 @@ export default class AutoForm extends Component {
         }
       },
     };
-    // const
+
     return (
       <FormGroup key={input.key} controlId={input.key}>
         <Col componentClass={ControlLabel} sm={2} md={3}>
@@ -179,12 +193,19 @@ export default class AutoForm extends Component {
 
   renderInline(fields) {
     const width = Math.floor(12 / fields.length);
-    const inlineFields = fields.map((field) => {
-      return (<Col md={width}>{this.renderField(field)}</Col>);
+    const inlineFields = fields.map((field, index) => {
+      return (
+        <Col
+          md={width}
+          key={`inline${index}`}
+        >
+          {this.renderField(field)}
+        </Col>
+      );
     });
 
     return (
-      <Col>{inlineFields}</Col>
+      <Col key={fields[0].key}>{inlineFields}</Col>
     );
   }
 
