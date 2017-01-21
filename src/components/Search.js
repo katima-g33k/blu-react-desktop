@@ -14,25 +14,6 @@ import Table from './Table.js';
 import I18n, { Translate } from '../lib/i18n/i18n';
 import { SearchColumns } from '../lib/TableColumns';
 
-const actions = {
-  member: {
-    row: {
-      onClick(event) {
-        const id = event.target.parentNode.getAttribute('data-id');
-        location.href = `member/${id}`;
-      },
-    },
-  },
-  item: {
-    row: {
-      onClick(event) {
-        const id = event.target.parentNode.getAttribute('data-id');
-        location.href = `item/${id}`;
-      },
-    },
-  },
-};
-
 export default class Search extends Component {
   constructor(props) {
     super(props);
@@ -40,8 +21,7 @@ export default class Search extends Component {
       isLoading: false,
       search: '',
       data: [],
-      columns: SearchColumns.member,
-      type: 'member',
+      type: props.type || 'member',
       archives: false,
     };
     this.search = this.search.bind(this);
@@ -76,7 +56,6 @@ export default class Search extends Component {
     const type = event.target.value;
     this.setState({
       type,
-      columns: SearchColumns[type],
       data: [],
     });
   }
@@ -86,20 +65,27 @@ export default class Search extends Component {
   }
 
   render() {
-    const tableMemberOptions = {
-      onRowClick(member) {
-        location.href = `member/${member.no}`;
+    const tableOptions = {
+      onRowClick: (data) => {
+        if (this.props.onRowClick) {
+          this.props.onRowClick(data);
+        } else {
+          location.href = data.no ? `member/${data.no}` : `item/${data.id}`;
+        }
       },
       noDataText: I18n.t('Search.results.none'),
     };
+
     return (
-      <Panel header={I18n.t('Search.title')}>
+      <Panel header={this.props.noHeader ? null : I18n.t('Search.title')}>
         <Row>
           <Col sm={10} md={10}>
             <form>
               <FormControl
                 type="search"
-                onChange={this.handleInput} />
+                onChange={this.handleInput}
+              />
+              {this.props.type ? null : (
                 <FormGroup>
                   <Radio
                     name="type"
@@ -120,6 +106,7 @@ export default class Search extends Component {
                     <Translate value="Search.filters.item" />
                   </Radio>
                 </FormGroup>
+              )}
               <Checkbox
                 onChange={this.handleArchive}
                 checked={this.state.archives}
@@ -143,11 +130,10 @@ export default class Search extends Component {
               <Translate value="Search.results.title" /> ({this.state.data.length})
             </h3>
             <Table
-              actions={actions[this.state.type]}
-              columns={this.state.columns}
+              columns={SearchColumns[this.state.type]}
               data={this.state.data}
               highlight={this.state.search}
-              options={tableMemberOptions}
+              options={tableOptions}
             />
           </Col>
         </Row>
@@ -155,3 +141,9 @@ export default class Search extends Component {
     );
   }
 }
+
+Search.propTypes = {
+  noHeader: React.PropTypes.bool,
+  type: React.PropTypes.string,
+  onRowClick: React.PropTypes.func,
+};

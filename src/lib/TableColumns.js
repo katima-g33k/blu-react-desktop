@@ -112,7 +112,7 @@ export const MemberCopyColumns = [
     dataField: 'name',
     label: I18n.t('TableColumns.memberCopy.title'),
     dataSort: true,
-    width: 400,
+    width: '400',
   },
   {
     dataField: 'editor',
@@ -123,13 +123,13 @@ export const MemberCopyColumns = [
     dataField: 'edition',
     label: I18n.t('TableColumns.memberCopy.edition'),
     dataSort: true,
-    width: 85,
+    width: '85',
   },
   {
     dataField: 'added',
     label: I18n.t('TableColumns.memberCopy.added'),
     dataSort: true,
-    width: 150,
+    width: '150',
     dataFormat(date) {
       return date === '' ? '' : moment(date).format('LL');
     },
@@ -138,7 +138,7 @@ export const MemberCopyColumns = [
     dataField: 'sold',
     label: I18n.t('TableColumns.memberCopy.sold'),
     dataSort: true,
-    width: 150,
+    width: '150',
     dataFormat(date) {
       return date ? moment(date).format('LL') : '';
     },
@@ -147,7 +147,7 @@ export const MemberCopyColumns = [
     dataField: 'paid',
     label: I18n.t('TableColumns.memberCopy.paid'),
     dataSort: true,
-    width: 150,
+    width: '150',
     dataFormat(date) {
       return date ? moment(date).format('LL') : '';
     },
@@ -156,7 +156,7 @@ export const MemberCopyColumns = [
     dataField: 'price',
     label: I18n.t('TableColumns.memberCopy.price'),
     dataSort: true,
-    width: 60,
+    width: '60',
     dataFormat(prix) {
       return `${prix} $`;
     },
@@ -165,12 +165,11 @@ export const MemberCopyColumns = [
     dataField: 'action',
     label: 'Actions',
     dataAlign: 'center',
-    width: 125,
+    width: '125',
     dataFormat(cell, row) {
       const cancelSell = (object) => {
         const event = object.nativeEvent;
         event.preventDefault();
-        console.log(object.nativeEvent);
       };
 
       if (row.paid) {

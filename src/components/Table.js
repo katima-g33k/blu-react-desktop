@@ -60,8 +60,6 @@ export default class Table extends Component {
 }
 
 Table.propTypes = {
-  actions: React.PropTypes.shape(),
-  columns: React.PropTypes.array,
   data: React.PropTypes.array,
   highlight: React.PropTypes.string,
   placeholder: React.PropTypes.string,

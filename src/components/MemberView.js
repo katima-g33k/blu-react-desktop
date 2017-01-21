@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
-import { Col, Glyphicon, Panel, Row } from 'react-bootstrap';
+import { Col, Glyphicon, Label, Panel, Row } from 'react-bootstrap';
 import Table from './Table';
 import HTTP from '../lib/HTTP';
 import moment from 'moment';
@@ -11,7 +11,7 @@ import AlignedData from './AlignedData';
 import ActionPanel from './ActionPanel';
 
 const formatDate = (date) => {
-  return date ? moment(date).format('LL') : '';
+  return date ? moment(new Date(date)).format('LL') : '';
 };
 
 const border = {
@@ -118,7 +118,11 @@ export default class MemberView extends Component {
         </h4>
         <AlignedData
           label={<Translate value="MemberView.account.activation" />}
-          value={<Translate value={`MemberView.account.${this.isActive() ? 'active' : 'deactivated'}`} />}
+          value={
+            <Label bsStyle={this.isActive() ? 'success' : 'danger'}>
+              <Translate value={`MemberView.account.${this.isActive() ? 'active' : 'deactivated'}`} />
+            </Label>
+          }
         />
         <AlignedData
           label={<Translate value="MemberView.account.registration" />}

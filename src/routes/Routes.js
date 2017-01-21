@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
+import AddCopies from '../components/AddCopies';
 import Admin from '../components/Admin';
 import ItemForm from '../components/ItemForm';
 import ItemView from '../components/ItemView';
@@ -20,6 +21,7 @@ export default class Routes extends Component {
         <Route name="editMember" path="/member/form/:no" component={MemberForm} />
         <Route path="/member/:no" component={MemberView} />
         <Route path="/member/:no/edit" component={MemberForm} />
+        <Route path="/member/:id/addCopies" component={AddCopies} />
         <Route path="/item" component={ItemForm} />
         <Route path="/item/:id" component={ItemView} />
         <Route path="/item/:id/edit" component={ItemForm} />
