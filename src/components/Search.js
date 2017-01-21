@@ -13,6 +13,7 @@ import HTTP from '../lib/HTTP';
 import Table from './Table.js';
 import I18n, { Translate } from '../lib/i18n/i18n';
 import { SearchColumns } from '../lib/TableColumns';
+import settings from '../settings.json';
 
 export default class Search extends Component {
   constructor(props) {
@@ -42,7 +43,7 @@ export default class Search extends Component {
       deactivated: this.state.archives,
     };
 
-    HTTP.post(`http://localhost/blu-api/${this.state.type}/search`, data, (err, res) => {
+    HTTP.post(`${settings.apiUrl}/${this.state.type}/search`, data, (err, res) => {
       if (res) {
         this.setState({
           data: res,

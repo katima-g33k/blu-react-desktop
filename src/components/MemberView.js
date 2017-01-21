@@ -9,6 +9,7 @@ import ProfileStats from './ProfileStats';
 import I18n, { Translate } from '../lib/i18n/i18n';
 import AlignedData from './AlignedData';
 import ActionPanel from './ActionPanel';
+import settings from '../settings.json';
 
 const formatDate = (date) => {
   return date ? moment(new Date(date)).format('LL') : '';
@@ -40,7 +41,7 @@ export default class MemberView extends Component {
   }
 
   componentWillMount() {
-    const url = 'http://localhost/blu-api/member/select';
+    const url = `${settings.apiUrl}/member/select`;
     const data = {
       no: this.props.params.no,
     };

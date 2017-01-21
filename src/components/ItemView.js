@@ -5,6 +5,7 @@ import HTTP from '../lib/HTTP';
 import ProfileStats from './ProfileStats';
 import Table from './Table';
 import { ItemCopyColumns } from '../lib/TableColumns';
+import settings from '../settings';
 
 export default class ItemView extends Component {
   constructor(props) {
@@ -24,7 +25,7 @@ export default class ItemView extends Component {
   }
 
   componentWillMount() {
-    const url = 'http://localhost/blu-api/item/select';
+    const url = `${settings.apiUrl}/item/select`;
     const data = {
       id: this.props.params.id,
     };

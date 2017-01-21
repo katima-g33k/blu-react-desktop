@@ -3,6 +3,7 @@ import { Col, Panel } from 'react-bootstrap';
 import I18n from '../lib/i18n/i18n';
 import HTTP from '../lib/HTTP';
 import AutoForm from './AutoForm';
+import settings from '../settings.json';
 
 const schema = {
   titleClass: 'h3',
@@ -202,7 +203,7 @@ export default class MemberForm extends Component {
   }
 
   componentWillMount() {
-    HTTP.post('http://localhost/blu-api/state/select', {}, (err, states) => {
+    HTTP.post(`${settings.apiUrl}/state/select`, {}, (err, states) => {
       if (states) {
         this.setState({ states });
       }
@@ -210,7 +211,7 @@ export default class MemberForm extends Component {
 
     if (this.props.params.no) {
       const no = this.props.params.no;
-      HTTP.post('http://localhost/blu-api/member/select', { no }, (err, member) => {
+      HTTP.post(`${settings.apiUrl}/blu-api/member/select`, { no }, (err, member) => {
         if (member) {
           this.setState({ member });
         }

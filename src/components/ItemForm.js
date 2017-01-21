@@ -3,6 +3,7 @@ import { Col, Panel } from 'react-bootstrap';
 import I18n from '../lib/i18n/i18n';
 import AutoForm from '../components/AutoForm';
 import HTTP from '../lib/HTTP';
+import settings from '../settings.json';
 
 const schema = {
   title: 'Modifier un ouvrage',
@@ -89,7 +90,7 @@ export default class ItemForm extends Component {
   }
 
   componentWillMount() {
-    HTTP.post('http://localhost/blu-api/category/select', {}, (err, categories) => {
+    HTTP.post(`${settings.apiURL}/category/select`, {}, (err, categories) => {
       if (categories) {
         this.setState({ categories });
       }

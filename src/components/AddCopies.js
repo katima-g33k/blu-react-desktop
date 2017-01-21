@@ -4,6 +4,26 @@ import Search from './Search';
 import Table from './Table';
 import InputModal from './modals/InputModal';
 import HTTP from '../lib/HTTP';
+import settings from '../settings.json';
+
+const columns = [
+  {
+    dataField: 'id',
+    isKey: true,
+    hidden: true,
+  },
+  {
+    dataField: 'title',
+    label: 'Titre',
+  },
+  {
+    dataField: 'price',
+    label: 'Prix',
+    dataFormat(cell) {
+      return `${cell} $`;
+    },
+  },
+];
 
 export default class AddCopies extends Component {
   constructor(props) {
@@ -19,40 +39,23 @@ export default class AddCopies extends Component {
     this.renderModal = this.renderModal.bind(this);
     this.deleteCopy = this.deleteCopy.bind(this);
     this.save = this.save.bind(this);
-    this.columns = [
-      {
-        dataField: 'id',
-        isKey: true,
-        hidden: true,
+    this.columns = columns;
+    this.columns.push({
+      dataField: 'action',
+      label: 'Actions',
+      dataAlign: 'center',
+      dataFormat: (cell, row) => {
+        const onClick = (event) => {
+          event.preventDefault();
+          this.deleteCopy(row.id);
+        };
+        return !row.reservation ? (
+          <Button bsStyle="danger" onClick={onClick}>
+            <Glyphicon glyph="trash" />
+          </Button>
+        ) : null;
       },
-      {
-        dataField: 'title',
-        label: 'Titre',
-      },
-      {
-        dataField: 'price',
-        label: 'Prix',
-        dataFormat(cell) {
-          return `${cell} $`;
-        },
-      },
-      {
-        dataField: 'action',
-        label: 'Actions',
-        dataAlign: 'center',
-        dataFormat: (cell, row) => {
-          const onClick = (event) => {
-            event.preventDefault();
-            this.deleteCopy(row.id);
-          };
-          return !row.reservation ? (
-            <Button bsStyle='danger' onClick={onClick} data-id={row.id}>
-              <Glyphicon glyph="trash" />
-            </Button>
-          ) : null;
-        },
-      },
-    ];
+    });
   }
 
   closeModal(state = {}) {
@@ -70,7 +73,7 @@ export default class AddCopies extends Component {
       price: value,
     };
 
-    HTTP.post('http://localhost/blu-api/copy/insert', data, (err, res) => {
+    HTTP.post(`${settings.apiUrl}/copy/insert`, data, (err, res) => {
       if (err) {
         this.closeModal();
         // TODO: Display error message
@@ -90,7 +93,7 @@ export default class AddCopies extends Component {
   }
 
   deleteCopy(id) {
-    HTTP.post('http://localhost/blu-api/copy/delete', { id }, (err) => {
+    HTTP.post(`${settings.apiUrl}/copy/delete`, { id }, (err) => {
       if (err) {
         // TODO: Display error message
         return;
