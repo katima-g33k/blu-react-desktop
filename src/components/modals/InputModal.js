@@ -7,22 +7,6 @@ export default class InputModal extends Component {
     this.state = {
       value: props.value || '',
     };
-
-    this.onChange = this.onChange.bind(this);
-    this.onSave = this.onSave.bind(this);
-    this.onCancel = this.onCancel.bind(this);
-  }
-
-  onChange(event) {
-    this.setState({ value: event.target.value });
-  }
-
-  onCancel(event) {
-    this.props.onCancel(event, this.state.value, this.props.name);
-  }
-
-  onSave(event) {
-    this.props.onSave(event, this.state.value, this.props.name);
   }
 
   render() {
@@ -37,22 +21,22 @@ export default class InputModal extends Component {
           <p>{this.props.message}</p>
           <FormControl
             type={this.props.type || 'text'}
-            onChange={this.onChange}
+            onChange={(event) => this.setState({ value: event.target.value })}
             value={this.state.value}
             componentClass={this.props.textarea ? 'textarea' : 'input'}
           />
         </Modal.Body>
         <Modal.Footer>
           <Button
-            onClick={this.onCancel}
+            onClick={(event) => this.props.onCancel(event, this.state.value)}
           >
-            Annuler
+            {'Annuler'}
           </Button>
           <Button
-            bsStyle="primary"
-            onClick={this.onSave}
+            bsStyle={this.props.saveStyle || 'primary'}
+            onClick={(event) => this.props.onSave(event, this.state.value)}
           >
-            Save changes
+            {'Sauvegarder'}
           </Button>
         </Modal.Footer>
       </Modal.Dialog>
@@ -62,11 +46,11 @@ export default class InputModal extends Component {
 
 InputModal.propTypes = {
   message: React.PropTypes.string,
-  onCancel: React.PropTypes.func,
-  onSave: React.PropTypes.func,
+  onCancel: React.PropTypes.func.isRequired,
+  onSave: React.PropTypes.func.isRequired,
+  saveStyle: React.PropTypes.string,
   textarea: React.PropTypes.bool,
-  title: React.PropTypes.string,
-  value: React.PropTypes.string,
+  title: React.PropTypes.string.isRequired,
   type: React.PropTypes.string,
-  name: React.PropTypes.string,
+  value: React.PropTypes.string,
 };

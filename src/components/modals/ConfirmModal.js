@@ -2,10 +2,6 @@ import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
 export default class ConfirmModal extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     return (
       <Modal.Dialog>
