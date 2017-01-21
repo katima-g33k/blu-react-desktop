@@ -9,19 +9,10 @@ export default class Table extends Component {
     };
 
     this.renderColumns = this.renderColumns.bind(this);
-    this.renderFooter = this.renderFooter.bind(this);
   }
 
   componentWillReceiveProps(props) {
     this.setState({ data: props.data });
-  }
-
-  renderFooter() {
-    return this.props.footer ? (
-      <tfoot>
-        <tr>{this.props.footer}</tr>
-      </tfoot>
-    ) : null;
   }
 
   renderColumns() {
@@ -61,8 +52,8 @@ export default class Table extends Component {
 
 Table.propTypes = {
   data: React.PropTypes.array,
+  columns: React.PropTypes.array,
   highlight: React.PropTypes.string,
   placeholder: React.PropTypes.string,
-  footer: React.PropTypes.shape(),
   options: React.PropTypes.shape(),
 };

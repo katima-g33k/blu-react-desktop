@@ -18,11 +18,11 @@ export default class InputModal extends Component {
   }
 
   onCancel(event) {
-    this.props.onCancel(event, this.state.value);
+    this.props.onCancel(event, this.state.value, this.props.name);
   }
 
   onSave(event) {
-    this.props.onSave(event, this.state.value);
+    this.props.onSave(event, this.state.value, this.props.name);
   }
 
   render() {
@@ -68,4 +68,5 @@ InputModal.propTypes = {
   title: React.PropTypes.string,
   value: React.PropTypes.string,
   type: React.PropTypes.string,
+  name: React.PropTypes.string,
 };

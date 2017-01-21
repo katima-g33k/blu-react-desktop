@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router';
-import { Col, Glyphicon, Label, Panel, Row } from 'react-bootstrap';
-import Table from './Table';
-import HTTP from '../lib/HTTP';
+import { Col, Label, Panel, Row } from 'react-bootstrap';
+import { I18n, Translate } from 'react-i18nify';
+
 import moment from 'moment';
-import { CommentColumns, MemberCopyColumns } from '../lib/TableColumns';
-import ProfileStats from './ProfileStats';
-import I18n, { Translate } from '../lib/i18n/i18n';
-import AlignedData from './AlignedData';
+
 import ActionPanel from './ActionPanel';
+import AlignedData from './AlignedData';
+import HTTP from '../lib/HTTP';
+import MemberComments from './MemberComments';
+import { MemberCopyColumns } from '../lib/TableColumns';
+import ProfileStats from './ProfileStats';
 import settings from '../settings.json';
+import Table from './Table';
 
 const formatDate = (date) => {
   return date ? moment(new Date(date)).format('LL') : '';
@@ -24,7 +26,7 @@ export default class MemberView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      member: {},
+      member: null,
     };
     this.isActive = this.isActive.bind(this);
     this.rendeGeneralInformation = this.rendeGeneralInformation.bind(this);
@@ -32,10 +34,8 @@ export default class MemberView extends Component {
     this.renderPhones = this.renderPhones.bind(this);
     this.renderAccountState = this.renderAccountState.bind(this);
     this.getDeactivationDate = this.getDeactivationDate.bind(this);
-    this.renderComments = this.renderComments.bind(this);
     this.renderStats = this.renderStats.bind(this);
     this.renderCopies = this.renderCopies.bind(this);
-    this.addComment = this.addComment.bind(this);
 
     this.renderActions = this.renderActions.bind(this);
   }
@@ -141,43 +141,6 @@ export default class MemberView extends Component {
     );
   }
 
-  addComment(event) {
-    event.preventDefault();
-  }
-
-  renderComments() {
-    const member = this.state.member;
-    const account = member.account || {};
-    const comments = account.comment || [];
-    const footerStyle = {
-      textAlign: 'center',
-    };
-    const footer = (
-      <td
-        colSpan={2}
-        style={footerStyle}
-      >
-        <Link to="#" onClick={this.addComment}>
-          <Glyphicon glyph="plus" />
-        </Link>
-      </td>
-    );
-
-    return (
-      <section>
-        <h4>
-          <Translate value="MemberView.comment.title" />
-        </h4>
-        <Table
-          columns={CommentColumns}
-          data={comments}
-          footer={footer}
-          placeholder={I18n.t('MemberView.comment.none')}
-        />
-      </section>
-    );
-  }
-
   renderStats() {
     return this.state.member && this.state.member.account ? (
       <section>
@@ -267,7 +230,12 @@ export default class MemberView extends Component {
             <hr/>
             <Row>
               <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
-              <Col sm={12} md={6}>{this.renderComments()}</Col>
+              <Col sm={12} md={6}>
+                <MemberComments
+                  member={this.state.member.no}
+                  comments={this.state.member.account.comment}
+                />
+              </Col>
             </Row>
             <hr/>
             <Row>
