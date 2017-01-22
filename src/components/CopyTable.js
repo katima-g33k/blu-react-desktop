@@ -4,7 +4,7 @@ import { I18n, Translate } from 'react-i18nify';
 import moment from 'moment';
 
 import { ItemCopyColumns, MemberCopyColumns } from '../lib/TableColumns';
-import { ConfirmModal } from './modals';
+import { ConfirmModal, InputModal } from './modals';
 import HTTP from '../lib/HTTP';
 import settings from '../settings.json';
 import Table from './Table';
@@ -41,8 +41,24 @@ export default class CopyTable extends Component {
     this.delete = this.delete.bind(this);
     this.refund = this.refund.bind(this);
     this.sell = this.sell.bind(this);
+    this.updatePrice = this.updatePrice.bind(this);
 
     this.columns = props.member ? MemberCopyColumns : ItemCopyColumns;
+    this.columns.map((column) => {
+      if (column.dataField === 'price') {
+        column.dataFormat = (cell, row) => {
+          return (
+            <Button
+              bsStyle="link"
+              onClick={() => this.setState({ activeCopy: row, showModal: 'update' })}
+              disabled={!!row.sold}
+            >
+              {`${cell} $`}
+            </Button>
+          );
+        };
+      }
+    });
     this.columns.push({
       dataField: 'action',
       label: 'Actions',
@@ -152,6 +168,22 @@ export default class CopyTable extends Component {
     });
   }
 
+  updatePrice(event, value) {
+    const copies = this.state.copies.map((copy) => {
+      if (copy.id === this.state.activeCopy.id) {
+        copy.price = value;
+      }
+
+      return copy;
+    });
+
+    this.setState({
+      copies,
+      showModal: null,
+      activeCopy: null,
+    });
+  }
+
   render() {
     const copies = formatCopies(this.state.copies);
 
@@ -173,6 +205,16 @@ export default class CopyTable extends Component {
             onConfirm={this.delete}
             onCancel={() => this.setState({ activeCopy: null, showModal: null })}
             confirmationStyle="danger"
+          />
+        ) : null}
+        {this.state.showModal === 'update' ? (
+          <InputModal
+            message="Entrer le nouveau montant"
+            title={'Mettre à jour le prix'}
+            type="number"
+            value={this.state.activeCopy.price}
+            onSave={this.updatePrice}
+            onCancel={() => this.setState({ activeCopy: null, showModal: null })}
           />
         ) : null}
       </section>

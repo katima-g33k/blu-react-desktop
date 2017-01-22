@@ -163,9 +163,6 @@ export const MemberCopyColumns = [
     label: I18n.t('TableColumns.memberCopy.price'),
     dataSort: true,
     width: '60',
-    dataFormat(prix) {
-      return `${prix} $`;
-    },
   },
 ];
 
@@ -209,8 +206,5 @@ export const ItemCopyColumns = [
   {
     dataField: 'price',
     label: I18n.t('TableColumns.itemCopy.price'),
-    dataFormat(prix) {
-      return `${prix} $`;
-    },
   },
 ];
