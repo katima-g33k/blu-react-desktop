@@ -178,26 +178,32 @@ export const ItemCopyColumns = [
   {
     dataField: 'member',
     label: I18n.t('TableColumns.itemCopy.member'),
+    dataFormat(cell, row) {
+      return (
+        <Link to={{ pathname: `/member/${row.member.no}` }}>
+          {row.member.first_name} {row.member.last_name}
+        </Link>);
+    },
   },
   {
     dataField: 'added',
     label: I18n.t('TableColumns.itemCopy.added'),
-    dataFormat(transaction) {
-      return transaction[0] ? moment(transaction[0].date).format('LL') : '';
+    dataFormat(date) {
+      return date ? moment(date).format('LL') : '';
     },
   },
   {
     dataField: 'sold',
     label: I18n.t('TableColumns.itemCopy.sold'),
-    dataFormat(transaction) {
-      return transaction[0] ? moment(transaction[0].date).format('LL') : '';
+    dataFormat(date) {
+      return date ? moment(date).format('LL') : '';
     },
   },
   {
     dataField: 'paid',
     label: I18n.t('TableColumns.itemCopy.paid'),
-    dataFormat(transaction) {
-      return transaction[0] ? moment(transaction[0].date).format('LL') : '';
+    dataFormat(date) {
+      return date ? moment(date).format('LL') : '';
     },
   },
   {

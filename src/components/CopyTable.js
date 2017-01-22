@@ -4,25 +4,12 @@ import { I18n, Translate } from 'react-i18nify';
 import moment from 'moment';
 
 import { ItemCopyColumns, MemberCopyColumns } from '../lib/TableColumns';
-// import { ConfirmModal, InputModal } from './modals';
+import { ConfirmModal } from './modals';
 import HTTP from '../lib/HTTP';
 import settings from '../settings.json';
 import Table from './Table';
 
-const getItemCopies = (copies) => {
-  return copies.map((copy) => {
-    return {
-      id: copy.id,
-      member: `${copy.member.first_name} ${copy.member.last_name}`,
-      price: copy.price,
-      added: copy.transaction.filter((t) => t.code === 'ADD'),
-      sold: copy.transaction.filter((t) => t.code === 'SELL' || t.code === 'SELL_PARENT'),
-      paid: copy.transaction.filter((t) => t.code === 'PAY'),
-    };
-  });
-};
-
-const getMemberCopies = (copies) => {
+const formatCopies = (copies) => {
   return copies.map((copy) => {
     const soldT = copy.transaction.filter((t) => t.code === 'SELL' || t.code === 'SELL_PARENT')[0];
     const sold = soldT ? moment(soldT.date) : null;
@@ -30,14 +17,15 @@ const getMemberCopies = (copies) => {
     const paid = paidT ? moment(paidT.date) : null;
     return {
       id: copy.id,
-      name: copy.item.name,
-      editor: copy.item.editor,
-      edition: copy.item.edition,
       price: copy.price,
       added: moment(copy.transaction.filter((t) => t.code === 'ADD')[0].date),
       sold,
       paid,
+      name: copy.item ? copy.item.name : null,
+      editor: copy.item ? copy.item.editor : null,
+      edition: copy.item ? copy.item.edition : null,
       item: copy.item,
+      member: copy.member,
     };
   });
 };
@@ -47,6 +35,7 @@ export default class CopyTable extends Component {
     super(props);
     this.state = {
       copies: props.copies,
+      showModal: null,
     };
 
     this.delete = this.delete.bind(this);
@@ -87,7 +76,7 @@ export default class CopyTable extends Component {
             </Button>
             <Button
               bsStyle='danger'
-              onClick={() => this.delete(row.id)}
+              onClick={() => this.setState({ activeCopy: row, showModal: 'delete' })}
             >
               <Glyphicon glyph="trash" />
             </Button>
@@ -97,7 +86,9 @@ export default class CopyTable extends Component {
     });
   }
 
-  delete(id) {
+  delete() {
+    const id = this.state.activeCopy.id;
+
     HTTP.post(`${settings.apiUrl}/copy/delete`, { id }, (err) => {
       if (err) {
         // TODO: Display error message
@@ -108,7 +99,7 @@ export default class CopyTable extends Component {
         return copy.id !== id;
       });
 
-      this.setState({ copies });
+      this.setState({ copies, showModal: null, activeCopy: null });
     });
   }
 
@@ -162,7 +153,7 @@ export default class CopyTable extends Component {
   }
 
   render() {
-    const copies = this.props.member ? getMemberCopies(this.state.copies) : getItemCopies(this.state.copies);
+    const copies = formatCopies(this.state.copies);
 
     return (
       <section>
@@ -175,6 +166,15 @@ export default class CopyTable extends Component {
           placeholder={I18n.t('MemberView.copies.none')}
           sortable
         />
+        {this.state.showModal === 'delete' ? (
+          <ConfirmModal
+            message={'Souhaitez-vous vraiment supprimer cet exemplaire ?'}
+            title="Supprimer un exemplaire"
+            onConfirm={this.delete}
+            onCancel={() => this.setState({ activeCopy: null, showModal: null })}
+            confirmationStyle="danger"
+          />
+        ) : null}
       </section>
     );
   }
