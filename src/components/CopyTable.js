@@ -43,8 +43,7 @@ export default class CopyTable extends Component {
     this.sell = this.sell.bind(this);
     this.updatePrice = this.updatePrice.bind(this);
 
-    this.columns = props.member ? MemberCopyColumns : ItemCopyColumns;
-    this.columns.map((column) => {
+    this.columns = (props.member ? MemberCopyColumns : ItemCopyColumns).map((column) => {
       if (column.dataField === 'price') {
         column.dataFormat = (cell, row) => {
           return (
@@ -58,12 +57,14 @@ export default class CopyTable extends Component {
           );
         };
       }
+
+      return column;
     });
     this.columns.push({
       dataField: 'action',
       label: 'Actions',
       dataAlign: 'center',
-      width: '125',
+      width: '175',
       dataFormat: (cell, row) => {
         if (row.paid) {
           return '';
@@ -79,6 +80,12 @@ export default class CopyTable extends Component {
 
         return (
           <ButtonGroup>
+            <Button
+              bsStyle="primary"
+              onClick={() => {}}
+            >
+              <Glyphicon glyph="user" />
+            </Button>
             <Button
               bsStyle='success'
               onClick={() => this.sell(row, true)}
