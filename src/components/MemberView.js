@@ -158,10 +158,28 @@ export default class MemberView extends Component {
       },
       {
         label: 'Ajouter des livres',
-        onClick(event) {
-          event.preventDefault();
-        },
+        href: `/member/${this.state.member.no}/addCopies`,
         style: 'primary',
+      },
+      {
+        label: 'Renouveler le compte',
+        style: 'primary',
+        onClick: (event) => {
+          event.preventDefault();
+
+          const member = this.state.member;
+          const data = { no: member.no };
+
+          HTTP.post(`${settings.apiUrl}/member/renew`, data, (err) => {
+            if (err) {
+              // TODO: display error message
+              return;
+            }
+
+            member.account.last_activity = moment();
+            this.setState({ member });
+          });
+        },
       },
     ];
 

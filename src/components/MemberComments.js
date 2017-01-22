@@ -21,29 +21,32 @@ export default class MemberComment extends Component {
     this.saveComment = this.saveComment.bind(this);
 
     this.CommentColumns = CommentColumns;
-    this.CommentColumns.push({
-      dataField: 'action',
-      label: 'Actions',
-      dataAlign: 'center',
-      width: '100',
-      dataFormat: (cell, row) => {
-        return (
-          <ButtonGroup>
-            <Button
-              onClick={() => this.setState({ activeComment: row, showModal: 'input' })}
-            >
-              <Glyphicon glyph="pencil" />
-            </Button>
-            <Button
-              bsStyle="danger"
-              onClick={() => this.setState({ activeComment: row, showModal: 'confirm' })}
-            >
-              <Glyphicon glyph="trash" />
-            </Button>
-          </ButtonGroup>
-        );
-      },
-    });
+
+    if (this.CommentColumns[this.CommentColumns.length - 1].dataField !== 'action') {
+      this.CommentColumns.push({
+        dataField: 'action',
+        label: 'Actions',
+        dataAlign: 'center',
+        width: '100',
+        dataFormat: (cell, row) => {
+          return (
+            <ButtonGroup>
+              <Button
+                onClick={() => this.setState({ activeComment: row, showModal: 'input' })}
+              >
+                <Glyphicon glyph="pencil" />
+              </Button>
+              <Button
+                bsStyle="danger"
+                onClick={() => this.setState({ activeComment: row, showModal: 'confirm' })}
+              >
+                <Glyphicon glyph="trash" />
+              </Button>
+            </ButtonGroup>
+          );
+        },
+      });
+    }
   }
 
   deleteComment(event) {
