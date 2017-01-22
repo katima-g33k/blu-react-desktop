@@ -41,9 +41,11 @@ export default class Search extends Component {
     const data = {
       search: this.state.search,
       deactivated: this.state.archives,
+      is_parent: this.state.type === 'parent',
     };
+    const searchType = this.state.type === 'item' ? 'item' : 'member';
 
-    HTTP.post(`${settings.apiUrl}/${this.state.type}/search`, data, (err, res) => {
+    HTTP.post(`${settings.apiUrl}/${searchType}/search`, data, (err, res) => {
       if (res) {
         this.setState({
           data: res,
@@ -108,12 +110,14 @@ export default class Search extends Component {
                   </Radio>
                 </FormGroup>
               )}
-              <Checkbox
-                onChange={this.handleArchive}
-                checked={this.state.archives}
-              >
-                <Translate value="Search.filters.archives" />
-              </Checkbox>
+              {!this.props.disableArchive ? (
+                <Checkbox
+                  onChange={this.handleArchive}
+                  checked={this.state.archives}
+                >
+                  <Translate value="Search.filters.archives" />
+                </Checkbox>
+              ) : null}
               <Button
                 bsStyle="primary"
                 type="submit"
@@ -131,7 +135,7 @@ export default class Search extends Component {
               <Translate value="Search.results.title" /> ({this.state.data.length})
             </h3>
             <Table
-              columns={SearchColumns[this.state.type]}
+              columns={SearchColumns[this.state.type === 'parent' ? 'member' : this.state.type]}
               data={this.state.data}
               highlight={this.state.search}
               options={tableOptions}
@@ -144,6 +148,7 @@ export default class Search extends Component {
 }
 
 Search.propTypes = {
+  disableArchive: React.PropTypes.bool,
   noHeader: React.PropTypes.bool,
   type: React.PropTypes.string,
   onRowClick: React.PropTypes.func,

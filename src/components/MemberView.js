@@ -169,16 +169,16 @@ export default class MemberView extends Component {
   }
 
   render() {
-    const member = this.state.member;
-
-    return member ? (
+    return this.state.member ? (
       <Row>
         <Col md={10}>
           <Panel
             header={I18n.t('MemberView.title')}
             bsStyle={this.isActive() ? 'default' : 'danger'}
           >
-            <h3>{`${member.first_name} ${member.last_name}`}</h3>
+            <h3>
+              {`${this.state.member.first_name} ${this.state.member.last_name}`}
+            </h3>
             <Row>
               <Col sm={12} md={6} style={border}>{this.rendeGeneralInformation()}</Col>
               <Col sm={12} md={6}>{this.renderAccountState()}</Col>

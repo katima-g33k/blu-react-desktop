@@ -4,7 +4,7 @@ import { I18n, Translate } from 'react-i18nify';
 import moment from 'moment';
 
 import { ItemCopyColumns, MemberCopyColumns } from '../lib/TableColumns';
-import { ConfirmModal, InputModal } from './modals';
+import { ConfirmModal, InputModal, SearchModal } from './modals';
 import HTTP from '../lib/HTTP';
 import settings from '../settings.json';
 import Table from './Table';
@@ -15,12 +15,15 @@ const formatCopies = (copies) => {
     const sold = soldT ? moment(soldT.date) : null;
     const paidT = copy.transaction.filter((t) => t.code === 'PAY')[0];
     const paid = paidT ? moment(paidT.date) : null;
+    const reservedT = copy.transaction.filter((t) => t.code === 'RESERVE')[0];
+    const reserved = reservedT ? moment(reservedT.date) : null;
     return {
       id: copy.id,
       price: copy.price,
       added: moment(copy.transaction.filter((t) => t.code === 'ADD')[0].date),
       sold,
       paid,
+      reserved,
       name: copy.item ? copy.item.name : null,
       editor: copy.item ? copy.item.editor : null,
       edition: copy.item ? copy.item.edition : null,
@@ -38,8 +41,10 @@ export default class CopyTable extends Component {
       showModal: null,
     };
 
+    this.cancelReservation = this.cancelReservation.bind(this);
     this.delete = this.delete.bind(this);
     this.refund = this.refund.bind(this);
+    this.reserve = this.reserve.bind(this);
     this.sell = this.sell.bind(this);
     this.updatePrice = this.updatePrice.bind(this);
 
@@ -50,7 +55,7 @@ export default class CopyTable extends Component {
             <Button
               bsStyle="link"
               onClick={() => this.setState({ activeCopy: row, showModal: 'update' })}
-              disabled={!!row.sold}
+              disabled={!!row.sold || !!row.reserved}
             >
               {`${cell} $`}
             </Button>
@@ -78,11 +83,30 @@ export default class CopyTable extends Component {
           );
         }
 
+        if (row.reserved) {
+          return (
+            <ButtonGroup>
+              <Button
+                bsStyle="primary"
+                onClick={() => this.setState({ activeCopy: row, showModal: 'cancelReservation' })}
+              >
+                <Glyphicon glyph="ban-circle" />
+              </Button>
+              <Button
+                bsStyle='success'
+                onClick={() => this.sell(row, true)}
+              >
+                {'$'}
+              </Button>
+            </ButtonGroup>
+          );
+        }
+
         return (
           <ButtonGroup>
             <Button
               bsStyle="primary"
-              onClick={() => {}}
+              onClick={() => this.setState({ activeCopy: row, showModal: 'reserve' })}
             >
               <Glyphicon glyph="user" />
             </Button>
@@ -106,6 +130,32 @@ export default class CopyTable extends Component {
           </ButtonGroup>
         );
       },
+    });
+  }
+
+  cancelReservation() {
+    const id = this.state.activeCopy.id;
+    const data = {
+      copy: id,
+      type: 'RESERVE',
+    };
+    HTTP.post(`${settings.apiUrl}/transaction/delete`, data, (err) => {
+      if (err) {
+        // TODO: Display error message
+        return;
+      }
+
+      const copies = this.state.copies.map((c) => {
+        if (c.id === id) {
+          c.transaction = c.transaction.filter((transaction) => {
+            return transaction.code !== 'RESERVE';
+          });
+        }
+
+        return c;
+      });
+
+      this.setState({ copies, showModal: null, activeCopy: null });
     });
   }
 
@@ -148,6 +198,34 @@ export default class CopyTable extends Component {
       });
 
       this.setState({ copies });
+    });
+  }
+
+  reserve(parent) {
+    const data = {
+      member: parent.no,
+      copies: [this.state.activeCopy.id],
+      type: 'RESERVE',
+    };
+    HTTP.post(`${settings.apiUrl}/transaction/insert`, data, (err) => {
+      if (err) {
+        // TODO: Display error message
+        return;
+      }
+
+      const copies = this.state.copies.map((c) => {
+        if (c.id === this.state.activeCopy.id) {
+          c.transaction.push({ code: data.type, date: moment() });
+        }
+
+        return c;
+      });
+
+      this.setState({
+        copies,
+        activeCopy: null,
+        showModal: null,
+      });
     });
   }
 
@@ -214,6 +292,15 @@ export default class CopyTable extends Component {
             confirmationStyle="danger"
           />
         ) : null}
+        {this.state.showModal === 'cancelReservation' ? (
+          <ConfirmModal
+            message={'Souhaitez-vous vraiment annuler cette réservation ?'}
+            title="Anuller une réservation"
+            onConfirm={this.cancelReservation}
+            onCancel={() => this.setState({ activeCopy: null, showModal: null })}
+            confirmationStyle="danger"
+          />
+        ) : null}
         {this.state.showModal === 'update' ? (
           <InputModal
             message="Entrer le nouveau montant"
@@ -222,6 +309,14 @@ export default class CopyTable extends Component {
             value={this.state.activeCopy.price}
             onSave={this.updatePrice}
             onCancel={() => this.setState({ activeCopy: null, showModal: null })}
+          />
+        ) : null}
+        {this.state.showModal === 'reserve' ? (
+          <SearchModal
+            disableArchive
+            onCancel={() => this.setState({ activeCopy: null, showModal: null })}
+            onRowClick={this.reserve}
+            type="parent"
           />
         ) : null}
       </section>
