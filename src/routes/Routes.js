@@ -23,7 +23,7 @@ export default class Routes extends Component {
         <Route path="/member/:no/edit" component={MemberForm} />
         <Route path="/member/:id/addCopies" component={AddCopies} />
         <Route path="/item" component={ItemForm} />
-        <Route path="/item/:id" component={ItemView} />
+        <Route name="itemView" path="/item/:id" component={ItemView} />
         <Route path="/item/:id/edit" component={ItemForm} />
         <Route path="/admin" component={Admin} />
       </Router>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Glyphicon, Row } from 'react-bootstrap';
+import { Link } from 'react-router';
 import moment from 'moment';
 import I18n from './i18n/i18n';
 
@@ -113,6 +113,12 @@ export const MemberCopyColumns = [
     label: I18n.t('TableColumns.memberCopy.title'),
     dataSort: true,
     width: '400',
+    dataFormat(cell, row) {
+      return (
+        <Link to={{ pathname: `/item/${row.item.id}` }}>
+          {cell}
+        </Link>);
+    },
   },
   {
     dataField: 'editor',
@@ -159,40 +165,6 @@ export const MemberCopyColumns = [
     width: '60',
     dataFormat(prix) {
       return `${prix} $`;
-    },
-  },
-  {
-    dataField: 'action',
-    label: 'Actions',
-    dataAlign: 'center',
-    width: '125',
-    dataFormat(cell, row) {
-      const cancelSell = (object) => {
-        const event = object.nativeEvent;
-        event.preventDefault();
-      };
-
-      if (row.paid) {
-        return '';
-      } else if (row.sold) {
-        return (
-          <Row>
-            <Button bsStyle='danger' onClick={cancelSell}>
-              <Glyphicon glyph="ban-circle" />
-            </Button>
-          </Row>
-        );
-      }
-
-      return (
-        <Row>
-          <Button bsStyle='success'>$</Button>
-          <Button>$$</Button>
-          <Button bsStyle='danger'>
-            <Glyphicon glyph="trash" />
-          </Button>
-        </Row>
-      );
     },
   },
 ];

@@ -6,12 +6,11 @@ import moment from 'moment';
 
 import ActionPanel from './ActionPanel';
 import AlignedData from './AlignedData';
+import CopyTable from './CopyTable';
 import HTTP from '../lib/HTTP';
 import MemberComments from './MemberComments';
-import { MemberCopyColumns } from '../lib/TableColumns';
 import ProfileStats from './ProfileStats';
 import settings from '../settings.json';
-import Table from './Table';
 
 const formatDate = (date) => {
   return date ? moment(new Date(date)).format('LL') : '';
@@ -35,8 +34,6 @@ export default class MemberView extends Component {
     this.renderAccountState = this.renderAccountState.bind(this);
     this.getDeactivationDate = this.getDeactivationDate.bind(this);
     this.renderStats = this.renderStats.bind(this);
-    this.renderCopies = this.renderCopies.bind(this);
-
     this.renderActions = this.renderActions.bind(this);
   }
 
@@ -152,47 +149,6 @@ export default class MemberView extends Component {
     ) : null;
   }
 
-  renderCopies() {
-    const account = this.state.member.account || {};
-    const copies = (account.copies || []).map((copy) => {
-      const soldT = copy.transaction.filter((t) => t.code === 'SELL' || t.code === 'SELL_PARENT')[0];
-      const sold = soldT ? moment(soldT.date) : null;
-      const paidT = copy.transaction.filter((t) => t.code === 'PAY')[0];
-      const paid = paidT ? moment(paidT.date) : null;
-      return {
-        id: copy.id,
-        name: copy.item.name,
-        editor: copy.item.editor,
-        edition: copy.item.edition,
-        price: copy.price,
-        added: moment(copy.transaction.filter((t) => t.code === 'ADD')[0].date),
-        sold,
-        paid,
-      };
-    });
-
-    const options = {
-      onRowClick(item) {
-        location.href = `item/${item.id}`;
-      },
-    };
-
-    return (
-      <section>
-        <h4>
-          <Translate value="MemberView.copies.title" />
-        </h4>
-        <Table
-          columns={MemberCopyColumns}
-          data={copies}
-          placeholder={I18n.t('MemberView.copies.none')}
-          sortable
-          options={options}
-        />
-      </section>
-    );
-  }
-
   renderActions() {
     const actions = [
       {
@@ -239,7 +195,12 @@ export default class MemberView extends Component {
             </Row>
             <hr/>
             <Row>
-              <Col md={12}>{this.renderCopies()}</Col>
+              <Col md={12}>
+                <CopyTable
+                  member={this.state.member.no}
+                  copies={this.state.member.account.copies}
+                />
+              </Col>
             </Row>
           </Panel>
         </Col>

@@ -25,6 +25,7 @@ export default class MemberComment extends Component {
       dataField: 'action',
       label: 'Actions',
       dataAlign: 'center',
+      width: '100',
       dataFormat: (cell, row) => {
         return (
           <ButtonGroup>

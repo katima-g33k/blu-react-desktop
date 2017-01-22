@@ -3,21 +3,21 @@ import { Panel } from 'react-bootstrap';
 import I18n, { Translate } from '../lib/i18n/i18n';
 import HTTP from '../lib/HTTP';
 import ProfileStats from './ProfileStats';
-import Table from './Table';
-import { ItemCopyColumns } from '../lib/TableColumns';
 import settings from '../settings';
+import CopyTable from './CopyTable';
 
 export default class ItemView extends Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      item: null,
+    };
     this.renderInformation = this.renderInformation.bind(this);
     this.getAuthors = this.getAuthors.bind(this);
     this.getStorage = this.getStorage.bind(this);
     this.getStatus = this.getStatus.bind(this);
     this.renderInternalManagement = this.renderInternalManagement.bind(this);
     this.renderStats = this.renderStats.bind(this);
-    this.renderCopies = this.renderCopies.bind(this);
     this.isValid = this.isValid.bind(this);
     this.isOutdated = this.isOutdated.bind(this);
     this.isRemoved = this.isRemoved.bind(this);
@@ -157,36 +157,6 @@ export default class ItemView extends Component {
     ) : null;
   }
 
-  renderCopies() {
-    if (!this.state.item) {
-      return null;
-    }
-
-    const copies = this.state.item.copies.map((copy) => {
-      return {
-        id: copy.id,
-        member: `${copy.member.first_name} ${copy.member.last_name}`,
-        price: copy.price,
-        added: copy.transaction.filter((t) => t.code === 'ADD'),
-        sold: copy.transaction.filter((t) => t.code === 'SELL' || t.code === 'SELL_PARENT'),
-        paid: copy.transaction.filter((t) => t.code === 'PAY'),
-      };
-    });
-
-    return (
-      <section>
-        <h4>
-          <Translate value="MemberView.copies.title" />
-        </h4>
-        <Table
-          columns={ItemCopyColumns}
-          data={copies}
-          placeholder={I18n.t('MemberView.copies.none')}
-        />
-      </section>
-    );
-  }
-
   render() {
     return this.state.item ? (
       <Panel
@@ -197,7 +167,7 @@ export default class ItemView extends Component {
         {this.renderInformation()}
         {this.renderInternalManagement()}
         {this.renderStats()}
-        {this.renderCopies()}
+        <CopyTable copies={this.state.item.copies} />
       </Panel>
     ) : null;
   }
