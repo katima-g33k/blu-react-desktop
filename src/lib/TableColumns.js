@@ -3,6 +3,10 @@ import { Link } from 'react-router';
 import moment from 'moment';
 import I18n from './i18n/i18n';
 
+const formatDate = (date) => {
+  return moment(date).format('YYYY-MM-DD');
+};
+
 const highlightResults = (cell, row, extra = {}) => {
   const regex = new RegExp(`(${extra.highlight})`, 'i');
 
@@ -137,7 +141,7 @@ export const MemberCopyColumns = [
     dataSort: true,
     width: '150',
     dataFormat(date) {
-      return date === '' ? '' : moment(date).format('LL');
+      return date ? formatDate(date) : '';
     },
   },
   {
@@ -146,7 +150,7 @@ export const MemberCopyColumns = [
     dataSort: true,
     width: '150',
     dataFormat(date) {
-      return date ? moment(date).format('LL') : '';
+      return date ? formatDate(date) : '';
     },
   },
   {
@@ -155,7 +159,7 @@ export const MemberCopyColumns = [
     dataSort: true,
     width: '150',
     dataFormat(date) {
-      return date ? moment(date).format('LL') : '';
+      return date ? formatDate(date) : '';
     },
   },
   {
@@ -186,21 +190,21 @@ export const ItemCopyColumns = [
     dataField: 'added',
     label: I18n.t('TableColumns.itemCopy.added'),
     dataFormat(date) {
-      return date ? moment(date).format('LL') : '';
+      return date ? formatDate(date) : '';
     },
   },
   {
     dataField: 'sold',
     label: I18n.t('TableColumns.itemCopy.sold'),
     dataFormat(date) {
-      return date ? moment(date).format('LL') : '';
+      return date ? formatDate(date) : '';
     },
   },
   {
     dataField: 'paid',
     label: I18n.t('TableColumns.itemCopy.paid'),
     dataFormat(date) {
-      return date ? moment(date).format('LL') : '';
+      return date ? formatDate(date) : '';
     },
   },
   {

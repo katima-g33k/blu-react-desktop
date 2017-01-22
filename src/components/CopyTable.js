@@ -243,6 +243,9 @@ export default class CopyTable extends Component {
 
       const copies = this.state.copies.map((c) => {
         if (c.id === copy.id) {
+          c.transaction = c.transaction.filter((transaction) => {
+            return transaction.code !== 'RESERVE';
+          });
           c.transaction.push({ code: data.type, date: moment() });
         }
 
