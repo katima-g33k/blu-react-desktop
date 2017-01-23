@@ -43,6 +43,7 @@ export default class CopyTable extends Component {
 
     this.cancelReservation = this.cancelReservation.bind(this);
     this.delete = this.delete.bind(this);
+    this.formatRow = this.formatRow.bind(this);
     this.refund = this.refund.bind(this);
     this.reserve = this.reserve.bind(this);
     this.sell = this.sell.bind(this);
@@ -176,6 +177,27 @@ export default class CopyTable extends Component {
     });
   }
 
+  formatRow(row, index) {
+    if (row.item && row.item.status) {
+      if (row.item.status.REMOVED) {
+        return 'removed';
+      }
+
+      if (row.item.status.OUTDATED) {
+        return 'archived';
+      }
+    }
+
+    if (row.member && row.member.account) {
+      const account = row.member.account;
+      const limit = moment().subtract(1, 'years');
+      return limit.isSameOrBefore(account.last_activity) ? '' : 'archived';
+    }
+
+    // Striped
+    return index % 2 === 0 ? 'striped-row' : '';
+  }
+
   refund(id) {
     const data = {
       copy: id,
@@ -285,6 +307,7 @@ export default class CopyTable extends Component {
           data={copies}
           placeholder={I18n.t('MemberView.copies.none')}
           sortable
+          rowClass={this.formatRow}
         />
         {this.state.showModal === 'delete' ? (
           <ConfirmModal

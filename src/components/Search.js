@@ -139,6 +139,7 @@ export default class Search extends Component {
               data={this.state.data}
               highlight={this.state.search}
               options={tableOptions}
+              striped
             />
           </Col>
         </Row>

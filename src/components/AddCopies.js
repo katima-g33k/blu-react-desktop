@@ -124,7 +124,7 @@ export default class AddCopies extends Component {
       <Panel header="Ajouter des exemplaires">
         <Row>
           <Col md={3}>
-             <Table columns={this.columns} data={this.state.copies} />
+             <Table columns={this.columns} data={this.state.copies} striped />
           </Col>
         </Row>
         <Search noHeader type="item" onRowClick={this.openModal} />

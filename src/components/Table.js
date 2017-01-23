@@ -39,10 +39,11 @@ export default class Table extends Component {
     return (
       <BootstrapTable
         condensed
-        striped
+        striped={this.props.striped}
         data={this.state.data}
         options={this.props.options}
         noDataText={this.props.placeholder}
+        trClassName={this.props.rowClass}
       >
         {this.renderColumns()}
       </BootstrapTable>
@@ -56,4 +57,6 @@ Table.propTypes = {
   highlight: React.PropTypes.string,
   placeholder: React.PropTypes.string,
   options: React.PropTypes.shape(),
+  rowClass: React.PropTypes.func,
+  striped: React.PropTypes.bool,
 };

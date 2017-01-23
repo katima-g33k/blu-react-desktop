@@ -11,3 +11,15 @@ body {
 .highlight {
   background-color: #FFFF00;
 }
+
+.removed {
+  background-color: #ABABAB;
+}
+
+.archived {
+  background-color: #BABABA;
+}
+
+.striped-row {
+  background-color: #F9F9F9;
+}

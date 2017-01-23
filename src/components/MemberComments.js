@@ -120,6 +120,7 @@ export default class MemberComment extends Component {
           columns={CommentColumns}
           data={this.state.comments}
           placeholder={I18n.t('MemberView.comment.none')}
+          striped
         />
         {this.state.showModal === 'input' ? (
           <InputModal
