@@ -5,10 +5,12 @@ import {
   Col,
   FormControl,
   FormGroup,
+  Glyphicon,
   Panel,
   Radio,
   Row,
 } from 'react-bootstrap';
+import { Link } from 'react-router';
 import HTTP from '../lib/HTTP';
 import Table from './Table.js';
 import I18n, { Translate } from '../lib/i18n/i18n';
@@ -68,6 +70,7 @@ export default class Search extends Component {
   }
 
   render() {
+    const type = this.state.type === 'parent' ? 'member' : this.state.type;
     const tableOptions = {
       onRowClick: (data) => {
         if (this.props.onRowClick) {
@@ -134,8 +137,22 @@ export default class Search extends Component {
             <h3>
               <Translate value="Search.results.title" /> ({this.state.data.length})
             </h3>
+            {this.props.onAddButton ? (
+              <Button
+                bsStyle="success"
+                onClick={this.props.onAddButton}
+              >
+                <Glyphicon glyph="plus" /> {'Ajouter'}
+              </Button>
+            ) : (
+              <Link to={`/${type}`}>
+                <Button bsStyle="success">
+                  <Glyphicon glyph="plus" /> {'Ajouter'}
+                </Button>
+              </Link>
+            )}
             <Table
-              columns={SearchColumns[this.state.type === 'parent' ? 'member' : this.state.type]}
+              columns={SearchColumns[type]}
               data={this.state.data}
               highlight={this.state.search}
               options={tableOptions}
@@ -153,4 +170,5 @@ Search.propTypes = {
   noHeader: React.PropTypes.bool,
   type: React.PropTypes.string,
   onRowClick: React.PropTypes.func,
+  onAddButton: React.PropTypes.func,
 };

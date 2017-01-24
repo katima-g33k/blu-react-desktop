@@ -5,6 +5,7 @@ import Table from './Table';
 import InputModal from './modals/InputModal';
 import HTTP from '../lib/HTTP';
 import settings from '../settings.json';
+import ItemForm from './ItemForm';
 
 const columns = [
   {
@@ -127,7 +128,15 @@ export default class AddCopies extends Component {
              <Table columns={this.columns} data={this.state.copies} striped />
           </Col>
         </Row>
-        <Search noHeader type="item" onRowClick={this.openModal} />
+        {this.state.isSearch ? (
+          <Search
+            noHeader
+            type="item"
+            onRowClick={this.openModal}
+            onAddButton={() => this.setState({ isSearch: false })}
+          />
+        ) : (<ItemForm />)}
+
         {this.renderModal()}
       </Panel>
     );
