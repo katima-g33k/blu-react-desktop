@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Col, Panel } from 'react-bootstrap';
+
 import I18n from '../lib/i18n/i18n';
 import HTTP from '../lib/HTTP';
 import AutoForm from './AutoForm';
@@ -169,28 +170,6 @@ const schema = {
       ],
     },
   ],
-  actions: [
-    {
-      label: 'Annuler',
-      options: {
-        bsStyle: 'danger',
-      },
-      onClick(event, data) {
-        event.preventDefault();
-        console.log(data);
-      },
-    },
-    {
-      label: 'Sauvegarder',
-      options: {
-        bsStyle: 'success',
-      },
-      onClick(event, data) {
-        event.preventDefault();
-        console.log(data);
-      },
-    },
-  ],
 };
 
 export default class MemberForm extends Component {
@@ -200,6 +179,11 @@ export default class MemberForm extends Component {
       states: [],
       member: {},
     };
+
+    this.schema = schema;
+
+    this.cancel = this.cancel.bind(this);
+    this.save = this.save.bind(this);
   }
 
   componentWillMount() {
@@ -211,7 +195,7 @@ export default class MemberForm extends Component {
 
     if (this.props.params.no) {
       const no = this.props.params.no;
-      HTTP.post(`${settings.apiUrl}/blu-api/member/select`, { no }, (err, member) => {
+      HTTP.post(`${settings.apiUrl}/member/select`, { no }, (err, member) => {
         if (member) {
           this.setState({ member });
         }
@@ -219,7 +203,38 @@ export default class MemberForm extends Component {
     }
   }
 
+  cancel(event) {
+    event.preventDefault();
+    if (this.state.member.no) {
+      this.props.router.push(`/member/${this.state.member.no}`);
+    } else {
+      this.props.router.push('search');
+    }
+  }
+
+  save(event, member) {
+    event.preventDefault();
+    const data = {
+      no: member.no,
+      member,
+    };
+
+    HTTP.post(`${settings.apiUrl}/member/update`, data, (err) => {
+      if (err) {
+        // TODO: Display error message
+        return;
+      }
+
+      this.props.router.push({
+        pathname: `/member/${member.no}`,
+      });
+    });
+  }
+
   render() {
+    const member = this.state.member;
+    delete member.account;
+
     schema.title = !this.props.params.no ? 'Ajouter un membre' : 'Modifier un membre';
     schema.sections.forEach((section) => {
       section.fields.forEach((field) => {
@@ -234,7 +249,9 @@ export default class MemberForm extends Component {
         <Col md={8}>
           <AutoForm
             schema={schema}
-            data={this.state.member}
+            data={member}
+            onCancel={this.cancel}
+            onSave={this.save}
           />
         </Col>
       </Panel>
@@ -244,4 +261,5 @@ export default class MemberForm extends Component {
 
 MemberForm.propTypes = {
   params: React.PropTypes.shape(),
+  router: React.PropTypes.shape(),
 };

@@ -153,12 +153,12 @@ export default class MemberView extends Component {
     const actions = [
       {
         label: 'Modifier',
-        href: `/member/form/${this.state.member.no}`,
+        href: `/member/edit/${this.state.member.no}`,
         style: 'primary',
       },
       {
         label: 'Ajouter des livres',
-        href: `/member/${this.state.member.no}/addCopies`,
+        href: `/member/copies/${this.state.member.no}`,
         style: 'primary',
       },
       {

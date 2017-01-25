@@ -284,13 +284,25 @@ export default class AutoForm extends Component {
           {this.state.schema.title}
         </Col>
         {this.renderSections(this.state.schema.sections)}
-        {this.renderActions(this.state.schema.actions)}
+        <ButtonToolbar>
+          <Button onClick={this.props.onCancel}>
+            {'Annuler'}
+          </Button>
+          <Button
+            bsStyle="primary"
+            onClick={(event) => this.props.onSave(event, this.state.data)}
+          >
+            {'Sauvegarder'}
+          </Button>
+        </ButtonToolbar>
       </Form>
     );
   }
 }
 
 AutoForm.propTypes = {
-  data: React.PropTypes.shape(),
-  schema: React.PropTypes.shape(),
+  data: React.PropTypes.shape().isRequired,
+  schema: React.PropTypes.shape().isRequired,
+  onCancel: React.PropTypes.func.isRequired,
+  onSave: React.PropTypes.func.isRequired,
 };
