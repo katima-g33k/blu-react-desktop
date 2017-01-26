@@ -6,6 +6,7 @@ import moment from 'moment';
 
 import ActionPanel from './ActionPanel';
 import AlignedData from './AlignedData';
+import ConfirmModal from './modals/ConfirmModal';
 import CopyTable from './CopyTable';
 import HTTP from '../lib/HTTP';
 import MemberComments from './MemberComments';
@@ -26,8 +27,10 @@ export default class MemberView extends Component {
     super(props);
     this.state = {
       member: null,
+      showModal: null,
     };
     this.isActive = this.isActive.bind(this);
+    this.printReceipt = this.printReceipt.bind(this);
     this.rendeGeneralInformation = this.rendeGeneralInformation.bind(this);
     this.renderAddress = this.renderAddress.bind(this);
     this.renderPhones = this.renderPhones.bind(this);
@@ -58,6 +61,10 @@ export default class MemberView extends Component {
 
   getDeactivationDate(lastActivity) {
     return lastActivity ? formatDate(moment(lastActivity).add(1, 'year')) : '';
+  }
+
+  printReceipt() {
+    this.setState({ showModal: null });
   }
 
   renderAddress() {
@@ -181,6 +188,34 @@ export default class MemberView extends Component {
           });
         },
       },
+      {
+        label: 'Remettre l\'argent',
+        style: 'primary',
+        onClick: (event) => {
+          // TODO: Display confirmation and Ask for receipt
+          event.preventDefault();
+
+          const member = this.state.member;
+          const data = { no: member.no };
+
+          HTTP.post(`${settings.apiUrl}/member/renew`, data, (err) => {
+            if (err) {
+              // TODO: display error message
+              return;
+            }
+
+            member.account.copies.forEach((copy) => {
+              copy.transaction.forEach((transaction) => {
+                if (transaction.code === 'SELL' || transaction.code === 'SELL_PARENT') {
+                  copy.transaction.push({ code: 'PAY', date: moment().format() });
+                }
+              });
+            });
+
+            this.setState({ member, showModal: 'paySuccessfull' });
+          });
+        },
+      },
     ];
 
     return (<ActionPanel actions={actions} />);
@@ -223,6 +258,14 @@ export default class MemberView extends Component {
           </Panel>
         </Col>
         <Col md={2}>{this.renderActions()}</Col>
+        <ConfirmModal
+          cancelText="Non"
+          confirmText="Oui"
+          message="Le remboursement a été complété, souhaitez-vous imprimer un reçu ?"
+          onCancel={() => this.setState({ showModal: null })}
+          onConfirm={() => this.printReceipt}
+          title="Remboursement réussi"
+        />
       </Row>
     ) : null;
   }

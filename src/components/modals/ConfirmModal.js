@@ -17,13 +17,13 @@ export default class ConfirmModal extends Component {
           <Button
             onClick={(event) => this.props.onCancel(event)}
           >
-            {'Annuler'}
+            {this.props.cancelText || 'Annuler'}
           </Button>
           <Button
             bsStyle={this.props.confirmationStyle || 'primary'}
             onClick={(event) => this.props.onConfirm(event)}
           >
-            {'Confirmer'}
+            {this.props.confirmText || 'Confirmer'}
           </Button>
         </Modal.Footer>
       </Modal.Dialog>
@@ -32,6 +32,8 @@ export default class ConfirmModal extends Component {
 }
 
 ConfirmModal.propTypes = {
+  cancelText: React.PropTypes.string,
+  confirmText: React.PropTypes.string,
   confirmationStyle: React.PropTypes.string,
   message: React.PropTypes.string.isRequired,
   onCancel: React.PropTypes.func.isRequired,
