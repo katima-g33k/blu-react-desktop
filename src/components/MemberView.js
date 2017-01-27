@@ -9,6 +9,7 @@ import AlignedData from './AlignedData';
 import ConfirmModal from './modals/ConfirmModal';
 import CopyTable from './CopyTable';
 import HTTP from '../lib/HTTP';
+import Member from '../lib/models/Member';
 import MemberComments from './MemberComments';
 import ProfileStats from './ProfileStats';
 import settings from '../settings.json';
@@ -29,13 +30,11 @@ export default class MemberView extends Component {
       member: null,
       showModal: null,
     };
-    this.isActive = this.isActive.bind(this);
+
     this.printReceipt = this.printReceipt.bind(this);
     this.rendeGeneralInformation = this.rendeGeneralInformation.bind(this);
-    this.renderAddress = this.renderAddress.bind(this);
     this.renderPhones = this.renderPhones.bind(this);
     this.renderAccountState = this.renderAccountState.bind(this);
-    this.getDeactivationDate = this.getDeactivationDate.bind(this);
     this.renderStats = this.renderStats.bind(this);
     this.renderActions = this.renderActions.bind(this);
   }
@@ -46,56 +45,32 @@ export default class MemberView extends Component {
       no: this.props.params.no,
     };
 
-    HTTP.post(url, data, (err, member) => {
-      if (member) {
-        this.setState({ member });
+    HTTP.post(url, data, (err, res) => {
+      if (res) {
+        this.setState({ member: new Member(res) });
       }
     });
-  }
-
-  isActive() {
-    const account = this.state.member.account;
-    const limit = moment().subtract(1, 'years');
-    return !account || limit.isSameOrBefore(account.last_activity);
-  }
-
-  getDeactivationDate(lastActivity) {
-    return lastActivity ? formatDate(moment(lastActivity).add(1, 'year')) : '';
   }
 
   printReceipt() {
     this.setState({ showModal: null });
   }
 
-  renderAddress() {
-    const member = this.state.member;
-    const street = member.address;
-    const zip = (member.zip || '').replace(/(.{3})(.{3})/, '$1 $2');
-    const city = member.city ? member.city.name : '';
-    const state = member.city && member.city.state ? member.city.state.code : '';
-    const address = street ? `${street}, ${city} (${state}) ${zip}` : '';
-
-    return (
-      <AlignedData
-        label={<Translate value="MemberView.general.address" />}
-        value={address} />
-    );
-  }
-
   renderPhones() {
-    const member = this.state.member;
-    const phones = member.phone || [];
-
-    return phones.map((phone, index) => {
-      const number = phone.number.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
-      const note = phone.note ? `(${phone.note})` : '';
+    return this.state.member.phone.map((phone, index) => {
       const label = (
         <span>
           <Translate value="MemberView.general.phone" /> {index + 1}
         </span>
       );
 
-      return (<AlignedData key={index} label={label} value={`${number} ${note}`} />);
+      return (
+        <AlignedData
+          key={index}
+          label={label}
+          value={phone.toString()}
+        />
+      );
     });
   }
 
@@ -107,7 +82,7 @@ export default class MemberView extends Component {
           <Translate value="MemberView.general.title" />
         </h4>
         <AlignedData label={<Translate value="MemberView.general.no" />} value={member.no || ''} />
-        {this.renderAddress()}
+        <AlignedData label={<Translate value="MemberView.general.address" />} value={member.addressString} />
         <AlignedData label={<Translate value="MemberView.general.email" />} value={member.email || ''} />
         {this.renderPhones()}
       </section>
@@ -115,7 +90,7 @@ export default class MemberView extends Component {
   }
 
   renderAccountState() {
-    const account = this.state.member ? this.state.member.account || {} : {};
+    const account = this.state.member.account;
     return (
       <section>
         <h4>
@@ -124,8 +99,8 @@ export default class MemberView extends Component {
         <AlignedData
           label={<Translate value="MemberView.account.activation" />}
           value={
-            <Label bsStyle={this.isActive() ? 'success' : 'danger'}>
-              <Translate value={`MemberView.account.${this.isActive() ? 'active' : 'deactivated'}`} />
+            <Label bsStyle={account.isActive ? 'success' : 'danger'}>
+              <Translate value={`MemberView.account.${account.isActive ? 'active' : 'deactivated'}`} />
             </Label>
           }
         />
@@ -135,11 +110,11 @@ export default class MemberView extends Component {
         />
         <AlignedData
           label={<Translate value="MemberView.account.lastActivity" />}
-          value={formatDate(account.last_activity)}
+          value={formatDate(account.lastActivity)}
         />
         <AlignedData
           label={<Translate value="MemberView.account.registration" />}
-          value={formatDate(this.getDeactivationDate(account.last_activity))}
+          value={formatDate(account.deactivationDate)}
         />
       </section>
     );
@@ -227,10 +202,10 @@ export default class MemberView extends Component {
         <Col md={10}>
           <Panel
             header={I18n.t('MemberView.title')}
-            bsStyle={this.isActive() ? 'default' : 'danger'}
+            bsStyle={this.state.member.account.isActive ? 'default' : 'danger'}
           >
             <h3>
-              {`${this.state.member.first_name} ${this.state.member.last_name}`}
+              {this.state.member.name}
             </h3>
             <Row>
               <Col sm={12} md={6} style={border}>{this.rendeGeneralInformation()}</Col>
@@ -258,14 +233,16 @@ export default class MemberView extends Component {
           </Panel>
         </Col>
         <Col md={2}>{this.renderActions()}</Col>
-        <ConfirmModal
-          cancelText="Non"
-          confirmText="Oui"
-          message="Le remboursement a été complété, souhaitez-vous imprimer un reçu ?"
-          onCancel={() => this.setState({ showModal: null })}
-          onConfirm={() => this.printReceipt}
-          title="Remboursement réussi"
-        />
+        {this.state.showModal === 'paySuccessfull' ? (
+          <ConfirmModal
+            cancelText="Non"
+            confirmText="Oui"
+            message="Le remboursement a été complété, souhaitez-vous imprimer un reçu ?"
+            onCancel={() => this.setState({ showModal: null })}
+            onConfirm={() => this.printReceipt}
+            title="Remboursement réussi"
+          />
+        ) : null}
       </Row>
     ) : null;
   }
