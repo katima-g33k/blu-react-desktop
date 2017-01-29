@@ -16,6 +16,8 @@ import Table from './Table.js';
 import I18n, { Translate } from '../lib/i18n/i18n';
 import { SearchColumns } from '../lib/TableColumns';
 import settings from '../settings.json';
+import Member from '../lib/models/Member';
+import Item from '../lib/models/Item';
 
 export default class Search extends Component {
   constructor(props) {
@@ -42,15 +44,16 @@ export default class Search extends Component {
     this.setState({ isLoading: true });
     const data = {
       search: this.state.search,
-      deactivated: this.state.archives,
       is_parent: this.state.type === 'parent',
     };
+
     const searchType = this.state.type === 'item' ? 'item' : 'member';
+    data[searchType === 'item' ? 'outdated' : 'deactivated'] = this.state.archives;
 
     HTTP.post(`${settings.apiUrl}/${searchType}/search`, data, (err, res) => {
       if (res) {
         this.setState({
-          data: res,
+          data: res.map(row => searchType === 'item' ? new Item(row) : new Member(row)),
           isLoading: false,
         });
       }

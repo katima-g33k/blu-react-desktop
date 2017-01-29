@@ -1,12 +1,13 @@
 import moment from 'moment';
 import Comment from './Comment';
+import Copy from './Copy';
 
 export default class Account {
   constructor(account = {}) {
     this.registration = account.registration;
     this.last_activity = account.last_activity;
     this.comment = account.comment ? account.comment.map(comment => new Comment(comment)) : [];
-    this.copies = account.copies || [];
+    this.copies = account.copies ? account.copies.map(copy => new Copy(copy)) : [];
   }
 
   get deactivationDate() {

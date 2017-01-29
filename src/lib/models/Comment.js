@@ -1,5 +1,5 @@
 export default class Comment {
-  constructor(comment) {
+  constructor(comment = {}) {
     this.id = comment.id || 0;
     this.comment = comment.comment || '';
     this.updated_at = comment.updated_at || comment.updatedAt;

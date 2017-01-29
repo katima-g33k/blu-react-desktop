@@ -26,7 +26,7 @@ export const CommentColumns = [
     label: I18n.t('TableColumns.comment.comment'),
   },
   {
-    dataField: 'updated_at',
+    dataField: 'updatedAt',
     label: I18n.t('TableColumns.comment.date'),
     dataFormat(date) {
       return date ? moment(date).format('LL') : '';
@@ -106,71 +106,7 @@ export const SearchColumns = {
   ],
 };
 
-export const MemberCopyColumns = [
-  {
-    dataField: 'id',
-    isKey: true,
-    hidden: true,
-  },
-  {
-    dataField: 'name',
-    label: I18n.t('TableColumns.memberCopy.title'),
-    dataSort: true,
-    width: '400',
-    dataFormat(cell, row) {
-      return (
-        <Link to={{ pathname: `/item/${row.item.id}` }}>
-          {cell}
-        </Link>);
-    },
-  },
-  {
-    dataField: 'editor',
-    label: I18n.t('TableColumns.memberCopy.editor'),
-    dataSort: true,
-  },
-  {
-    dataField: 'edition',
-    label: I18n.t('TableColumns.memberCopy.edition'),
-    dataSort: true,
-    width: '85',
-  },
-  {
-    dataField: 'added',
-    label: I18n.t('TableColumns.memberCopy.added'),
-    dataSort: true,
-    width: '150',
-    dataFormat(date) {
-      return date ? formatDate(date) : '';
-    },
-  },
-  {
-    dataField: 'sold',
-    label: I18n.t('TableColumns.memberCopy.sold'),
-    dataSort: true,
-    width: '150',
-    dataFormat(date) {
-      return date ? formatDate(date) : '';
-    },
-  },
-  {
-    dataField: 'paid',
-    label: I18n.t('TableColumns.memberCopy.paid'),
-    dataSort: true,
-    width: '150',
-    dataFormat(date) {
-      return date ? formatDate(date) : '';
-    },
-  },
-  {
-    dataField: 'price',
-    label: I18n.t('TableColumns.memberCopy.price'),
-    dataSort: true,
-    width: '60',
-  },
-];
-
-export const ItemCopyColumns = [
+export const CopyColumns = [
   {
     dataField: 'id',
     isKey: true,
@@ -179,36 +115,85 @@ export const ItemCopyColumns = [
   {
     dataField: 'member',
     label: I18n.t('TableColumns.itemCopy.member'),
-    dataFormat(cell, row) {
+    dataSort: true,
+    width: '400',
+    itemOnly: true,
+    dataFormat(cell) {
       return (
-        <Link to={{ pathname: `/member/${row.member.no}` }}>
-          {row.member.first_name} {row.member.last_name}
+        <Link to={{ pathname: `/member/${cell.no}` }}>
+          {cell.name}
         </Link>);
     },
   },
   {
-    dataField: 'added',
-    label: I18n.t('TableColumns.itemCopy.added'),
+    dataField: 'name',
+    label: I18n.t('TableColumns.memberCopy.title'),
+    dataSort: true,
+    width: '400',
+    memberOnly: true,
+    dataFormat(cell, row) {
+      return (
+        <Link to={{ pathname: `/item/${row.item.id}` }}>
+          {row.item.name}
+        </Link>);
+    },
+  },
+  {
+    dataField: 'editor',
+    label: I18n.t('TableColumns.memberCopy.editor'),
+    dataSort: true,
+    memberOnly: true,
+    dataFormat(cell, row) {
+      return row.item.editor || '';
+    },
+  },
+  {
+    dataField: 'edition',
+    label: I18n.t('TableColumns.memberCopy.edition'),
+    dataSort: true,
+    width: '85',
+    memberOnly: true,
+    dataFormat(cell, row) {
+      return row.item.edition || '';
+    },
+  },
+  {
+    dataField: 'dateAdded',
+    label: I18n.t('TableColumns.memberCopy.added'),
+    dataSort: true,
+    width: '150',
     dataFormat(date) {
       return date ? formatDate(date) : '';
     },
   },
   {
-    dataField: 'sold',
-    label: I18n.t('TableColumns.itemCopy.sold'),
+    dataField: 'dateSold',
+    label: I18n.t('TableColumns.memberCopy.sold'),
+    dataSort: true,
+    width: '150',
     dataFormat(date) {
       return date ? formatDate(date) : '';
     },
   },
   {
-    dataField: 'paid',
-    label: I18n.t('TableColumns.itemCopy.paid'),
+    dataField: 'datePaid',
+    label: I18n.t('TableColumns.memberCopy.paid'),
+    dataSort: true,
+    width: '150',
     dataFormat(date) {
       return date ? formatDate(date) : '';
     },
   },
   {
-    dataField: 'price',
-    label: I18n.t('TableColumns.itemCopy.price'),
+    dataField: 'priceString',
+    label: I18n.t('TableColumns.memberCopy.price'),
+    dataSort: true,
+    width: '60',
+  },
+  {
+    dataField: 'actions',
+    label: '',
+    dataAlign: 'center',
+    width: '175',
   },
 ];

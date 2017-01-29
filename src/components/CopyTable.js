@@ -1,37 +1,13 @@
 import React, { Component } from 'react';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 import { I18n, Translate } from 'react-i18nify';
-import moment from 'moment';
 
-import { ItemCopyColumns, MemberCopyColumns } from '../lib/TableColumns';
+import { CopyColumns } from '../lib/TableColumns';
 import { ConfirmModal, InputModal, SearchModal } from './modals';
 import HTTP from '../lib/HTTP';
 import settings from '../settings.json';
 import Table from './Table';
-
-const formatCopies = (copies) => {
-  return copies.map((copy) => {
-    const soldT = copy.transaction.filter((t) => t.code === 'SELL' || t.code === 'SELL_PARENT')[0];
-    const sold = soldT ? moment(soldT.date) : null;
-    const paidT = copy.transaction.filter((t) => t.code === 'PAY')[0];
-    const paid = paidT ? moment(paidT.date) : null;
-    const reservedT = copy.transaction.filter((t) => t.code === 'RESERVE')[0];
-    const reserved = reservedT ? moment(reservedT.date) : null;
-    return {
-      id: copy.id,
-      price: copy.price,
-      added: moment(copy.transaction.filter((t) => t.code === 'ADD')[0].date),
-      sold,
-      paid,
-      reserved,
-      name: copy.item ? copy.item.name : null,
-      editor: copy.item ? copy.item.editor : null,
-      edition: copy.item ? copy.item.edition : null,
-      item: copy.item,
-      member: copy.member,
-    };
-  });
-};
+import Transaction from '../lib/models/Transaction';
 
 export default class CopyTable extends Component {
   constructor(props) {
@@ -48,97 +24,85 @@ export default class CopyTable extends Component {
     this.reserve = this.reserve.bind(this);
     this.sell = this.sell.bind(this);
     this.updatePrice = this.updatePrice.bind(this);
+    this.renderModals = this.renderModals.bind(this);
 
-    this.columns = (props.member ? MemberCopyColumns : ItemCopyColumns).map((column) => {
-      if (column.dataField === 'price') {
-        column.dataFormat = (cell, row) => {
-          return (
-            <Button
-              bsStyle="link"
-              onClick={() => this.setState({ activeCopy: row, showModal: 'update' })}
-              disabled={!!row.sold || !!row.reserved}
-            >
-              {`${cell} $`}
-            </Button>
-          );
-        };
+    this.columns = CopyColumns.filter(column => this.props.member ? !column.itemOnly : !column.memberOnly);
+    this.columns.find(c => c.dataField === 'priceString').dataFormat = (price, copy) => (
+      <Button
+        bsStyle="link"
+        onClick={() => this.setState({ activeCopy: copy, showModal: 'update' })}
+        disabled={copy.isPaid || copy.isSold || copy.isReserved}
+      >
+        {price}
+      </Button>
+    );
+    this.columns.find(c => c.dataField === 'actions').dataFormat = (cell, copy) => {
+      if (copy.isPaid) {
+        return '';
       }
 
-      return column;
-    });
-    this.columns.push({
-      dataField: 'action',
-      label: 'Actions',
-      dataAlign: 'center',
-      width: '175',
-      dataFormat: (cell, row) => {
-        if (row.paid) {
-          return '';
-        }
+      if (copy.isSold) {
+        return (
+          <Button bsStyle='danger' onClick={() => this.refund(copy.id)}>
+            <Glyphicon glyph="ban-circle" />
+          </Button>
+        );
+      }
 
-        if (row.sold) {
-          return (
-            <Button bsStyle='danger' onClick={() => this.refund(row.id)}>
-              <Glyphicon glyph="ban-circle" />
-            </Button>
-          );
-        }
-
-        if (row.reserved) {
-          return (
-            <ButtonGroup>
-              <Button
-                bsStyle="primary"
-                onClick={() => this.setState({ activeCopy: row, showModal: 'cancelReservation' })}
-              >
-                <Glyphicon glyph="ban-circle" />
-              </Button>
-              <Button
-                bsStyle='success'
-                onClick={() => this.sell(row, true)}
-              >
-                {'$'}
-              </Button>
-            </ButtonGroup>
-          );
-        }
-
+      if (copy.isReserved) {
         return (
           <ButtonGroup>
             <Button
               bsStyle="primary"
-              onClick={() => this.setState({ activeCopy: row, showModal: 'reserve' })}
+              onClick={() => this.setState({ activeCopy: copy, showModal: 'cancelReservation' })}
             >
-              <Glyphicon glyph="user" />
+              <Glyphicon glyph="ban-circle" />
             </Button>
             <Button
               bsStyle='success'
-              onClick={() => this.sell(row, true)}
+              onClick={() => this.sell(copy, true)}
             >
               {'$'}
             </Button>
-            <Button
-              onClick={() => this.sell(row)}
-            >
-              {'$$'}
-            </Button>
-            <Button
-              bsStyle='danger'
-              onClick={() => this.setState({ activeCopy: row, showModal: 'delete' })}
-            >
-              <Glyphicon glyph="trash" />
-            </Button>
           </ButtonGroup>
         );
-      },
-    });
+      }
+
+      return (
+        <ButtonGroup>
+          <Button
+            bsStyle="primary"
+            onClick={() => this.setState({ activeCopy: copy, showModal: 'reserve' })}
+          >
+            <Glyphicon glyph="user" />
+          </Button>
+          <Button
+            bsStyle='success'
+            onClick={() => this.sell(copy, true)}
+          >
+            {'$'}
+          </Button>
+          <Button
+            onClick={() => this.sell(copy)}
+          >
+            {'$$'}
+          </Button>
+          <Button
+            bsStyle='danger'
+            onClick={() => this.setState({ activeCopy: copy, showModal: 'delete' })}
+          >
+            <Glyphicon glyph="trash" />
+          </Button>
+        </ButtonGroup>
+      );
+    };
   }
 
   cancelReservation() {
     const id = this.state.activeCopy.id;
     const data = {
       copy: id,
-      type: 'RESERVE',
+      type: Transaction.TYPES.RESERVE,
     };
     HTTP.post(`${settings.apiUrl}/transaction/delete`, data, (err) => {
       if (err) {
@@ -146,16 +110,8 @@ export default class CopyTable extends Component {
         return;
       }
 
-      const copies = this.state.copies.map((c) => {
-        if (c.id === id) {
-          c.transaction = c.transaction.filter((transaction) => {
-            return transaction.code !== 'RESERVE';
-          });
-        }
-
-        return c;
-      });
-
+      const copies = this.state.copies;
+      copies.find(copy => copy.id === id).cancelReservation();
       this.setState({ copies, showModal: null, activeCopy: null });
     });
   }
@@ -169,29 +125,19 @@ export default class CopyTable extends Component {
         return;
       }
 
-      const copies = this.state.copies.filter((copy) => {
-        return copy.id !== id;
-      });
-
+      const copies = this.state.copies.filter((copy) => copy.id !== id);
       this.setState({ copies, showModal: null, activeCopy: null });
     });
   }
 
   formatRow(row, index) {
-    if (row.item && row.item.status) {
-      if (row.item.status.REMOVED) {
-        return 'removed';
-      }
-
-      if (row.item.status.OUTDATED) {
-        return 'archived';
-      }
+    if (row.item && row.item.status && row.item.status.REMOVED) {
+      return 'removed';
     }
 
-    if (row.member && row.member.account) {
-      const account = row.member.account;
-      const limit = moment().subtract(1, 'years');
-      return limit.isSameOrBefore(account.last_activity) ? '' : 'archived';
+    if ((row.member && !row.member.account.isActive) ||
+        (row.item && row.item.status && row.item.status.OUTDATED)) {
+      return 'archived';
     }
 
     // Striped
@@ -201,7 +147,7 @@ export default class CopyTable extends Component {
   refund(id) {
     const data = {
       copy: id,
-      type: 'SELL',
+      type: Transaction.TYPES.SELL,
     };
     HTTP.post(`${settings.apiUrl}/transaction/delete`, data, (err) => {
       if (err) {
@@ -209,25 +155,18 @@ export default class CopyTable extends Component {
         return;
       }
 
-      const copies = this.state.copies.map((c) => {
-        if (c.id === id) {
-          c.transaction = c.transaction.filter((transaction) => {
-            return transaction.code !== 'SELL' && transaction.code !== 'SELL_PARENT';
-          });
-        }
-
-        return c;
-      });
-
+      const copies = this.state.copies;
+      copies.find(copy => copy.id === id).refund();
       this.setState({ copies });
     });
   }
 
   reserve(parent) {
+    const id = this.state.activeCopy.id;
     const data = {
       member: parent.no,
-      copies: [this.state.activeCopy.id],
-      type: 'RESERVE',
+      copies: [id],
+      type: Transaction.TYPES.RESERVE,
     };
     HTTP.post(`${settings.apiUrl}/transaction/insert`, data, (err) => {
       if (err) {
@@ -235,19 +174,9 @@ export default class CopyTable extends Component {
         return;
       }
 
-      const copies = this.state.copies.map((c) => {
-        if (c.id === this.state.activeCopy.id) {
-          c.transaction.push({ code: data.type, date: moment() });
-        }
-
-        return c;
-      });
-
-      this.setState({
-        copies,
-        activeCopy: null,
-        showModal: null,
-      });
+      const copies = this.state.copies;
+      copies.find(copy => copy.id === id).reserve(parent);
+      this.setState({ copies, activeCopy: null, showModal: null });
     });
   }
 
@@ -255,7 +184,7 @@ export default class CopyTable extends Component {
     const data = {
       member: this.props.member || copy.member.no,
       copies: [copy.id],
-      type: halfPrice ? 'SELL_PARENT' : 'SELL',
+      type: Transaction.TYPES[halfPrice ? 'SELL_PARENT' : 'SELL'],
     };
     HTTP.post(`${settings.apiUrl}/transaction/insert`, data, (err) => {
       if (err) {
@@ -263,52 +192,37 @@ export default class CopyTable extends Component {
         return;
       }
 
-      const copies = this.state.copies.map((c) => {
-        if (c.id === copy.id) {
-          c.transaction = c.transaction.filter((transaction) => {
-            return transaction.code !== 'RESERVE';
-          });
-          c.transaction.push({ code: data.type, date: moment() });
-        }
+      const copies = this.state.copies;
 
-        return c;
-      });
+      if (halfPrice) {
+        copies.find(c => c.id === copy.id).sellParent();
+      } else {
+        copies.find(c => c.id === copy.id).sell();
+      }
 
       this.setState({ copies });
     });
   }
 
   updatePrice(event, value) {
-    const copies = this.state.copies.map((copy) => {
-      if (copy.id === this.state.activeCopy.id) {
-        copy.price = value;
+    const id = this.state.activeCopy.id;
+    const data = { id, price: value };
+
+    HTTP.post(`${settings.apiUrl}/copy/update`, data, (err) => {
+      if (err) {
+        // TODO: Display error message
+        return;
       }
 
-      return copy;
-    });
-
-    this.setState({
-      copies,
-      showModal: null,
-      activeCopy: null,
+      const copies = this.state.copies;
+      copies.find(copy => copy.id === id).price = value;
+      this.setState({ copies, showModal: null, activeCopy: null });
     });
   }
 
-  render() {
-    const copies = formatCopies(this.state.copies);
-
+  renderModals() {
     return (
-      <section>
-        <h4>
-          <Translate value="MemberView.copies.title" />
-        </h4>
-        <Table
-          columns={this.columns}
-          data={copies}
-          placeholder={I18n.t('MemberView.copies.none')}
-          sortable
-          rowClass={this.formatRow}
-        />
+      <div>
         {this.state.showModal === 'delete' ? (
           <ConfirmModal
             message={'Souhaitez-vous vraiment supprimer cet exemplaire ?'}
@@ -345,6 +259,24 @@ export default class CopyTable extends Component {
             type="parent"
           />
         ) : null}
+      </div>
+    );
+  }
+
+  render() {
+    return (
+      <section>
+        <h4>
+          <Translate value="MemberView.copies.title" />
+        </h4>
+        <Table
+          columns={this.columns}
+          data={this.state.copies}
+          placeholder={I18n.t('MemberView.copies.none')}
+          sortable
+          rowClass={this.formatRow}
+        />
+        {this.renderModals()}
       </section>
     );
   }

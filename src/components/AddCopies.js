@@ -6,6 +6,8 @@ import InputModal from './modals/InputModal';
 import HTTP from '../lib/HTTP';
 import settings from '../settings.json';
 import ItemForm from './ItemForm';
+import Copy from '../lib/models/Copy';
+import Transaction from '../lib/models/Transaction';
 
 const columns = [
   {
@@ -24,6 +26,11 @@ const columns = [
       return `${cell} $`;
     },
   },
+  {
+    dataField: 'actions',
+    label: '',
+    dataAlign: 'center',
+  },
 ];
 
 export default class AddCopies extends Component {
@@ -41,22 +48,16 @@ export default class AddCopies extends Component {
     this.deleteCopy = this.deleteCopy.bind(this);
     this.save = this.save.bind(this);
     this.columns = columns;
-    this.columns.push({
-      dataField: 'action',
-      label: 'Actions',
-      dataAlign: 'center',
-      dataFormat: (cell, row) => {
-        const onClick = (event) => {
-          event.preventDefault();
-          this.deleteCopy(row.id);
-        };
-        return !row.reservation ? (
-          <Button bsStyle="danger" onClick={onClick}>
-            <Glyphicon glyph="trash" />
-          </Button>
-        ) : null;
-      },
-    });
+    this.columns.find(column => column.dataField === 'actions').dataFormat = (cell, copy) => {
+      return !copy.reservation ? (
+        <Button
+          bsStyle="danger"
+          onClick={() => this.deleteCopy(copy.id)}
+        >
+          <Glyphicon glyph="trash" />
+        </Button>
+      ) : null;
+    };
   }
 
   closeModal(state = {}) {
@@ -82,12 +83,21 @@ export default class AddCopies extends Component {
       }
 
       const copies = this.state.copies;
-      copies.push({
+      const copy = new Copy({
         id: res.id,
-        title: this.state.item.name,
+        item: this.state.item,
         price: value,
-        reservation: res.reservation,
+        transaction: [{
+          code: Transaction.TYPES.ADD,
+          date: new Date(),
+        }],
       });
+
+      if (res.reservation) {
+        copy.reserve(res.reservation.member);
+      }
+
+      copies.push(copy);
 
       this.closeModal({ copies });
     });
@@ -100,10 +110,7 @@ export default class AddCopies extends Component {
         return;
       }
 
-      const copies = this.state.copies.filter((copy) => {
-        return copy.id !== id;
-      });
-
+      const copies = this.state.copies.filter((copy) => copy.id !== id);
       this.setState({ copies });
     });
   }
