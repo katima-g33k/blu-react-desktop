@@ -25,4 +25,20 @@ export default class Account {
   set lastActivity(lastActivity) {
     this.last_activity = lastActivity;
   }
+
+  getAddedCopies() {
+    return this.copies.filter(copy => copy.isAdded || copy.isReserved);
+  }
+
+  getSoldCopies() {
+    return this.copies.filter(copy => copy.isSold);
+  }
+
+  donateAll() {
+    this.copies.forEach(copy => {
+      if ((copy.isAdded || copy.isReserved || copy.isSold) && !copy.isDonated) {
+        copy.donate();
+      }
+    });
+  }
 }

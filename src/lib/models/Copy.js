@@ -76,6 +76,13 @@ export default class Copy {
     });
   }
 
+  donate() {
+    this.transaction.push(new Transaction({
+      code: Transaction.TYPES.DONATE,
+      date: new Date(),
+    }));
+  }
+
   sell() {
     this.transaction.push(new Transaction({
       code: Transaction.TYPES.SELL,

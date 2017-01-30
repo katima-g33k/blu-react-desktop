@@ -13,6 +13,7 @@ import Member from '../lib/models/Member';
 import MemberComments from './MemberComments';
 import ProfileStats from './ProfileStats';
 import settings from '../settings.json';
+import Transaction from '../lib/models/Transaction';
 
 const formatDate = (date) => {
   return date ? moment(new Date(date)).format('LL') : '';
@@ -37,6 +38,7 @@ export default class MemberView extends Component {
     this.renderAccountState = this.renderAccountState.bind(this);
     this.renderStats = this.renderStats.bind(this);
     this.renderActions = this.renderActions.bind(this);
+    this.renewAccount = this.renewAccount.bind(this);
   }
 
   componentWillMount() {
@@ -132,12 +134,13 @@ export default class MemberView extends Component {
   }
 
   renderActions() {
-    const actions = [
-      {
-        label: 'Modifier',
-        href: `/member/edit/${this.state.member.no}`,
-        style: 'primary',
-      },
+    const generalActions = [{
+      label: 'Modifier',
+      href: `/member/edit/${this.state.member.no}`,
+      style: 'primary',
+    }];
+
+    const activeActions = [
       {
         label: 'Ajouter des livres',
         href: `/member/copies/${this.state.member.no}`,
@@ -148,19 +151,7 @@ export default class MemberView extends Component {
         style: 'primary',
         onClick: (event) => {
           event.preventDefault();
-
-          const member = this.state.member;
-          const data = { no: member.no };
-
-          HTTP.post(`${settings.apiUrl}/member/renew`, data, (err) => {
-            if (err) {
-              // TODO: display error message
-              return;
-            }
-
-            member.account.last_activity = moment();
-            this.setState({ member });
-          });
+          this.renewAccount();
         },
       },
       {
@@ -173,18 +164,16 @@ export default class MemberView extends Component {
           const member = this.state.member;
           const data = { no: member.no };
 
-          HTTP.post(`${settings.apiUrl}/member/renew`, data, (err) => {
+          HTTP.post(`${settings.apiUrl}/member/pay`, data, (err) => {
             if (err) {
               // TODO: display error message
               return;
             }
 
-            member.account.copies.forEach((copy) => {
-              copy.transaction.forEach((transaction) => {
-                if (transaction.code === 'SELL' || transaction.code === 'SELL_PARENT') {
-                  copy.transaction.push({ code: 'PAY', date: moment().format() });
-                }
-              });
+            member.account.copies.forEach(copy => {
+              if (copy.isSold) {
+                copy.pay();
+              }
             });
 
             this.setState({ member, showModal: 'paySuccessfull' });
@@ -193,7 +182,55 @@ export default class MemberView extends Component {
       },
     ];
 
-    return (<ActionPanel actions={actions} />);
+    const inactiveActions = [{
+      label: 'Réactiver le compte',
+      style: 'primary',
+      onClick: (event) => {
+        event.preventDefault();
+
+        const member = this.state.member;
+        const copies = member.account.getAddedCopies();
+        copies.push(...member.account.getSoldCopies());
+        const data = {
+          copies: copies.map(copy => copy.id),
+          member: member.no,
+          type: Transaction.TYPES.DONATE,
+        };
+
+        HTTP.post(`${settings.apiUrl}/transaction/insert`, data, (err) => {
+          if (err) {
+            // TODO: display error message
+            return;
+          }
+
+          member.account.donateAll();
+          this.setState({ member });
+          this.renewAccount();
+
+        });
+      },
+    }];
+
+    return (
+      <ActionPanel
+        actions={generalActions.concat(this.state.member.account.isActive ? activeActions : inactiveActions)}
+      />
+    );
+  }
+
+  renewAccount() {
+    const member = this.state.member;
+    const data = { no: member.no };
+
+    HTTP.post(`${settings.apiUrl}/member/renew`, data, (err) => {
+      if (err) {
+        // TODO: display error message
+        return;
+      }
+
+      member.account.last_activity = moment();
+      this.setState({ member });
+    });
   }
 
   render() {
@@ -226,7 +263,7 @@ export default class MemberView extends Component {
               <Col md={12}>
                 <CopyTable
                   member={this.state.member.no}
-                  copies={this.state.member.account.copies}
+                  copies={this.state.member.account.copies.filter(copy => !copy.isDonated)}
                 />
               </Col>
             </Row>
