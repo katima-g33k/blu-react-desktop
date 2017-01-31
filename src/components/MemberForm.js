@@ -5,6 +5,7 @@ import I18n from '../lib/i18n/i18n';
 import HTTP from '../lib/HTTP';
 import AutoForm from './AutoForm';
 import settings from '../settings.json';
+import Member from '../lib/models/Member';
 
 const schema = {
   titleClass: 'h3',
@@ -15,18 +16,18 @@ const schema = {
     {
       fields: [
         {
-          key: 'is_parent',
+          key: 'isParent',
           type: 'checkbox',
           label: 'Parent-Étudiant',
         },
         {
-          key: 'first_name',
+          key: 'firstName',
           type: 'text',
           label: 'Prénom',
           placeholder: 'Prénom',
         },
         {
-          key: 'last_name',
+          key: 'lastName',
           type: 'text',
           label: 'Nom',
           placeholder: 'Nom',
@@ -65,10 +66,13 @@ const schema = {
           placeholder: 'A0A 0A0',
         },
         {
-          key: 'city.name',
+          key: 'city',
           type: 'text',
           label: 'Ville',
           placeholder: 'Ville',
+          value(value) {
+            return value ? value.name : '';
+          },
           onChange(event, data) {
             const member = data;
             member.city.name = event.target.value;
@@ -76,10 +80,13 @@ const schema = {
           },
         },
         {
-          key: 'city.state.code',
+          key: 'state',
           type: 'select',
           label: 'Province',
           default: 'QC',
+          value(value, data = {}) {
+            return data.city ? data.city.state.code : 'QC';
+          },
           onChange(event, data) {
             const member = data;
             member.city.state.code = event.target.value;
@@ -195,9 +202,9 @@ export default class MemberForm extends Component {
 
     if (this.props.params.no) {
       const no = this.props.params.no;
-      HTTP.post(`${settings.apiUrl}/member/select`, { no }, (err, member) => {
-        if (member) {
-          this.setState({ member });
+      HTTP.post(`${settings.apiUrl}/member/select`, { no }, (err, res) => {
+        if (res) {
+          this.setState({ member: new Member(res) });
         }
       });
     }
@@ -205,11 +212,7 @@ export default class MemberForm extends Component {
 
   cancel(event) {
     event.preventDefault();
-    if (this.state.member.no) {
-      this.props.router.push(`/member/${this.state.member.no}`);
-    } else {
-      this.props.router.push('search');
-    }
+    this.props.router.push(this.state.member.no ? `/member/${this.state.member.no}` : 'search');
   }
 
   save(event, member) {
@@ -236,13 +239,8 @@ export default class MemberForm extends Component {
     delete member.account;
 
     schema.title = !this.props.params.no ? 'Ajouter un membre' : 'Modifier un membre';
-    schema.sections.forEach((section) => {
-      section.fields.forEach((field) => {
-        if (field.key === 'city.state.code') {
-          field.options = this.state.states.map((state) => ({ value: state, label: state }));
-        }
-      });
-    });
+    const stateSelect = schema.sections[1].fields.find(field => field.key === 'state');
+    stateSelect.options = this.state.states.map(state => ({ value: state, label: state }));
 
     return (
       <Panel header={I18n.t('MemberForm.title')}>

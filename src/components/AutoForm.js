@@ -26,7 +26,6 @@ export default class AutoForm extends Component {
     this.renderActions = this.renderActions.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onCheckChange = this.onCheckChange.bind(this);
-    this.getValue = this.getValue.bind(this);
     this.renderFields = this.renderFields.bind(this);
     this.renderInline = this.renderInline.bind(this);
     this.renderField = this.renderField.bind(this);
@@ -38,21 +37,6 @@ export default class AutoForm extends Component {
       data: props.data || this.state.data,
       schema: props.schema || this.state.schema,
     });
-  }
-
-  getValue(dotNotation) {
-    const keys = dotNotation.split('.');
-
-    if (keys.length === 1) {
-      return this.state.data[dotNotation];
-    }
-
-    let value = this.state.data;
-    keys.forEach((key) => {
-      value = value[key] ? value[key] : value;
-    });
-
-    return typeof value === 'object' ? '' : value;
   }
 
   onChange(event, inputOnChange) {
@@ -76,8 +60,8 @@ export default class AutoForm extends Component {
   }
 
   renderCheckbox(input) {
-    const checked = !!this.getValue(input.key);
     const data = this.state.data;
+    const checked = input.value ? input.value(data[input.key], data) : data[input.key];
     const onChange = this.onCheckChange;
     const actions = {
       onChange(event) {
@@ -132,6 +116,7 @@ export default class AutoForm extends Component {
   renderSelect(input) {
     const data = this.state.data;
     const onChange = this.onChange;
+    const value = input.value ? input.value(data[input.key], data) || input.default : data[input.key] || input.default;
     const actions = {
       onChange(event) {
         if (input.onChange) {
@@ -150,7 +135,7 @@ export default class AutoForm extends Component {
         <Col sm={10} md={9}>
           <FormControl
             componentClass='select'
-            value={this.getValue(input.key) || input.default}
+            value={value}
             onChange={actions.onChange}
           >
             {input.optgroups ? this.renderOptgroups(input.optgroups) : this.renderOptions(input.options || [])}
@@ -162,7 +147,7 @@ export default class AutoForm extends Component {
 
   renderInput(input) {
     const data = this.state.data;
-    const value = input.value ? input.value(this.getValue(input.key), data) : this.getValue(input.key);
+    const value = input.value ? input.value(data[input.key], data) : data[input.key];
     const onChange = this.onChange;
     const actions = {
       onChange(event) {
