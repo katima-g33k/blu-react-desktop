@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 import { I18n, Translate } from 'react-i18nify';
 
-import { CommentColumns } from '../lib/TableColumns';
-import { ConfirmModal, InputModal } from './modals';
-import HTTP from '../lib/HTTP';
-import settings from '../settings.json';
-import Table from './Table';
+import { CommentColumns } from '../../lib/TableColumns';
+import { ConfirmModal, InputModal } from '../general/modals';
+import HTTP from '../../lib/HTTP';
+import settings from '../../settings.json';
+import Table from '../general/Table';
 
 export default class MemberComment extends Component {
   constructor(props) {

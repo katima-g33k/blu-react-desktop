@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Button, Col, Glyphicon, Panel, Row } from 'react-bootstrap';
-import Search from './Search';
-import Table from './Table';
-import InputModal from './modals/InputModal';
-import HTTP from '../lib/HTTP';
-import settings from '../settings.json';
-import ItemForm from './ItemForm';
-import Copy from '../lib/models/Copy';
-import Transaction from '../lib/models/Transaction';
+import Search from '../search/Search';
+import Table from '../general/Table';
+import InputModal from '../general/modals/InputModal';
+import HTTP from '../../lib/HTTP';
+import settings from '../../settings.json';
+import ItemForm from '../item/ItemForm';
+import Copy from '../../lib/models/Copy';
+import Transaction from '../../lib/models/Transaction';
 
 const columns = [
   {

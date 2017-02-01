@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { Col, Panel } from 'react-bootstrap';
 
-import I18n from '../lib/i18n/i18n';
-import HTTP from '../lib/HTTP';
-import AutoForm from './AutoForm';
-import settings from '../settings.json';
-import Member from '../lib/models/Member';
+import I18n from '../../lib/i18n/i18n';
+import HTTP from '../../lib/HTTP';
+import AutoForm from '../general/AutoForm';
+import settings from '../../settings.json';
+import Member from '../../lib/models/Member';
 
 const schema = {
   titleClass: 'h3',

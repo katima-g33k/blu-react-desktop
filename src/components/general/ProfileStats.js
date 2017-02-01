@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import Transaction, { Type } from '../lib/Transaction';
-import { Translate } from '../lib/i18n/i18n';
+import Transaction, { Type } from '../../lib/Transaction';
+import { Translate } from '../../lib/i18n/i18n';
 
 export default class ProfileStats extends Component {
   constructor(props) {

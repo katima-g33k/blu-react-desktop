@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 import { I18n, Translate } from 'react-i18nify';
 
-import { CopyColumns } from '../lib/TableColumns';
-import { ConfirmModal, InputModal, SearchModal } from './modals';
-import HTTP from '../lib/HTTP';
-import settings from '../settings.json';
-import Table from './Table';
-import Transaction from '../lib/models/Transaction';
+import { CopyColumns } from '../../lib/TableColumns';
+import { ConfirmModal, InputModal, SearchModal } from '../general/modals';
+import HTTP from '../../lib/HTTP';
+import settings from '../../settings.json';
+import Table from '../general/Table';
+import Transaction from '../../lib/models/Transaction';
 
 export default class CopyTable extends Component {
   constructor(props) {

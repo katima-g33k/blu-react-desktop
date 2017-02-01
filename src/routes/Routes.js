@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
-import AddCopies from '../components/AddCopies';
-import Admin from '../components/Admin';
-import ItemForm from '../components/ItemForm';
-import ItemView from '../components/ItemView';
-import MemberForm from '../components/MemberForm';
-import MemberView from '../components/MemberView';
-import Search from '../components/Search';
+import AddCopies from '../components/copy/AddCopies';
+import Admin from '../components/admin/Admin';
+import ItemForm from '../components/item/ItemForm';
+import ItemView from '../components/item/ItemView';
+import MemberForm from '../components/member/MemberForm';
+import MemberView from '../components/member/MemberView';
+import Search from '../components/search/Search';
 
 const lang = 'fr';
 const i18n = {

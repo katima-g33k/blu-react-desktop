@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 
-import Header from './components/Header';
-import Sidebar from './components/Sidebar';
+import Header from './components/general/Header';
+import Sidebar from './components/general/Sidebar';
 import Routes from './routes/Routes';
 
 export default class App extends Component {

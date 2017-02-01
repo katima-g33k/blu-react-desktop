@@ -11,13 +11,13 @@ import {
   Row,
 } from 'react-bootstrap';
 import { Link } from 'react-router';
-import HTTP from '../lib/HTTP';
-import Table from './Table.js';
-import I18n, { Translate } from '../lib/i18n/i18n';
-import { SearchColumns } from '../lib/TableColumns';
-import settings from '../settings.json';
-import Member from '../lib/models/Member';
-import Item from '../lib/models/Item';
+import HTTP from '../../lib/HTTP';
+import Table from '../general/Table.js';
+import I18n, { Translate } from '../../lib/i18n/i18n';
+import { SearchColumns } from '../../lib/TableColumns';
+import settings from '../../settings.json';
+import Member from '../../lib/models/Member';
+import Item from '../../lib/models/Item';
 
 export default class Search extends Component {
   constructor(props) {

@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { Label, Panel } from 'react-bootstrap';
-import I18n, { Translate } from '../lib/i18n/i18n';
-import HTTP from '../lib/HTTP';
-import ProfileStats from './ProfileStats';
-import settings from '../settings';
-import CopyTable from './CopyTable';
-import Item from '../lib/models/Item';
-import AlignedData from './AlignedData';
+import I18n, { Translate } from '../../lib/i18n/i18n';
+import HTTP from '../../lib/HTTP';
+import ProfileStats from '../general/ProfileStats';
+import settings from '../../settings';
+import CopyTable from '../copy/CopyTable';
+import Item from '../../lib/models/Item';
+import AlignedData from '../general/AlignedData';
 
 const INFORMATION_FIELDS = {
   authors: 'authorString',

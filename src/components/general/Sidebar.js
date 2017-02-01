@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Nav, NavItem } from 'react-bootstrap';
-import { Translate } from '../lib/i18n/i18n';
+import { Translate } from '../../lib/i18n/i18n';
 
 export default class Sidebar extends Component {
   constructor(props) {

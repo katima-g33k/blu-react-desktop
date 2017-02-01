@@ -4,16 +4,16 @@ import { I18n, Translate } from 'react-i18nify';
 
 import moment from 'moment';
 
-import ActionPanel from './ActionPanel';
-import AlignedData from './AlignedData';
-import ConfirmModal from './modals/ConfirmModal';
-import CopyTable from './CopyTable';
-import HTTP from '../lib/HTTP';
-import Member from '../lib/models/Member';
+import ActionPanel from '../general/ActionPanel';
+import AlignedData from '../general/AlignedData';
+import ConfirmModal from '../general/modals/ConfirmModal';
+import CopyTable from '../copy/CopyTable';
+import HTTP from '../../lib/HTTP';
+import Member from '../../lib/models/Member';
 import MemberComments from './MemberComments';
-import ProfileStats from './ProfileStats';
-import settings from '../settings.json';
-import Transaction from '../lib/models/Transaction';
+import ProfileStats from '../general/ProfileStats';
+import settings from '../../settings.json';
+import Transaction from '../../lib/models/Transaction';
 
 const formatDate = (date) => {
   return date ? moment(new Date(date)).format('LL') : '';
