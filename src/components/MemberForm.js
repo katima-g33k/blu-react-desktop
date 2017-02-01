@@ -85,7 +85,7 @@ const schema = {
           label: 'Province',
           default: 'QC',
           value(value, data = {}) {
-            return data.city ? data.city.state.code : 'QC';
+            return data.city ? data.city.state.code : this.default;
           },
           onChange(event, data) {
             const member = data;

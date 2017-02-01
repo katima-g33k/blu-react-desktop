@@ -158,7 +158,6 @@ export default class MemberView extends Component {
         label: 'Remettre l\'argent',
         style: 'primary',
         onClick: (event) => {
-          // TODO: Display confirmation and Ask for receipt
           event.preventDefault();
 
           const member = this.state.member;
@@ -276,7 +275,7 @@ export default class MemberView extends Component {
             confirmText="Oui"
             message="Le remboursement a été complété, souhaitez-vous imprimer un reçu ?"
             onCancel={() => this.setState({ showModal: null })}
-            onConfirm={() => this.printReceipt}
+            onConfirm={this.printReceipt}
             title="Remboursement réussi"
           />
         ) : null}
