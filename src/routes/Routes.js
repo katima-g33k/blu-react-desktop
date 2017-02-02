@@ -5,7 +5,7 @@ import AddCopies from '../components/copy/AddCopies';
 import Admin from '../components/admin/Admin';
 import ItemForm from '../components/item/ItemForm';
 import ItemView from '../components/item/ItemView';
-import MemberForm from '../components/member/MemberForm';
+import MemberFormContainer from '../components/member/form/MemberFormContainer';
 import MemberViewContainer from '../components/member/view/MemberViewContainer';
 import Search from '../components/search/Search';
 
@@ -37,7 +37,7 @@ const i18n = {
 const routes = {
   addMember: {
     path: i18n[lang].AddMember,
-    component: MemberForm,
+    component: MemberFormContainer,
   },
   memberView: {
     path: i18n[lang].MemberView,
@@ -78,8 +78,8 @@ export default class Routes extends Component {
         </Route>
         <Route name="Member" path="/member">
           <Route name="MemberView" path=":no" component={MemberViewContainer} />
-          <Route name="MemberAdd" path="add" component={MemberForm} />
-          <Route name="MemberEdit" path="edit/:no" component={MemberForm} />
+          <Route name="MemberAdd" path="add" component={MemberFormContainer} />
+          <Route name="MemberEdit" path="edit/:no" component={MemberFormContainer} />
           <Route name="AddCopies" path="copies/:no" component={AddCopies} />
         </Route>
         <Route name="Item" path="/item">
