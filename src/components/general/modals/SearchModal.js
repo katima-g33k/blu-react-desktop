@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
-import Search from '../../search/Search';
+import SearchContainer from '../../search/SearchContainer';
 
 export default class SearchModal extends Component {
   render() {
@@ -13,7 +13,7 @@ export default class SearchModal extends Component {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Search
+          <SearchContainer
             type={this.props.type}
             onRowClick={this.props.onRowClick}
             noHeader

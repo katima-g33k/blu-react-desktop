@@ -7,7 +7,7 @@ import ItemForm from '../components/item/ItemForm';
 import ItemView from '../components/item/ItemView';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
 import MemberViewContainer from '../components/member/view/MemberViewContainer';
-import Search from '../components/search/Search';
+import SearchContainer from '../components/search/SearchContainer';
 
 const lang = 'fr';
 const i18n = {
@@ -45,7 +45,7 @@ const routes = {
   },
   search: {
     path: i18n[lang].Search,
-    component: Search,
+    component: SearchContainer,
   },
 };
 
@@ -68,12 +68,12 @@ export default class Routes extends Component {
   render() {
     return (
       <Router history={browserHistory}>
-        <Route path="/" component={Search}>
+        <Route path="/" component={SearchContainer}>
           <IndexRedirect to="/search" />
           <Route
             name="Search"
             path="/search"
-            component={Search}
+            component={SearchContainer}
           />
         </Route>
         <Route name="Member" path="/member">

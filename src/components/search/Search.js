@@ -11,80 +11,11 @@ import {
   Row,
 } from 'react-bootstrap';
 import { Link } from 'react-router';
-import HTTP from '../../lib/HTTP';
 import Table from '../general/Table.js';
 import I18n, { Translate } from '../../lib/i18n/i18n';
-import { SearchColumns } from '../../lib/TableColumns';
-import settings from '../../settings.json';
-import Member from '../../lib/models/Member';
-import Item from '../../lib/models/Item';
 
 export default class Search extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoading: false,
-      search: '',
-      data: [],
-      type: props.type || 'member',
-      archives: false,
-    };
-    this.search = this.search.bind(this);
-    this.handleInput = this.handleInput.bind(this);
-    this.handleType = this.handleType.bind(this);
-    this.handleArchive = this.handleArchive.bind(this);
-  }
-
-  handleInput(event) {
-    this.setState({ search: event.target.value });
-  }
-
-  search(event) {
-    event.preventDefault();
-    this.setState({ isLoading: true });
-    const data = {
-      search: this.state.search,
-      is_parent: this.state.type === 'parent',
-    };
-
-    const searchType = this.state.type === 'item' ? 'item' : 'member';
-    data[searchType === 'item' ? 'outdated' : 'deactivated'] = this.state.archives;
-
-    HTTP.post(`${settings.apiUrl}/${searchType}/search`, data, (err, res) => {
-      if (res) {
-        this.setState({
-          data: res.map(row => searchType === 'item' ? new Item(row) : new Member(row)),
-          isLoading: false,
-        });
-      }
-    });
-  }
-
-  handleType(event) {
-    const type = event.target.value;
-    this.setState({
-      type,
-      data: [],
-    });
-  }
-
-  handleArchive() {
-    this.setState({ archives: !this.state.archives });
-  }
-
   render() {
-    const type = this.state.type === 'parent' ? 'member' : this.state.type;
-    const tableOptions = {
-      onRowClick: (data) => {
-        if (this.props.onRowClick) {
-          this.props.onRowClick(data);
-        } else {
-          location.href = data.no ? `member/${data.no}` : `item/${data.id}`;
-        }
-      },
-      noDataText: I18n.t('Search.results.none'),
-    };
-
     return (
       <Panel header={this.props.noHeader ? null : I18n.t('Search.title')}>
         <Row>
@@ -92,16 +23,16 @@ export default class Search extends Component {
             <form>
               <FormControl
                 type="search"
-                onChange={this.handleInput}
+                onChange={this.props.handleInput}
               />
-              {this.props.type ? null : (
+              {this.props.disableTypeSelection ? null : (
                 <FormGroup>
                   <Radio
                     name="type"
                     value="member"
                     inline
-                    checked={this.state.type === 'member'}
-                    onChange={this.handleType}
+                    checked={this.props.type === 'member'}
+                    onChange={this.props.handleType}
                   >
                     <Translate value="Search.filters.member" />
                   </Radio>
@@ -109,8 +40,8 @@ export default class Search extends Component {
                     name="type"
                     value="item"
                     inline
-                    checked={this.state.type === 'item'}
-                    onChange={this.handleType}
+                    checked={this.props.type === 'item'}
+                    onChange={this.props.handleType}
                   >
                     <Translate value="Search.filters.item" />
                   </Radio>
@@ -118,8 +49,8 @@ export default class Search extends Component {
               )}
               {!this.props.disableArchive ? (
                 <Checkbox
-                  onChange={this.handleArchive}
-                  checked={this.state.archives}
+                  onChange={this.props.handleArchive}
+                  checked={this.props.archives}
                 >
                   <Translate value="Search.filters.archives" />
                 </Checkbox>
@@ -127,10 +58,10 @@ export default class Search extends Component {
               <Button
                 bsStyle="primary"
                 type="submit"
-                disabled={this.state.isLoading}
-                onClick={!this.state.isLoading ? this.search : null}
+                disabled={this.props.isLoading}
+                onClick={!this.props.isLoading ? this.props.handleSearch : null}
               >
-                <Translate value={this.state.isLoading ? 'Search.loading' : 'Search.title'} />
+                <Translate value={this.props.isLoading ? 'Search.loading' : 'Search.title'} />
               </Button>
             </form>
           </Col>
@@ -138,7 +69,7 @@ export default class Search extends Component {
         <Row>
           <Col sm={12} md={10}>
             <h3>
-              <Translate value="Search.results.title" /> ({this.state.data.length})
+              <Translate value="Search.results.title" /> ({this.props.data.length})
             </h3>
             {this.props.onAddButton ? (
               <Button
@@ -148,17 +79,17 @@ export default class Search extends Component {
                 <Glyphicon glyph="plus" /> {'Ajouter'}
               </Button>
             ) : (
-              <Link to={`/${type}`}>
+              <Link to={`/${this.props.type}`}>
                 <Button bsStyle="success">
                   <Glyphicon glyph="plus" /> {'Ajouter'}
                 </Button>
               </Link>
             )}
             <Table
-              columns={SearchColumns[type]}
-              data={this.state.data}
-              highlight={this.state.search}
-              options={tableOptions}
+              columns={this.props.columns}
+              data={this.props.data}
+              highlight={this.props.search}
+              options={this.props.tableOptions}
               striped
             />
           </Col>
@@ -171,7 +102,18 @@ export default class Search extends Component {
 Search.propTypes = {
   disableArchive: React.PropTypes.bool,
   noHeader: React.PropTypes.bool,
-  type: React.PropTypes.string,
   onRowClick: React.PropTypes.func,
   onAddButton: React.PropTypes.func,
+  disableTypeSelection: React.PropTypes.bool,
+  archives: React.PropTypes.bool,
+  handleInput: React.PropTypes.func,
+  handleType: React.PropTypes.func,
+  handleArchive: React.PropTypes.func,
+  type: React.PropTypes.string,
+  isLoading: React.PropTypes.bool,
+  handleSearch: React.PropTypes.func,
+  columns: React.PropTypes.array,
+  data: React.PropTypes.array,
+  search: React.PropTypes.string,
+  tableOptions: React.PropTypes.shape(),
 };
