@@ -7,7 +7,7 @@ import moment from 'moment';
 import ActionPanel from '../../general/ActionPanel';
 import AlignedData from '../../general/AlignedData';
 import CopyTable from '../../copy/CopyTable';
-import MemberComments from './../MemberComments';
+import MemberCommentsContainer from './MemberCommentsContainer';
 import ProfileStats from '../../general/ProfileStats';
 
 const formatDate = (date) => {
@@ -129,7 +129,7 @@ export default class MemberView extends Component {
             <Row>
               <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
               <Col sm={12} md={6}>
-                <MemberComments
+                <MemberCommentsContainer
                   member={this.props.member.no}
                   comments={this.props.member.account.comment}
                 />
