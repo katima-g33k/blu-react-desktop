@@ -4,7 +4,7 @@ import I18n, { Translate } from '../../lib/i18n/i18n';
 import HTTP from '../../lib/HTTP';
 import ProfileStats from '../general/ProfileStats';
 import settings from '../../settings';
-import CopyTable from '../copy/CopyTable';
+import CopyTableContainer from '../copy/table/CopyTableContainer';
 import Item from '../../lib/models/Item';
 import AlignedData from '../general/AlignedData';
 
@@ -113,7 +113,7 @@ export default class ItemView extends Component {
           <Translate value="ItemView.stats.title" />
         </h4>
         <ProfileStats copies={this.state.item.copies}/>
-        <CopyTable copies={this.state.item.copies} />
+        <CopyTableContainer copies={this.state.item.copies} />
       </Panel>
     ) : null;
   }

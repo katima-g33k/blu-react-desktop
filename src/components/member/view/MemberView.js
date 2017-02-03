@@ -6,7 +6,7 @@ import moment from 'moment';
 
 import ActionPanel from '../../general/ActionPanel';
 import AlignedData from '../../general/AlignedData';
-import CopyTable from '../../copy/CopyTable';
+import CopyTableContainer from '../../copy/table/CopyTableContainer';
 import MemberCommentsContainer from './MemberCommentsContainer';
 import ProfileStats from '../../general/ProfileStats';
 
@@ -138,7 +138,7 @@ export default class MemberView extends Component {
             <hr/>
             <Row>
               <Col md={12}>
-                <CopyTable
+                <CopyTableContainer
                   member={this.props.member.no}
                   copies={this.props.member.account.copies.filter(copy => !copy.isDonated)}
                 />
