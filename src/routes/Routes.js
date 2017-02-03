@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
-import AddCopies from '../components/copy/AddCopies';
+import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
 import Admin from '../components/admin/Admin';
 import ItemForm from '../components/item/ItemForm';
 import ItemView from '../components/item/ItemView';
@@ -80,7 +80,7 @@ export default class Routes extends Component {
           <Route name="MemberView" path=":no" component={MemberViewContainer} />
           <Route name="MemberAdd" path="add" component={MemberFormContainer} />
           <Route name="MemberEdit" path="edit/:no" component={MemberFormContainer} />
-          <Route name="AddCopies" path="copies/:no" component={AddCopies} />
+          <Route name="AddCopies" path="copies/:no" component={AddCopiesContainer} />
         </Route>
         <Route name="Item" path="/item">
           <Route name="ItemView" path=":id" component={ItemView} />
