@@ -3,7 +3,7 @@ import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
 import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
 import Admin from '../components/admin/Admin';
-import ItemForm from '../components/item/ItemForm';
+import ItemFormContainer from '../components/item/form/ItemFormContainer';
 import ItemViewContainer from '../components/item/view/ItemViewContainer';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
 import MemberViewContainer from '../components/member/view/MemberViewContainer';
@@ -84,8 +84,8 @@ export default class Routes extends Component {
         </Route>
         <Route name="Item" path="/item">
           <Route name="ItemView" path=":id" component={ItemViewContainer} />
-          <Route name="ItemAdd" path="add" component={ItemForm} />
-          <Route name="ItemEdit" path="edit/:id" component={ItemForm} />
+          <Route name="ItemAdd" path="add" component={ItemFormContainer} />
+          <Route name="ItemEdit" path="edit/:id" component={ItemFormContainer} />
         </Route>
         <Route name="Admin" path="/admin" component={Admin} />
       </Router>

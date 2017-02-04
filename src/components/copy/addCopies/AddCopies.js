@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Col, Panel, Row } from 'react-bootstrap';
 
-import ItemForm from '../../item/ItemForm';
+import ItemForm from '../../item/form/ItemForm';
 import SearchContainer from '../../search/SearchContainer';
 import Table from '../../general/Table';
 

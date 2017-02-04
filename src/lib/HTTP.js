@@ -15,8 +15,11 @@ const HTTP = {
 
     const apiURL = `${API_BASE_URL}index.php?req=${JSON.stringify(req)}`;
     request[method.toLowerCase()](apiURL, (err, res, body) => {
-      // console.log(body);
-      callback(err, err ? null : JSON.parse(body).data);
+      try {
+        callback(err, err ? null : JSON.parse(body).data);
+      } catch (e) {
+        callback({ code: 500, message: body });
+      }
     });
   },
 
