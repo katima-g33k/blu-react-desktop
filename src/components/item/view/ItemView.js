@@ -1,55 +1,17 @@
 import React, { Component } from 'react';
 import { Label, Panel } from 'react-bootstrap';
-import I18n, { Translate } from '../../lib/i18n/i18n';
-import HTTP from '../../lib/HTTP';
-import ProfileStats from '../general/ProfileStats';
-import settings from '../../settings';
-import CopyTableContainer from '../copy/table/CopyTableContainer';
-import Item from '../../lib/models/Item';
-import AlignedData from '../general/AlignedData';
 
-const INFORMATION_FIELDS = {
-  authors: 'authorString',
-  edition: 'edition',
-  editor: 'editor',
-  publication: 'publication',
-  ean13: 'ean13',
-  comment: 'comment',
-};
-
-const LABEL_STYLE = {
-  valid: 'success',
-  outdated: 'warning',
-  removed: 'danger',
-};
-
-const PANEL_STYLE = {
-  VALID: 'default',
-  OUTDATED: 'warning',
-  REMOVED: 'danger',
-};
+import AlignedData from '../../general/AlignedData';
+import CopyTableContainer from '../../copy/table/CopyTableContainer';
+import I18n, { Translate } from '../../../lib/i18n/i18n';
+import { INFORMATION_FIELDS, LABEL_STYLE, PANEL_STYLE } from './constant';
+import ProfileStats from '../../general/ProfileStats';
 
 export default class ItemView extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      item: null,
-    };
-
     this.renderInformation = this.renderInformation.bind(this);
     this.renderInternalManagement = this.renderInternalManagement.bind(this);
-  }
-
-  componentWillMount() {
-    const data = {
-      id: this.props.params.id,
-    };
-
-    HTTP.post(`${settings.apiUrl}/item/select`, data, (err, res) => {
-      if (res) {
-        this.setState({ item: new Item(res) });
-      }
-    });
   }
 
   renderInformation() {
@@ -62,7 +24,7 @@ export default class ItemView extends Component {
           <AlignedData
             key={key}
             label={<Translate value={`ItemView.information.${key}`} />}
-            value={this.state.item[INFORMATION_FIELDS[key]] || ''}
+            value={this.props.data[INFORMATION_FIELDS[key]] || ''}
           />
         ))}
       </section>
@@ -70,7 +32,7 @@ export default class ItemView extends Component {
   }
 
   renderInternalManagement() {
-    const status = this.state.item.getStatus().toLowerCase();
+    const status = this.props.data.getStatus().toLowerCase();
     return (
       <section>
         <h4>
@@ -86,39 +48,39 @@ export default class ItemView extends Component {
         />
         <AlignedData
           label={<Translate value="ItemView.internalManagement.category" />}
-          value={this.state.item.subject.category.name}
+          value={this.props.data.subject.category.name}
         />
         <AlignedData
           label={<Translate value="ItemView.internalManagement.subject" />}
-          value={this.state.item.subject.name}
+          value={this.props.data.subject.name}
         />
         <AlignedData
           label={<Translate value="ItemView.internalManagement.storage" />}
-          value={this.state.item.storageString}
+          value={this.props.data.storageString}
         />
       </section>
     );
   }
 
   render() {
-    return this.state.item ? (
+    return (
       <Panel
         header={I18n.t('ItemView.title')}
-        bsStyle={PANEL_STYLE[this.state.item.getStatus()]}
+        bsStyle={PANEL_STYLE[this.props.data.getStatus()]}
       >
-        <h3>{this.state.item.name}</h3>
+        <h3>{this.props.data.name}</h3>
         {this.renderInformation()}
         {this.renderInternalManagement()}
         <h4>
           <Translate value="ItemView.stats.title" />
         </h4>
-        <ProfileStats copies={this.state.item.copies}/>
-        <CopyTableContainer copies={this.state.item.copies} />
+        <ProfileStats copies={this.props.data.copies}/>
+        <CopyTableContainer copies={this.props.data.copies} />
       </Panel>
-    ) : null;
+    );
   }
 }
 
 ItemView.propTypes = {
-  params: React.PropTypes.shape(),
+  data: React.PropTypes.shape(),
 };
