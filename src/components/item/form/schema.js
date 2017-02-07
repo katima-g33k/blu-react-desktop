@@ -49,28 +49,6 @@ const schema = {
       ],
     },
   ],
-  actions: [
-    {
-      label: 'Annuler',
-      options: {
-        bsStyle: 'danger',
-      },
-      onClick(event, data) {
-        event.preventDefault();
-        return data;
-      },
-    },
-    {
-      label: 'Sauvegarder',
-      options: {
-        bsStyle: 'success',
-      },
-      onClick(event, data) {
-        event.preventDefault();
-        return data;
-      },
-    },
-  ],
 };
 
 export default schema;

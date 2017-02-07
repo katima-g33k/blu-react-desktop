@@ -83,7 +83,7 @@ export default class Routes extends Component {
           <Route name="AddCopies" path="copies/:no" component={AddCopiesContainer} />
         </Route>
         <Route name="Item" path="/item">
-          <Route name="ItemView" path=":id" component={ItemViewContainer} />
+          <Route name="ItemView" path="view/:id" component={ItemViewContainer} />
           <Route name="ItemAdd" path="add" component={ItemFormContainer} />
           <Route name="ItemEdit" path="edit/:id" component={ItemFormContainer} />
         </Route>

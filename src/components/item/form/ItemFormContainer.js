@@ -1,17 +1,23 @@
 import React, { Component } from 'react';
+
 import HTTP from '../../../lib/HTTP';
-import settings from '../../../settings.json';
+import Item from '../../../lib/models/Item';
 import ItemForm from './ItemForm';
+import settings from '../../../settings.json';
 import schema from './schema';
 
 export default class ItemFormContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      item: {},
+      item: new Item(),
       categories: [],
     };
 
+    this.insert = this.insert.bind(this);
+    this.onCancel = this.onCancel.bind(this);
+    this.onSave = this.onSave.bind(this);
+    this.update = this.update.bind(this);
     this.schema = schema;
   }
 
@@ -33,12 +39,57 @@ export default class ItemFormContainer extends Component {
           // TODO: display error
         }
 
-        this.setState({ item: res });
+        this.setState({ item: new Item(res) });
       });
     }
   }
 
+  insert(item) {
+    HTTP.post(`${settings.apiUrl}/item/insert`, { item }, (err, res) => {
+      if (err) {
+        // TODO: Display message
+        return;
+      }
+
+      this.props.router.push(`/item/${res.id}`);
+    });
+  }
+
+  onCancel() {
+    const id = this.props.params.id;
+    this.props.router.push(id ? `/item/${id}` : 'search');
+  }
+
+  onSave(event, data) {
+    const item = data;
+    item.subject = item.subject.id;
+    return this.props.params.id ? this.update(item) : this.insert(item);
+  }
+
+  update(item) {
+    const id = this.props.params.id;
+    const data = {
+      id,
+      item,
+    };
+
+    HTTP.post(`${settings.apiUrl}/item/update`, data, (err, res) => {
+      if (err) {
+        // TODO: Display message
+        return;
+      }
+
+      this.props.router.push(`/item/${id}`);
+    });
+  }
+
   render() {
+    const item = this.state.item;
+    delete item.copies;
+    delete item.reservation;
+    delete item.status;
+    delete item.storage;
+
     const subjectField = this.schema.sections[0].fields.find(field => field.key === 'subject');
     subjectField.optgroups = this.state.categories.map((category) => {
       return {
@@ -52,7 +103,9 @@ export default class ItemFormContainer extends Component {
 
     return (
       <ItemForm
-        data={this.state.item}
+        data={item}
+        onCancel={this.onCancel}
+        onSave={this.onSave}
         schema={this.schema}
       />
     );
@@ -61,4 +114,5 @@ export default class ItemFormContainer extends Component {
 
 ItemFormContainer.propTypes = {
   params: React.PropTypes.shape(),
+  router: React.PropTypes.shape(),
 };

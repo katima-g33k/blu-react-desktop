@@ -11,8 +11,8 @@ export default class ItemForm extends Component {
           <AutoForm
             schema={this.props.schema}
             data={this.props.data}
-            onCancel={() => {}}
-            onSave={() => {}}
+            onCancel={this.props.onCancel}
+            onSave={this.props.onSave}
           />
         </Col>
       </Panel>);
@@ -21,5 +21,7 @@ export default class ItemForm extends Component {
 
 ItemForm.propTypes = {
   data: React.PropTypes.shape(),
-  schema: React.PropTypes.shape(),
+  onCancel: React.PropTypes.func.isRequired,
+  onSave: React.PropTypes.func.isRequired,
+  schema: React.PropTypes.shape().isRequired,
 };
