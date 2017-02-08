@@ -29,7 +29,7 @@ export default class SearchContainer extends Component {
         if (this.props.onRowClick) {
           this.props.onRowClick(data);
         } else {
-          location.href = data.no ? `member/${data.no}` : `item/${data.id}`;
+          location.href = data.no ? `member/view/${data.no}` : `item/view/${data.id}`;
         }
       },
       noDataText: I18n.t('Search.results.none'),

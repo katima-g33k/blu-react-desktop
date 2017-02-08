@@ -23,10 +23,10 @@ export default class Sidebar extends Component {
         <NavItem eventKey='search' href="/search">
           <Translate value="Sidebar.search" />
         </NavItem>
-        <NavItem eventKey='item' href="/item">
+        <NavItem eventKey='item' href="/item/add">
           <Translate value="Sidebar.item" />
         </NavItem>
-        <NavItem eventKey='member' href="/member">
+        <NavItem eventKey='member' href="/member/add">
           <Translate value="Sidebar.member" />
         </NavItem>
         <NavItem eventKey='admin' href="/admin">

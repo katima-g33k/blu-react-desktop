@@ -66,12 +66,12 @@ export default class AddCopiesContainer extends Component {
   }
 
   openModal(item) {
-    this.setState({ item, showModal: true });
+    this.setState({ item, showModal: true, isSearch: true });
   }
 
   save(event, value) {
     const data = {
-      member_no: this.props.params.id,
+      member_no: this.props.params.no,
       item_id: this.state.item.id,
       price: value,
     };
@@ -107,12 +107,15 @@ export default class AddCopiesContainer extends Component {
   render() {
     return (
       <AddCopies
+        {...this.props}
         columns={this.columns}
-        data={this.state.data}
+        data={this.state.copies}
         isSearch={this.state.isSearch}
-        modal={this.getModal}
+        modal={this.getModal()}
         onAddButton={() => this.setState({ isSearch: false })}
         openModal={this.openModal}
+        onFormSave={this.openModal}
+        onFormCancel={() => this.setState({ isSearch: true })}
       />
     );
   }

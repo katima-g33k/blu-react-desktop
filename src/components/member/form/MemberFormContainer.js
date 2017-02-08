@@ -11,7 +11,7 @@ export default class MemberFormContainer extends Component {
     super(props);
     this.state = {
       states: [],
-      member: null,
+      member: new Member(),
     };
 
     this.schema = memberFormSchema;
@@ -42,7 +42,7 @@ export default class MemberFormContainer extends Component {
 
   cancel(event) {
     event.preventDefault();
-    this.props.router.push(this.state.member.no ? `/member/${this.state.member.no}` : 'search');
+    this.props.router.push(this.state.member.no ? `/member/view/${this.state.member.no}` : '/search');
   }
 
   save(event, member) {
@@ -59,7 +59,7 @@ export default class MemberFormContainer extends Component {
       }
 
       this.props.router.push({
-        pathname: `/member/${member.no}`,
+        pathname: `/member/view/${member.no}`,
       });
     });
   }
@@ -71,14 +71,14 @@ export default class MemberFormContainer extends Component {
       delete member.account;
     }
 
-    return member ? (
+    return (
       <MemberForm
         member={member}
         onCancel={this.cancel}
         onSave={this.save}
         schema={this.schema}
       />
-    ) : null;
+    );
   }
 }
 

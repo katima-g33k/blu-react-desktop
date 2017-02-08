@@ -7,6 +7,9 @@ const addCopiesColumns = [
   {
     dataField: 'title',
     label: 'Titre',
+    dataFormat(cell, row) {
+      return row.item.name;
+    },
   },
   {
     dataField: 'price',

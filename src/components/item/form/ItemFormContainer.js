@@ -30,7 +30,7 @@ export default class ItemFormContainer extends Component {
       this.setState({ categories: res });
     });
 
-    if (this.props.params.id) {
+    if (this.props.params && this.props.params.id) {
       const data = {
         id: this.props.params.id,
       };
@@ -51,13 +51,19 @@ export default class ItemFormContainer extends Component {
         return;
       }
 
-      this.props.router.push(`/item/${res.id}`);
+      if (this.props.onSave) {
+        // TODO: update item with res
+        item.id = res.id;
+        this.props.onSave(item);
+      } else {
+        this.props.router.push(`/item/view/${res.id}`);
+      }
     });
   }
 
   onCancel() {
-    const id = this.props.params.id;
-    this.props.router.push(id ? `/item/${id}` : 'search');
+    const id = this.props.params ? this.props.params.id : null;
+    this.props.router.push(id ? `/item/view/${id}` : '/search');
   }
 
   onSave(event, data) {
@@ -73,13 +79,18 @@ export default class ItemFormContainer extends Component {
       item,
     };
 
-    HTTP.post(`${settings.apiUrl}/item/update`, data, (err, res) => {
+    HTTP.post(`${settings.apiUrl}/item/update`, data, (err) => {
       if (err) {
         // TODO: Display message
         return;
       }
 
-      this.props.router.push(`/item/${id}`);
+      if (this.props.onSave) {
+        // TODO: update item with res
+        this.props.onSave(item);
+      } else {
+        this.props.router.push(`/item/view/${id}`);
+      }
     });
   }
 
@@ -104,7 +115,7 @@ export default class ItemFormContainer extends Component {
     return (
       <ItemForm
         data={item}
-        onCancel={this.onCancel}
+        onCancel={this.props.onCancel || this.onCancel}
         onSave={this.onSave}
         schema={this.schema}
       />
@@ -113,6 +124,8 @@ export default class ItemFormContainer extends Component {
 }
 
 ItemFormContainer.propTypes = {
+  onCancel: React.PropTypes.func,
+  onSave: React.PropTypes.func,
   params: React.PropTypes.shape(),
   router: React.PropTypes.shape(),
 };

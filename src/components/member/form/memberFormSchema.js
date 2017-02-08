@@ -97,7 +97,7 @@ const memberFormSchema = {
               label: 'Téléphone 1',
               placeholder: 'XXX-XXX-XXXX',
               value(value, member) {
-                return member.phone ? member.phone[0].number : '';
+                return member.phone && member.phone[0] ? member.phone[0].number : '';
               },
               onChange(event, data) {
                 const member = data;
@@ -110,7 +110,7 @@ const memberFormSchema = {
               type: 'text',
               label: 'Note',
               value(value, member) {
-                return member.phone ? member.phone[0].note : '';
+                return member.phone && member.phone[0] ? member.phone[0].note : '';
               },
               onChange(event, data) {
                 const member = data;

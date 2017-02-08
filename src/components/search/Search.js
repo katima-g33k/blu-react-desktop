@@ -79,7 +79,7 @@ export default class Search extends Component {
                 <Glyphicon glyph="plus" /> {'Ajouter'}
               </Button>
             ) : (
-              <Link to={`/${this.props.type}`}>
+              <Link to={`/${this.props.type}/add`}>
                 <Button bsStyle="success">
                   <Glyphicon glyph="plus" /> {'Ajouter'}
                 </Button>

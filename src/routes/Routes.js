@@ -77,12 +77,14 @@ export default class Routes extends Component {
           />
         </Route>
         <Route name="Member" path="/member">
-          <Route name="MemberView" path=":no" component={MemberViewContainer} />
+          <IndexRedirect to="add" />
+          <Route name="MemberView" path="view/:no" component={MemberViewContainer} />
           <Route name="MemberAdd" path="add" component={MemberFormContainer} />
           <Route name="MemberEdit" path="edit/:no" component={MemberFormContainer} />
           <Route name="AddCopies" path="copies/:no" component={AddCopiesContainer} />
         </Route>
         <Route name="Item" path="/item">
+          <IndexRedirect to="add" />
           <Route name="ItemView" path="view/:id" component={ItemViewContainer} />
           <Route name="ItemAdd" path="add" component={ItemFormContainer} />
           <Route name="ItemEdit" path="edit/:id" component={ItemFormContainer} />
