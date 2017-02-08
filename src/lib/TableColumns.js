@@ -120,7 +120,7 @@ export const CopyColumns = [
     itemOnly: true,
     dataFormat(cell) {
       return (
-        <Link to={{ pathname: `/member/${cell.no}` }}>
+        <Link to={{ pathname: `/member/view/${cell.no}` }}>
           {cell.name}
         </Link>);
     },
@@ -133,7 +133,7 @@ export const CopyColumns = [
     memberOnly: true,
     dataFormat(cell, row) {
       return (
-        <Link to={{ pathname: `/item/${row.item.id}` }}>
+        <Link to={{ pathname: `/item/view/${row.item.id}` }}>
           {row.item.name}
         </Link>);
     },

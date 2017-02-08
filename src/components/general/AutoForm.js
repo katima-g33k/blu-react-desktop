@@ -23,7 +23,6 @@ export default class AutoForm extends Component {
     this.renderOptions = this.renderOptions.bind(this);
     this.renderSelect = this.renderSelect.bind(this);
     this.renderInput = this.renderInput.bind(this);
-    this.renderActions = this.renderActions.bind(this);
     this.onChange = this.onChange.bind(this);
     this.onCheckChange = this.onCheckChange.bind(this);
     this.renderFields = this.renderFields.bind(this);
@@ -232,34 +231,6 @@ export default class AutoForm extends Component {
         </FormGroup>
       );
     });
-  }
-
-  renderActions(actions) {
-    const data = this.state.data;
-    const buttons = actions.map((action, index) => {
-      const onClick = (event) => {
-        action.onClick(event, data);
-      };
-      return (
-        <Button
-          key={`action${index}`}
-          onClick={onClick}
-          {...action.options}
-        >
-          {action.label}
-        </Button>
-      );
-    });
-
-    return (
-      <FormGroup>
-        <Col smOffset={2} mdOffset={3} sm={10} md={9}>
-          <ButtonToolbar>
-            {buttons}
-          </ButtonToolbar>
-        </Col>
-      </FormGroup>
-    );
   }
 
   render() {

@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
-import { I18n, Translate } from 'react-i18nify';
 
-import { CopyColumns } from '../lib/TableColumns';
-import { ConfirmModal, InputModal, SearchModal } from './modals';
-import HTTP from '../lib/HTTP';
-import settings from '../settings.json';
-import Table from './Table';
-import Transaction from '../lib/models/Transaction';
+import CopyTable from './CopyTable';
+import { CopyColumns } from '../../../lib/TableColumns';
+import { ConfirmModal, InputModal, SearchModal } from '../../general/modals';
+import HTTP from '../../../lib/HTTP';
+import settings from '../../../settings.json';
+import Transaction from '../../../lib/models/Transaction';
 
-export default class CopyTable extends Component {
+export default class CopyTableContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -19,14 +18,16 @@ export default class CopyTable extends Component {
 
     this.cancelReservation = this.cancelReservation.bind(this);
     this.delete = this.delete.bind(this);
-    this.formatRow = this.formatRow.bind(this);
     this.refund = this.refund.bind(this);
     this.reserve = this.reserve.bind(this);
     this.sell = this.sell.bind(this);
     this.updatePrice = this.updatePrice.bind(this);
-    this.renderModals = this.renderModals.bind(this);
+    this.getModal = this.getModal.bind(this);
 
     this.columns = CopyColumns.filter(column => this.props.member ? !column.itemOnly : !column.memberOnly);
+  }
+
+  componentWillMount() {
     this.columns.find(c => c.dataField === 'priceString').dataFormat = (price, copy) => (
       <Button
         bsStyle="link"
@@ -36,6 +37,7 @@ export default class CopyTable extends Component {
         {price}
       </Button>
     );
+
     this.columns.find(c => c.dataField === 'actions').dataFormat = (cell, copy) => {
       if (copy.isPaid) {
         return '';
@@ -130,20 +132,6 @@ export default class CopyTable extends Component {
     });
   }
 
-  formatRow(row, index) {
-    if (row.item && row.item.status && row.item.status.REMOVED) {
-      return 'removed';
-    }
-
-    if ((row.member && !row.member.account.isActive) ||
-        (row.item && row.item.status && row.item.status.OUTDATED)) {
-      return 'archived';
-    }
-
-    // Striped
-    return index % 2 === 0 ? 'striped-row' : '';
-  }
-
   refund(id) {
     const data = {
       copy: id,
@@ -220,10 +208,10 @@ export default class CopyTable extends Component {
     });
   }
 
-  renderModals() {
-    return (
-      <div>
-        {this.state.showModal === 'delete' ? (
+  getModal() {
+    switch (this.state.showModal) {
+      case 'delete':
+        return (
           <ConfirmModal
             message={'Souhaitez-vous vraiment supprimer cet exemplaire ?'}
             title="Supprimer un exemplaire"
@@ -231,8 +219,9 @@ export default class CopyTable extends Component {
             onCancel={() => this.setState({ activeCopy: null, showModal: null })}
             confirmationStyle="danger"
           />
-        ) : null}
-        {this.state.showModal === 'cancelReservation' ? (
+        );
+      case 'cancelReservation':
+        return (
           <ConfirmModal
             message={'Souhaitez-vous vraiment annuler cette réservation ?'}
             title="Anuller une réservation"
@@ -240,8 +229,9 @@ export default class CopyTable extends Component {
             onCancel={() => this.setState({ activeCopy: null, showModal: null })}
             confirmationStyle="danger"
           />
-        ) : null}
-        {this.state.showModal === 'update' ? (
+        );
+      case 'update':
+        return (
           <InputModal
             message="Entrer le nouveau montant"
             title={'Mettre à jour le prix'}
@@ -250,39 +240,33 @@ export default class CopyTable extends Component {
             onSave={this.updatePrice}
             onCancel={() => this.setState({ activeCopy: null, showModal: null })}
           />
-        ) : null}
-        {this.state.showModal === 'reserve' ? (
+        );
+      case 'reserve':
+        return (
           <SearchModal
             disableArchive
             onCancel={() => this.setState({ activeCopy: null, showModal: null })}
             onRowClick={this.reserve}
             type="parent"
           />
-        ) : null}
-      </div>
-    );
+        );
+      default:
+        return null;
+    }
   }
 
   render() {
     return (
-      <section>
-        <h4>
-          <Translate value="MemberView.copies.title" />
-        </h4>
-        <Table
-          columns={this.columns}
-          data={this.state.copies}
-          placeholder={I18n.t('MemberView.copies.none')}
-          sortable
-          rowClass={this.formatRow}
-        />
-        {this.renderModals()}
-      </section>
+      <CopyTable
+        columns={this.columns}
+        data={this.state.copies}
+        modal={this.getModal()}
+      />
     );
   }
 }
 
-CopyTable.propTypes = {
+CopyTableContainer.propTypes = {
   copies: React.PropTypes.array.isRequired,
   member: React.PropTypes.string,
 };

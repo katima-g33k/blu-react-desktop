@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 
-import Header from './components/Header';
-import Sidebar from './components/Sidebar';
+import Header from './components/general/Header';
+import Sidebar from './components/general/Sidebar';
 import Routes from './routes/Routes';
 
 export default class App extends Component {
@@ -29,12 +29,12 @@ export default class App extends Component {
           case 10:
             const no = 2 + code.slice(1, 9);
             // TODO: call member/exists
-            location.href = `/member/${no}`;
+            location.href = `/member/view/${no}`;
             break;
           case 13:
             // TODO call  item/exists
             const id = 0;
-            location.href = `/item/${id}`;
+            location.href = `/item/view/${id}`;
             break;
           default:
             // TODO: Alert code not supported

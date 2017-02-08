@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
-import { I18n, Translate } from 'react-i18nify';
 
-import { CommentColumns } from '../lib/TableColumns';
-import { ConfirmModal, InputModal } from './modals';
-import HTTP from '../lib/HTTP';
-import settings from '../settings.json';
-import Table from './Table';
+import { CommentColumns } from '../../../lib/TableColumns';
+import { ConfirmModal, InputModal } from '../../general/modals';
+import MemberComments from './MemberComments';
+import HTTP from '../../../lib/HTTP';
+import settings from '../../../settings.json';
 
-export default class MemberComment extends Component {
+export default class MemberCommentContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -17,13 +16,15 @@ export default class MemberComment extends Component {
       showModal: null,
     };
 
+    this.columns = CommentColumns;
     this.deleteComment = this.deleteComment.bind(this);
+    this.getModal = this.getModal.bind(this);
     this.saveComment = this.saveComment.bind(this);
+  }
 
-    this.CommentColumns = CommentColumns;
-
-    if (this.CommentColumns[this.CommentColumns.length - 1].dataField !== 'action') {
-      this.CommentColumns.push({
+  componentWillMount() {
+    if (this.columns[this.columns.length - 1].dataField !== 'action') {
+      this.columns.push({
         dataField: 'action',
         label: 'Actions',
         dataAlign: 'center',
@@ -104,25 +105,10 @@ export default class MemberComment extends Component {
     });
   }
 
-  render() {
-    return (
-      <section>
-        <h4>
-          <Translate value="MemberView.comment.title" />
-        </h4>
-        <Button
-          bsStyle='success'
-          onClick={() => this.setState({ showModal: 'input' })}
-        >
-          <Glyphicon glyph='plus' /> {'Ajouter'}
-        </Button>
-        <Table
-          columns={CommentColumns}
-          data={this.state.comments}
-          placeholder={I18n.t('MemberView.comment.none')}
-          striped
-        />
-        {this.state.showModal === 'input' ? (
+  getModal() {
+    switch (this.state.showModal) {
+      case 'input':
+        return (
           <InputModal
             message="Entrer le commentaire"
             title={this.state.activeComment ? 'Modifier un commentaire' : 'Ajouter un commentaire'}
@@ -131,8 +117,9 @@ export default class MemberComment extends Component {
             onSave={this.saveComment}
             onCancel={() => this.setState({ activeComment: null, showModal: null })}
           />
-        ) : null}
-        {this.state.showModal === 'confirm' ? (
+        );
+      case 'confirm':
+        return (
           <ConfirmModal
             message={`Souhaitez-vous vraiment supprimer ce commentaire : "${this.state.activeComment.comment}"`}
             title="Supprimer un commentaire"
@@ -140,13 +127,25 @@ export default class MemberComment extends Component {
             onCancel={() => this.setState({ activeComment: null, showModal: null })}
             confirmationStyle="danger"
           />
-        ) : null}
-      </section>
+        );
+      default:
+        return null;
+    }
+  }
+
+  render() {
+    return (
+      <MemberComments
+        columns={this.columns}
+        data={this.state.comments}
+        modal={this.getModal()}
+        onAddClick={() => this.setState({ showModal: 'input' })}
+      />
     );
   }
 }
 
-MemberComment.propTypes = {
+MemberCommentContainer.propTypes = {
   comments: React.PropTypes.array,
   member: React.PropTypes.string,
 };

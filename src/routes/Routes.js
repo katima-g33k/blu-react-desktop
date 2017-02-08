@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
-import AddCopies from '../components/AddCopies';
-import Admin from '../components/Admin';
-import ItemForm from '../components/ItemForm';
-import ItemView from '../components/ItemView';
-import MemberForm from '../components/MemberForm';
-import MemberView from '../components/MemberView';
-import Search from '../components/Search';
+import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
+import Admin from '../components/admin/Admin';
+import ItemFormContainer from '../components/item/form/ItemFormContainer';
+import ItemViewContainer from '../components/item/view/ItemViewContainer';
+import MemberFormContainer from '../components/member/form/MemberFormContainer';
+import MemberViewContainer from '../components/member/view/MemberViewContainer';
+import SearchContainer from '../components/search/SearchContainer';
 
 const lang = 'fr';
 const i18n = {
@@ -37,15 +37,15 @@ const i18n = {
 const routes = {
   addMember: {
     path: i18n[lang].AddMember,
-    component: MemberForm,
+    component: MemberFormContainer,
   },
   memberView: {
     path: i18n[lang].MemberView,
-    component: MemberView,
+    component: MemberViewContainer,
   },
   search: {
     path: i18n[lang].Search,
-    component: Search,
+    component: SearchContainer,
   },
 };
 
@@ -68,24 +68,26 @@ export default class Routes extends Component {
   render() {
     return (
       <Router history={browserHistory}>
-        <Route path="/" component={Search}>
+        <Route path="/" component={SearchContainer}>
           <IndexRedirect to="/search" />
           <Route
             name="Search"
             path="/search"
-            component={Search}
+            component={SearchContainer}
           />
         </Route>
         <Route name="Member" path="/member">
-          <Route name="MemberView" path=":no" component={MemberView} />
-          <Route name="MemberAdd" path="add" component={MemberForm} />
-          <Route name="MemberEdit" path="edit/:no" component={MemberForm} />
-          <Route name="AddCopies" path="copies/:no" component={AddCopies} />
+          <IndexRedirect to="add" />
+          <Route name="MemberView" path="view/:no" component={MemberViewContainer} />
+          <Route name="MemberAdd" path="add" component={MemberFormContainer} />
+          <Route name="MemberEdit" path="edit/:no" component={MemberFormContainer} />
+          <Route name="AddCopies" path="copies/:no" component={AddCopiesContainer} />
         </Route>
         <Route name="Item" path="/item">
-          <Route name="ItemView" path=":id" component={ItemView} />
-          <Route name="ItemAdd" path="add" component={ItemForm} />
-          <Route name="ItemEdit" path="edit/:id" component={ItemForm} />
+          <IndexRedirect to="add" />
+          <Route name="ItemView" path="view/:id" component={ItemViewContainer} />
+          <Route name="ItemAdd" path="add" component={ItemFormContainer} />
+          <Route name="ItemEdit" path="edit/:id" component={ItemFormContainer} />
         </Route>
         <Route name="Admin" path="/admin" component={Admin} />
       </Router>
