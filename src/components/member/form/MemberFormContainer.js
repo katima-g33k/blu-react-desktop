@@ -14,10 +14,12 @@ export default class MemberFormContainer extends Component {
       member: new Member(),
     };
 
-    this.schema = memberFormSchema;
     this.cancel = this.cancel.bind(this);
+    this.insert = this.insert.bind(this);
     this.save = this.save.bind(this);
+    this.update = this.update.bind(this);
 
+    this.schema = memberFormSchema;
     this.schema.title = !this.props.params.no ? 'Ajouter un membre' : 'Modifier un membre';
   }
 
@@ -42,17 +44,31 @@ export default class MemberFormContainer extends Component {
 
   cancel(event) {
     event.preventDefault();
-    this.props.router.push(this.state.member.no ? `/member/view/${this.state.member.no}` : '/search');
+    const no = this.props.params.no;
+    this.props.router.push(no ? `/member/view/${no}` : '/search');
+  }
+
+  insert(member) {
+    HTTP.post(`${settings.apiUrl}/member/insert`, { ...member }, (err) => {
+      if (err) {
+        // TODO: Display error message
+        return;
+      }
+
+      this.props.router.push({
+        pathname: `/member/view/${member.no}`,
+      });
+    });
   }
 
   save(event, member) {
     event.preventDefault();
-    const data = {
-      no: member.no,
-      member,
-    };
+    const no = this.props.params.no;
+    return no ? this.update(no, member) : this.insert(member);
+  }
 
-    HTTP.post(`${settings.apiUrl}/member/update`, data, (err) => {
+  update(no, member) {
+    HTTP.post(`${settings.apiUrl}/member/update`, { no, member }, (err) => {
       if (err) {
         // TODO: Display error message
         return;
@@ -66,10 +82,7 @@ export default class MemberFormContainer extends Component {
 
   render() {
     const member = this.state.member;
-
-    if (member) {
-      delete member.account;
-    }
+    delete member.account;
 
     return (
       <MemberForm
