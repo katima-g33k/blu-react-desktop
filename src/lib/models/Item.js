@@ -13,7 +13,7 @@ export default class Item {
     this.ean13 = item.ean13;
     this.author = item.author ? item.author.map(author => new Author(author)) : [];
     this.copies = item.copies ? item.copies.map(copy => new Copy(copy)) : [];
-    this.status = item.status || '';
+    this.status = item.status || {};
     this.storage = item.storage || [];
     this.reservation = item.reservation || [];
   }
@@ -28,6 +28,18 @@ export default class Item {
     }
 
     return Item.STATUS.VALID;
+  }
+
+  updateStatus(status) {
+    switch (status) {
+      case Item.STATUS.VALID:
+        delete this.status[Item.STATUS.OUTDATED];
+      case Item.STATUS.OUTDATED:                    // eslint-disable-line
+        delete this.status[Item.STATUS.REMOVED];
+      default:                                      // eslint-disable-line
+        this.status[status] = new Date();
+        break;
+    }
   }
 
   get isValid() {

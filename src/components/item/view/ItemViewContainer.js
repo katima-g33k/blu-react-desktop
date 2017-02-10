@@ -5,6 +5,20 @@ import Item from '../../../lib/models/Item';
 import ItemView from './ItemView';
 import settings from '../../../settings';
 
+const status = {
+  VALID: {
+    label: 'Valide',
+    style: 'success',
+  },
+  OUTDATED: {
+    label: 'Désuet',
+    style: 'warning',
+  },
+  REMOVED: {
+    label: 'Retiré',
+    style: 'danger',
+  },
+};
 
 export default class ItemViewContainer extends Component {
   constructor(props) {
@@ -13,6 +27,9 @@ export default class ItemViewContainer extends Component {
       item: null,
     };
 
+    this.decreaseStatus = this.decreaseStatus.bind(this);
+    this.increaseStatus = this.increaseStatus.bind(this);
+    this.updateStatus = this.updateStatus.bind(this);
     this.getActions = this.getActions.bind(this);
   }
 
@@ -28,18 +45,54 @@ export default class ItemViewContainer extends Component {
     });
   }
 
+  decreaseStatus() {
+    const newStatus = this.state.item.isValid ? Item.STATUS.OUTDATED : Item.STATUS.REMOVED;
+    this.updateStatus(newStatus);
+  }
+
+  increaseStatus() {
+    const newStatus = this.state.item.isRemoved ? Item.STATUS.OUTDATED : Item.STATUS.VALID;
+    this.updateStatus(newStatus);
+  }
+
+  updateStatus(newStatus) {
+    const data = {
+      id: this.props.params.id,
+      status: newStatus,
+    };
+
+    HTTP.post(`${settings.apiUrl}/item/updateStatus`, data, (err) => {
+      if (err) {
+        // TODO: Display erorr message
+        return;
+      }
+
+      const item = this.state.item;
+      item.updateStatus(newStatus);
+      this.setState({ item });
+    });
+  }
+
   getActions() {
     return [
       {
         label: 'Modifier',
-        href: `/item/edit/${this.state.item.id}`,
+        href: `/item/edit/${this.props.params.id}`,
         style: 'primary',
       },
       {
-        label: 'Statut',
-        style: 'primary',
-        onClick: (event) => {
-          event.preventDefault();
+        custom: true,
+        iconLeft: 'minus',
+        iconRight: 'plus',
+        label: status[this.state.item.getStatus()].label,
+        bsStyleCenter: status[this.state.item.getStatus()].style,
+        leftButton: {
+          onClick: this.decreaseStatus,
+          disabled: this.state.item.isRemoved,
+        },
+        rightButton: {
+          onClick: this.increaseStatus,
+          disabled: this.state.item.isValid || this.state.item.isRemoved,
         },
       },
       {

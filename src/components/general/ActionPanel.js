@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Button, Col, Panel, Row } from 'react-bootstrap';
 import { Link } from 'react-router';
 
+import CustomButton from './CustomButton';
+
 export default class ActionPanel extends Component {
   constructor(props) {
     super(props);
@@ -22,7 +24,9 @@ export default class ActionPanel extends Component {
     return (
       <Panel header='actions'>
         {this.props.actions.map((action, index) => {
-          return (
+          return action.custom ? (
+            <CustomButton key={`action${index}`} {...action} />
+          ) : (
             <Row key={`action${index}`} style={style}>
               <Col md={12}>
                 <Link to={action.href || '#'}>
