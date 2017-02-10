@@ -12,6 +12,8 @@ export default class ItemViewContainer extends Component {
     this.state = {
       item: null,
     };
+
+    this.getActions = this.getActions.bind(this);
   }
 
   componentWillMount() {
@@ -26,9 +28,36 @@ export default class ItemViewContainer extends Component {
     });
   }
 
+  getActions() {
+    return [
+      {
+        label: 'Modifier',
+        href: `/item/edit/${this.state.item.id}`,
+        style: 'primary',
+      },
+      {
+        label: 'Statut',
+        style: 'primary',
+        onClick: (event) => {
+          event.preventDefault();
+        },
+      },
+      {
+        label: 'Gérer les caisses',
+        style: 'primary',
+        onClick: (event) => {
+          event.preventDefault();
+        },
+      },
+    ];
+  }
+
   render() {
     return this.state.item ? (
-      <ItemView data={this.state.item} />
+      <ItemView
+        data={this.state.item}
+        actions={this.getActions()}
+      />
     ) : null;
   }
 }
