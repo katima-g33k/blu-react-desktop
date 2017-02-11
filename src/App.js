@@ -52,9 +52,7 @@ export default class App extends Component {
   render() {
     return (
       <div>
-        <header>
-          <Header />
-        </header>
+        <Header />
         <main>
           <Col md={2}>
             <Sidebar />
