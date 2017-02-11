@@ -8,6 +8,10 @@ import I18n, { Translate } from '../../../lib/i18n/i18n';
 import { INFORMATION_FIELDS, LABEL_STYLE, PANEL_STYLE } from './constant';
 import ProfileStats from '../../general/ProfileStats';
 
+const border = {
+  borderRight: '1px #e0e0e0 solid',
+};
+
 export default class ItemView extends Component {
   constructor(props) {
     super(props);
@@ -72,12 +76,19 @@ export default class ItemView extends Component {
             bsStyle={PANEL_STYLE[this.props.data.getStatus()]}
           >
             <h3>{this.props.data.name}</h3>
-            {this.renderInformation()}
-            {this.renderInternalManagement()}
-            <h4>
-              <Translate value="ItemView.stats.title" />
-            </h4>
-            <ProfileStats copies={this.props.data.copies}/>
+            <Row>
+              <Col sm={12} md={6} style={border}>
+                {this.renderInformation()}
+                <hr/>
+                {this.renderInternalManagement()}
+              </Col>
+              <Col sm={12} md={6}>
+                <h4>
+                  <Translate value="ItemView.stats.title" />
+                </h4>
+                <ProfileStats copies={this.props.data.copies}/>
+              </Col>
+            </Row>
             <CopyTableContainer copies={this.props.data.copies} />
           </Panel>
         </Col>
