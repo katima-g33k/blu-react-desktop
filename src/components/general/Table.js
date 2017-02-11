@@ -41,8 +41,10 @@ export default class Table extends Component {
         condensed
         striped={this.props.striped}
         data={this.state.data}
-        options={this.props.options}
-        noDataText={this.props.placeholder}
+        options={{
+          ...this.props.options,
+          noDataText: this.props.placeholder,
+        }}
         trClassName={this.props.rowClass}
       >
         {this.renderColumns()}
