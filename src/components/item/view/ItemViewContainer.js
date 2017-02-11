@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import HTTP from '../../../lib/HTTP';
+import InputModal from '../../general/modals/InputModal';
 import Item from '../../../lib/models/Item';
 import ItemView from './ItemView';
 import settings from '../../../settings';
@@ -25,12 +26,15 @@ export default class ItemViewContainer extends Component {
     super(props);
     this.state = {
       item: null,
+      showModal: null,
     };
 
     this.decreaseStatus = this.decreaseStatus.bind(this);
     this.increaseStatus = this.increaseStatus.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
+    this.updateStorage = this.updateStorage.bind(this);
     this.getActions = this.getActions.bind(this);
+    this.getModal = this.getModal.bind(this);
   }
 
   componentWillMount() {
@@ -73,6 +77,25 @@ export default class ItemViewContainer extends Component {
     });
   }
 
+  updateStorage(event, value) {
+    const storage = value.replace(/\D+/g, ' ').split(/\D/).sort((a, b) => a - b);
+    const data = {
+      id: this.props.params.id,
+      storage,
+    };
+
+    HTTP.post(`${settings.apiUrl}/item/update_storage`, data, (err) => {
+      if (err) {
+        // TODO: Display erorr message
+        return;
+      }
+
+      const item = this.state.item;
+      item.storage = storage;
+      this.setState({ item, showModal: null });
+    });
+  }
+
   getActions() {
     return [
       {
@@ -100,9 +123,22 @@ export default class ItemViewContainer extends Component {
         style: 'primary',
         onClick: (event) => {
           event.preventDefault();
+          this.setState({ showModal: 'storage' });
         },
       },
     ];
+  }
+
+  getModal() {
+    return this.state.showModal === 'storage' ? (
+      <InputModal
+        message={'Veuillez entrer les caisses de rangements, séparé par ;'}
+        onCancel={() => this.setState({ showModal: null })}
+        onSave={this.updateStorage}
+        title={'Modifier les caisses de rangements'}
+        value={this.state.item.storage.join('; ')}
+      />
+    ) : null;
   }
 
   render() {
@@ -110,6 +146,7 @@ export default class ItemViewContainer extends Component {
       <ItemView
         data={this.state.item}
         actions={this.getActions()}
+        modal={this.getModal()}
       />
     ) : null;
   }

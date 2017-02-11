@@ -84,6 +84,7 @@ export default class ItemView extends Component {
         <Col md={2}>
           <ActionPanel actions={this.props.actions} />
         </Col>
+        {this.props.modal}
       </Row>
     );
   }
@@ -92,4 +93,5 @@ export default class ItemView extends Component {
 ItemView.propTypes = {
   actions: React.PropTypes.array,
   data: React.PropTypes.shape(),
+  modal: React.PropTypes.shape(),
 };
