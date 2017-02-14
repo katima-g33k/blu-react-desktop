@@ -10,7 +10,7 @@ export default class Sidebar extends Component {
   }
 
   componentWillMount() {
-    this.setState({ page: location.pathname.split('/')[1] });
+    this.setState({ activeKey: location.pathname.split('/')[1] });
   }
 
   handleSelect(event) {
@@ -19,7 +19,7 @@ export default class Sidebar extends Component {
 
   render() {
     return (
-      <Nav bsStyle="pills" stacked activeKey={this.state.page}>
+      <Nav bsStyle="pills" stacked activeKey={this.state.activeKey}>
         <NavItem eventKey='search' href="/search">
           <Translate value="Sidebar.search" />
         </NavItem>
