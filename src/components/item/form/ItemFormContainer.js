@@ -68,7 +68,15 @@ export default class ItemFormContainer extends Component {
 
   onSave(event, data) {
     const item = data;
-    item.subject = item.subject.id;
+
+    if (typeof data.subject === 'object') {
+      if (data.subject.id) {
+        item.subject = data.subject.id;
+      } else {
+        item.subject = document.getElementById('subject').value;
+      }
+    }
+
     return this.props.params.id ? this.update(item) : this.insert(item);
   }
 
@@ -102,15 +110,13 @@ export default class ItemFormContainer extends Component {
     delete item.storage;
 
     const subjectField = this.schema.sections[0].fields.find(field => field.key === 'subject');
-    subjectField.optgroups = this.state.categories.map((category) => {
-      return {
-        label: category.name,
-        options: category.subject.map(subject => ({
-          value: subject.id,
-          label: subject.name,
-        })),
-      };
-    });
+    subjectField.optgroups = this.state.categories.map(category => ({
+      label: category.name,
+      options: category.subject.map(subject => ({
+        value: subject.id,
+        label: subject.name,
+      })),
+    }));
 
     return (
       <ItemForm
