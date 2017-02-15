@@ -6,6 +6,27 @@ import MemberForm from './MemberForm';
 import memberFormSchema from './memberFormSchema';
 import settings from '../../../settings.json';
 
+const removeEmptyPropperties = (data) => {
+  Object.keys(data).forEach(key => {
+    if (data[key] === null) {
+      delete data[key];
+    } else if (typeof data[key] === 'string' && data[key] === '') {
+      delete data[key];
+    } else if (typeof data[key] === 'number' && data[key] === 0) {
+      delete data[key];
+    } else if (Array.isArray(data[key]) && !data[key].length) {
+      delete data[key];
+    } else if (typeof data[key] === 'object') {
+      const property = removeEmptyPropperties(data[key]);
+      if (!Object.keys(property).length) {
+        delete data[key];
+      }
+    }
+  });
+
+  return data;
+};
+
 export default class MemberFormContainer extends Component {
   constructor(props) {
     super(props);
@@ -48,15 +69,15 @@ export default class MemberFormContainer extends Component {
     this.props.router.push(no ? `/member/view/${no}` : '/search');
   }
 
-  insert(member) {
-    HTTP.post(`${settings.apiUrl}/member/insert`, { ...member }, (err) => {
+  insert(data) {
+    HTTP.post(`${settings.apiUrl}/member/insert`, data, (err) => {
       if (err) {
         // TODO: Display error message
         return;
       }
 
       this.props.router.push({
-        pathname: `/member/view/${member.no}`,
+        pathname: `/member/view/${data.no}`,
       });
     });
   }
@@ -64,18 +85,19 @@ export default class MemberFormContainer extends Component {
   save(event, member) {
     event.preventDefault();
     const no = this.props.params.no;
-    return no ? this.update(no, member) : this.insert(member);
+    const data = removeEmptyPropperties({ ...member });
+    return no ? this.update(no, data) : this.insert(data);
   }
 
-  update(no, member) {
-    HTTP.post(`${settings.apiUrl}/member/update`, { no, member }, (err) => {
+  update(no, data) {
+    HTTP.post(`${settings.apiUrl}/member/update`, { no, member: data }, (err) => {
       if (err) {
         // TODO: Display error message
         return;
       }
 
       this.props.router.push({
-        pathname: `/member/view/${member.no}`,
+        pathname: `/member/view/${data.no}`,
       });
     });
   }
