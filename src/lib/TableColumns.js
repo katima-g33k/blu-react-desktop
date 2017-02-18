@@ -3,9 +3,7 @@ import { Link } from 'react-router';
 import moment from 'moment';
 import I18n from './i18n/i18n';
 
-const formatDate = (date) => {
-  return moment(date).format('YYYY-MM-DD');
-};
+const formatDate = date => moment(date).format('YYYY-MM-DD');
 
 const highlightResults = (cell, row, extra = {}) => {
   const regex = new RegExp(`(${extra.highlight})`, 'i');
@@ -49,6 +47,7 @@ export const SearchColumns = {
     {
       dataField: 'name',
       label: I18n.t('TableColumns.search.item.title'),
+      tdStyle: { whiteSpace: 'normal' },
       dataSort: true,
       dataFormat: highlightResults,
       formatExtraData: { props: ['highlight'] },
@@ -56,6 +55,8 @@ export const SearchColumns = {
     {
       dataField: 'editor',
       label: I18n.t('TableColumns.search.item.editor'),
+      width: '170px',
+      tdStyle: { whiteSpace: 'normal' },
       dataSort: true,
       dataFormat: highlightResults,
       formatExtraData: { props: ['highlight'] },
@@ -64,18 +65,21 @@ export const SearchColumns = {
       dataField: 'edition',
       label: I18n.t('TableColumns.search.item.edition'),
       dataSort: true,
+      width: '80px',
       dataFormat: highlightResults,
       formatExtraData: { props: ['highlight'] },
     },
     {
       dataField: 'publication',
       label: I18n.t('TableColumns.search.item.publication'),
+      width: '160px',
       dataSort: true,
       dataFormat: highlightResults,
     },
     {
       dataField: 'author',
       label: I18n.t('TableColumns.search.item.authors'),
+      tdStyle: { whiteSpace: 'normal' },
       dataFormat(authors) {
         if (!Array.isArray(authors)) {
           return '';
@@ -97,7 +101,6 @@ export const CopyColumns = [
     dataField: 'member',
     label: I18n.t('TableColumns.itemCopy.member'),
     dataSort: true,
-    width: '400',
     itemOnly: true,
     dataFormat(cell) {
       return (
@@ -110,7 +113,7 @@ export const CopyColumns = [
     dataField: 'name',
     label: I18n.t('TableColumns.memberCopy.title'),
     dataSort: true,
-    width: '400',
+    tdStyle: { whiteSpace: 'normal' },
     memberOnly: true,
     dataFormat(cell, row) {
       return (
@@ -122,6 +125,8 @@ export const CopyColumns = [
   {
     dataField: 'editor',
     label: I18n.t('TableColumns.memberCopy.editor'),
+    tdStyle: { whiteSpace: 'normal' },
+    width: '170px',
     dataSort: true,
     memberOnly: true,
     dataFormat(cell, row) {
@@ -132,7 +137,7 @@ export const CopyColumns = [
     dataField: 'edition',
     label: I18n.t('TableColumns.memberCopy.edition'),
     dataSort: true,
-    width: '85',
+    width: '85px',
     memberOnly: true,
     dataFormat(cell, row) {
       return row.item.edition || '';
@@ -142,7 +147,7 @@ export const CopyColumns = [
     dataField: 'dateAdded',
     label: I18n.t('TableColumns.memberCopy.added'),
     dataSort: true,
-    width: '150',
+    width: '120px',
     dataFormat(date) {
       return date ? formatDate(date) : '';
     },
@@ -151,7 +156,7 @@ export const CopyColumns = [
     dataField: 'dateSold',
     label: I18n.t('TableColumns.memberCopy.sold'),
     dataSort: true,
-    width: '150',
+    width: '120px',
     dataFormat(date) {
       return date ? formatDate(date) : '';
     },
@@ -160,7 +165,7 @@ export const CopyColumns = [
     dataField: 'datePaid',
     label: I18n.t('TableColumns.memberCopy.paid'),
     dataSort: true,
-    width: '150',
+    width: '120px',
     dataFormat(date) {
       return date ? formatDate(date) : '';
     },
@@ -169,12 +174,12 @@ export const CopyColumns = [
     dataField: 'priceString',
     label: I18n.t('TableColumns.memberCopy.price'),
     dataSort: true,
-    width: '60',
+    width: '60px',
   },
   {
     dataField: 'actions',
     label: '',
     dataAlign: 'center',
-    width: '175',
+    width: '175px',
   },
 ];

@@ -70,7 +70,7 @@ export default class AddCopiesContainer extends Component {
   }
 
   save(event, value) {
-    const price = parseInt(value);
+    const price = parseInt(value, 10);
     const data = {
       member_no: this.props.params.no,
       item_id: this.state.item.id,

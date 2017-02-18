@@ -10,10 +10,12 @@ export default [
   {
     dataField: 'comment',
     label: I18n.t('TableColumns.comment.comment'),
+    tdStyle: { whiteSpace: 'normal' },
   },
   {
     dataField: 'updatedAt',
     label: I18n.t('TableColumns.comment.date'),
     dataFormat: date => moment(date).format('LL'),
+    width: '130px',
   },
 ];
