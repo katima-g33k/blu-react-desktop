@@ -15,25 +15,6 @@ const highlightResults = (cell, row, extra = {}) => {
   }).join('');
 };
 
-export const CommentColumns = [
-  {
-    dataField: 'id',
-    isKey: true,
-    hidden: true,
-  },
-  {
-    dataField: 'comment',
-    label: I18n.t('TableColumns.comment.comment'),
-  },
-  {
-    dataField: 'updatedAt',
-    label: I18n.t('TableColumns.comment.date'),
-    dataFormat(date) {
-      return date ? moment(date).format('LL') : '';
-    },
-  },
-];
-
 export const SearchColumns = {
   member: [
     {
