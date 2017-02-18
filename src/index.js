@@ -1,7 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/App';
+import App from './App';
 import './style.css';
+import './react-bootstrap-table-all.min.css';
 
 ReactDOM.render(
   <App />,

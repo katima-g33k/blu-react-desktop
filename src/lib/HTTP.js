@@ -13,12 +13,12 @@ const HTTP = {
       'api-key': API_KEY,
     };
 
-    request[method.toLowerCase()](`${API_BASE_URL}index.php?req=${JSON.stringify(req)}`, (err, res, body) => {
-      if (err) {
-        callback(err);
-      } else {
-        const responseData = JSON.parse(`{${body.split('}{')[1]}`).data;
-        callback(null, responseData);
+    const apiURL = `${API_BASE_URL}index.php?req=${JSON.stringify(req)}`;
+    request[method.toLowerCase()](apiURL, (err, res, body) => {
+      try {
+        callback(err, err ? null : JSON.parse(body).data);
+      } catch (e) {
+        callback({ code: 500, message: body });
       }
     });
   },
