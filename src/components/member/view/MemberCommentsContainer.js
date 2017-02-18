@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 
-import { CommentColumns } from '../../../lib/TableColumns';
+import CommentColumns from './CommentColumns';
 import { ConfirmModal, InputModal } from '../../general/modals';
 import MemberComments from './MemberComments';
 import HTTP from '../../../lib/HTTP';
@@ -19,7 +19,9 @@ export default class MemberCommentContainer extends Component {
     this.columns = CommentColumns;
     this.deleteComment = this.deleteComment.bind(this);
     this.getModal = this.getModal.bind(this);
+    this.insertComment = this.insertComment.bind(this);
     this.saveComment = this.saveComment.bind(this);
+    this.updateComment = this.updateComment.bind(this);
   }
 
   componentWillMount() {
@@ -67,35 +69,58 @@ export default class MemberCommentContainer extends Component {
     });
   }
 
+  insertComment(value) {
+    const url = `${settings.apiUrl}/comment/insert`;
+    const data = {
+      comment: value,
+      member: this.props.member,
+    };
+
+    HTTP.post(url, data, (err, res) => {
+      if (err) {
+        // TODO: display error message
+        return;
+      }
+
+      const comments = this.state.comments || [];
+
+      comments.push({
+        id: res.id,
+        updatedAt: new Date(),
+        comment: value,
+      });
+
+      this.setState({
+        comments,
+        activeComment: null,
+        showModal: false,
+      });
+    });
+  }
+
   saveComment(event, value) {
     event.preventDefault();
     const isUpdate = !!this.state.activeComment;
-    const url = `${settings.apiUrl}/comment/${isUpdate ? 'update' : 'insert'}`;
-    const data = { comment: value };
+    return isUpdate ? this.updateComment(value) : this.insertComment(value);
+  }
 
-    if (isUpdate) {
-      data.id = this.state.activeComment.id;
-    } else {
-      data.member = this.props.member;
-    }
+  updateComment(value) {
+    const url = `${settings.apiUrl}/comment/update`;
+    const data = {
+      comment: value,
+      id: this.state.activeComment.id,
+    };
 
-    HTTP.post(url, data, (err, res) => {
-      let comments = this.state.comments || [];
-
-      if (isUpdate) {
-        comments = comments.map((comment) => {
-          if (comment.id === this.state.activeComment.id) {
-            return { ...comment, comment: value };
-          }
-          return comment;
-        });
-      } else {
-        comments.push({
-          id: res.id,
-          updated_at: new Date(),
-          comment: value,
-        });
+    HTTP.post(url, data, (err) => {
+      if (err) {
+        // TODO: display error message
+        return;
       }
+
+      const comments = this.state.comments;
+      const currentComment = comments.find(comment => comment.id === this.state.activeComment.id);
+      currentComment.comment = value;
+      currentComment.updatedAt = new Date();
 
       this.setState({
         comments,

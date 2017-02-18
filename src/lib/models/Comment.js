@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export default class Comment {
   constructor(comment = {}) {
     this.id = comment.id || 0;
@@ -7,7 +9,7 @@ export default class Comment {
   }
 
   get updatedAt() {
-    return this.updated_at;
+    return moment(this.updated_at || new Date());
   }
 
   set updatedAt(updatedAt) {
