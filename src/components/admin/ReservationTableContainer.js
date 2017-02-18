@@ -29,6 +29,7 @@ const columns = [
   {
     dataField: 'date',
     label: 'Date',
+    width: '150px',
     dataFormat(date) {
       return moment(date).format('LL');
     },
@@ -36,6 +37,8 @@ const columns = [
   {
     dataField: 'received',
     label: 'Reçu',
+    width: '70px',
+    dataAlign: 'center',
     dataFormat(field, reservation) {
       return reservation.copy ? <Label bsStyle="success"><Glyphicon glyph="ok-sign" /></Label> : '';
     },
