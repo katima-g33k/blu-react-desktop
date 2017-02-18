@@ -7,6 +7,7 @@ const addCopiesColumns = [
   {
     dataField: 'title',
     label: 'Titre',
+    tdStyle: { whiteSpace: 'normal' },
     dataFormat(cell, row) {
       return row.item.name;
     },
@@ -14,6 +15,7 @@ const addCopiesColumns = [
   {
     dataField: 'price',
     label: 'Prix',
+    width: '40px',
     dataFormat(cell) {
       return `${cell} $`;
     },
@@ -22,6 +24,7 @@ const addCopiesColumns = [
     dataField: 'actions',
     label: '',
     dataAlign: 'center',
+    width: '60px',
   },
 ];
 

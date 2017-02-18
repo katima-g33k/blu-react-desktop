@@ -193,8 +193,9 @@ export default class CopyTableContainer extends Component {
   }
 
   updatePrice(event, value) {
+    const price = parseInt(value, 10);
     const id = this.state.activeCopy.id;
-    const data = { id, price: value };
+    const data = { id, price };
 
     HTTP.post(`${settings.apiUrl}/copy/update`, data, (err) => {
       if (err) {
@@ -203,7 +204,7 @@ export default class CopyTableContainer extends Component {
       }
 
       const copies = this.state.copies;
-      copies.find(copy => copy.id === id).price = value;
+      copies.find(copy => copy.id === id).price = price;
       this.setState({ copies, showModal: null, activeCopy: null });
     });
   }

@@ -31,7 +31,7 @@ export default class AddCopies extends Component {
     return (
       <Panel header="Ajouter des exemplaires">
         <Row>
-          <Col md={3}>
+          <Col md={4}>
             <Table
               columns={this.props.columns}
               data={this.props.data}

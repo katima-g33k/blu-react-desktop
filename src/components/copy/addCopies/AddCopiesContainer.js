@@ -70,10 +70,11 @@ export default class AddCopiesContainer extends Component {
   }
 
   save(event, value) {
+    const price = parseInt(value, 10);
     const data = {
       member_no: this.props.params.no,
       item_id: this.state.item.id,
-      price: value,
+      price,
     };
 
     HTTP.post(`${settings.apiUrl}/copy/insert`, data, (err, res) => {
@@ -87,7 +88,7 @@ export default class AddCopiesContainer extends Component {
       const copy = new Copy({
         id: res.id,
         item: this.state.item,
-        price: value,
+        price,
         transaction: [{
           code: Transaction.TYPES.ADD,
           date: new Date(),
