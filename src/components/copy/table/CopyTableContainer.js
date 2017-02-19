@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 
 import CopyTable from './CopyTable';
-import { CopyColumns } from '../../../lib/TableColumns';
+import CopyColumns from './columns';
 import { ConfirmModal, InputModal, SearchModal } from '../../general/modals';
 import HTTP from '../../../lib/HTTP';
 import settings from '../../../settings.json';
@@ -61,7 +61,6 @@ export default class CopyTableContainer extends Component {
               <Glyphicon glyph="ban-circle" />
             </Button>
             <Button
-              bsStyle='success'
               onClick={() => this.sell(copy, true)}
             >
               {'$'}
@@ -79,13 +78,13 @@ export default class CopyTableContainer extends Component {
             <Glyphicon glyph="user" />
           </Button>
           <Button
-            bsStyle='success'
             onClick={() => this.sell(copy, true)}
           >
             {'$'}
           </Button>
           <Button
             onClick={() => this.sell(copy)}
+            bsStyle='success'
           >
             {'$$'}
           </Button>

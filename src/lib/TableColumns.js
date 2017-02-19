@@ -1,16 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router';
-import moment from 'moment';
 import I18n from './i18n/i18n';
 
-const formatDate = date => moment(date).format('YYYY-MM-DD');
-
+const formatString = (str, highlight) => highlight ? `<span class="highlight">${str}</span>` : str;
 const highlightResults = (cell, row, extra = {}) => {
   const regex = new RegExp(`(${extra.highlight})`, 'i');
-
-  return cell.split(regex).map((string) => {
-    return regex.test(string) ? `<span class="highlight">${string}</span>` : string;
-  }).join('');
+  return cell.split(regex).map(string => formatString(string, regex.test(string))).join('');
 };
 
 export const SearchColumns = {
@@ -90,96 +83,3 @@ export const SearchColumns = {
     },
   ],
 };
-
-export const CopyColumns = [
-  {
-    dataField: 'id',
-    isKey: true,
-    hidden: true,
-  },
-  {
-    dataField: 'member',
-    label: I18n.t('TableColumns.itemCopy.member'),
-    dataSort: true,
-    itemOnly: true,
-    dataFormat(cell) {
-      return (
-        <Link to={{ pathname: `/member/view/${cell.no}` }}>
-          {cell.name}
-        </Link>);
-    },
-  },
-  {
-    dataField: 'name',
-    label: I18n.t('TableColumns.memberCopy.title'),
-    dataSort: true,
-    tdStyle: { whiteSpace: 'normal' },
-    memberOnly: true,
-    dataFormat(cell, row) {
-      return (
-        <Link to={{ pathname: `/item/view/${row.item.id}` }}>
-          {row.item.name}
-        </Link>);
-    },
-  },
-  {
-    dataField: 'editor',
-    label: I18n.t('TableColumns.memberCopy.editor'),
-    tdStyle: { whiteSpace: 'normal' },
-    width: '170px',
-    dataSort: true,
-    memberOnly: true,
-    dataFormat(cell, row) {
-      return row.item.editor || '';
-    },
-  },
-  {
-    dataField: 'edition',
-    label: I18n.t('TableColumns.memberCopy.edition'),
-    dataSort: true,
-    width: '85px',
-    memberOnly: true,
-    dataFormat(cell, row) {
-      return row.item.edition || '';
-    },
-  },
-  {
-    dataField: 'dateAdded',
-    label: I18n.t('TableColumns.memberCopy.added'),
-    dataSort: true,
-    width: '120px',
-    dataFormat(date) {
-      return date ? formatDate(date) : '';
-    },
-  },
-  {
-    dataField: 'dateSold',
-    label: I18n.t('TableColumns.memberCopy.sold'),
-    dataSort: true,
-    width: '120px',
-    dataFormat(date) {
-      return date ? formatDate(date) : '';
-    },
-  },
-  {
-    dataField: 'datePaid',
-    label: I18n.t('TableColumns.memberCopy.paid'),
-    dataSort: true,
-    width: '120px',
-    dataFormat(date) {
-      return date ? formatDate(date) : '';
-    },
-  },
-  {
-    dataField: 'priceString',
-    label: I18n.t('TableColumns.memberCopy.price'),
-    dataSort: true,
-    width: '60px',
-  },
-  {
-    dataField: 'actions',
-    label: '',
-    dataAlign: 'center',
-    width: '175px',
-  },
-];
