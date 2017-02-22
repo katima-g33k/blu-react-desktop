@@ -17,16 +17,41 @@ export default [
     dataField: 'member',
     label: I18n.t('TableColumns.itemCopy.member'),
     dataSort: true,
+    defaultSort: true,
+    tdStyle: { whiteSpace: 'normal' },
     itemOnly: true,
     dataFormat: (cell) => link(`/member/view/${cell.no}`, cell.name),
+    sortFunc: (a, b, order) => {
+      if (a.member.name < b.member.name) {
+        return order === 'asc' ? -1 : 1;
+      }
+
+      if (a.member.name > b.member.name) {
+        return order === 'asc' ? 1 : -1;
+      }
+
+      return 0;
+    },
   },
   {
     dataField: 'name',
     label: I18n.t('TableColumns.memberCopy.title'),
     dataSort: true,
+    defaultSort: true,
     tdStyle: { whiteSpace: 'normal' },
     memberOnly: true,
     dataFormat: (cell, row) => link(`/item/view/${row.item.id}`, row.item.name),
+    sortFunc: (a, b, order) => {
+      if (a.item.name < b.item.name) {
+        return order === 'asc' ? -1 : 1;
+      }
+
+      if (a.item.name > b.item.name) {
+        return order === 'asc' ? 1 : -1;
+      }
+
+      return 0;
+    },
   },
   {
     dataField: 'editor',
@@ -36,6 +61,17 @@ export default [
     dataSort: true,
     memberOnly: true,
     dataFormat: (cell, row) => row.item.editor,
+    sortFunc: (a, b, order) => {
+      if (a.item.editor < b.item.editor) {
+        return order === 'asc' ? -1 : 1;
+      }
+
+      if (a.item.editor > b.item.editor) {
+        return order === 'asc' ? 1 : -1;
+      }
+
+      return 0;
+    },
   },
   {
     dataField: 'edition',
@@ -44,6 +80,12 @@ export default [
     width: '85px',
     memberOnly: true,
     dataFormat: (cell, row) => row.item.edition,
+    sortFunc: (a, b, order) => {
+      if (order === 'asc') {
+        return a.item.edition - b.item.edition;
+      }
+      return b.item.edition - a.item.edition;
+    },
   },
   {
     dataField: 'dateAdded',
@@ -51,6 +93,17 @@ export default [
     dataSort: true,
     width: '120px',
     dataFormat: date => formatDate(date),
+    sortFunc: (a, b, order) => {
+      if (moment(a.dateAdded).isBefore(b.dateAdded)) {
+        return order === 'asc' ? -1 : 1;
+      }
+
+      if (moment(a.dateAdded).isAfter(b.dateAdded)) {
+        return order === 'asc' ? 1 : -1;
+      }
+
+      return 0;
+    },
   },
   {
     dataField: 'dateSold',
@@ -58,6 +111,17 @@ export default [
     dataSort: true,
     width: '120px',
     dataFormat: date => formatDate(date),
+    sortFunc: (a, b, order) => {
+      if (b.dateSold === '' || moment(a.dateSold).isBefore(b.dateSold)) {
+        return order === 'asc' ? -1 : 1;
+      }
+
+      if (a.dateSold === '' || moment(a.dateSold).isAfter(b.dateSold)) {
+        return order === 'asc' ? 1 : -1;
+      }
+
+      return 0;
+    },
   },
   {
     dataField: 'datePaid',
@@ -65,12 +129,24 @@ export default [
     dataSort: true,
     width: '120px',
     dataFormat: date => formatDate(date),
+    sortFunc: (a, b, order) => {
+      if (b.datePaid === '' || moment(a.datePaid).isBefore(b.datePaid)) {
+        return order === 'asc' ? -1 : 1;
+      }
+
+      if (a.datePaid === '' || moment(a.datePaid).isAfter(b.datePaid)) {
+        return order === 'asc' ? 1 : -1;
+      }
+
+      return 0;
+    },
   },
   {
     dataField: 'priceString',
     label: I18n.t('TableColumns.memberCopy.price'),
     dataSort: true,
     width: '60px',
+    sortFunc: (a, b, order) => order === 'asc' ? b.price - a.price : a.price - b.price,
   },
   {
     dataField: 'actions',
