@@ -22,6 +22,6 @@ export default class Author {
   }
 
   toString() {
-    return this.first_name !== '' ? `${this.first_name} ${this.last_name}` : this.last_name;
+    return this.firstName !== '' ? `${this.lastName} ${this.firstName}` : this.lastName;
   }
 }
