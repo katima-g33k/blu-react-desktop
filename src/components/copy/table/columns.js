@@ -20,7 +20,10 @@ export default [
     defaultSort: true,
     tdStyle: { whiteSpace: 'normal' },
     itemOnly: true,
-    dataFormat: (cell) => link(`/member/view/${cell.no}`, cell.name),
+    dataFormat: (member, copy) => {
+      const label = `${copy.isDonated ? 'BLU - ' : ''}${copy.member.name}`;
+      return link(`/member/view/${member.no}`, label);
+    },
     sortFunc: (a, b, order) => {
       if (a.member.name < b.member.name) {
         return order === 'asc' ? -1 : 1;
