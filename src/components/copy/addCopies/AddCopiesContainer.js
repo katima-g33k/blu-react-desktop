@@ -8,6 +8,7 @@ import HTTP from '../../../lib/HTTP';
 import InputModal from '../../general/modals/InputModal';
 import settings from '../../../settings.json';
 import Transaction from '../../../lib/models/Transaction';
+import Member from '../../../lib/models/Member';
 
 export default class AddCopiesContainer extends Component {
   constructor(props) {
@@ -16,10 +17,12 @@ export default class AddCopiesContainer extends Component {
       copies: [],
       isSearch: true,
       showModal: false,
+      member: new Member({ no: this.props.params.no }),
     };
 
     this.deleteCopy = this.deleteCopy.bind(this);
     this.closeModal = this.closeModal.bind(this);
+    this.getActions = this.getActions.bind(this);
     this.getModal = this.getModal.bind(this);
     this.openModal = this.openModal.bind(this);
     this.save = this.save.bind(this);
@@ -37,6 +40,18 @@ export default class AddCopiesContainer extends Component {
     };
   }
 
+  componentWillMount() {
+    const no = this.props.params.no;
+    HTTP.post(`${settings.apiUrl}/member/getName`, { no }, (err, res) => {
+      if (err) {
+        // TODO: Display erorr message
+        return;
+      }
+
+      this.setState({ member: new Member({ no, ...res }) });
+    });
+  }
+
   deleteCopy(id) {
     HTTP.post(`${settings.apiUrl}/copy/delete`, { id }, (err) => {
       if (err) {
@@ -51,6 +66,14 @@ export default class AddCopiesContainer extends Component {
 
   closeModal(state = {}) {
     this.setState({ ...state, item: null, showModal: false });
+  }
+
+  getActions() {
+    return [{
+      label: 'Terminer',
+      href: `/member/view/${this.props.params.no}`,
+      style: 'primary',
+    }];
   }
 
   getModal() {
@@ -109,9 +132,11 @@ export default class AddCopiesContainer extends Component {
     return (
       <AddCopies
         {...this.props}
+        actions={this.getActions()}
         columns={this.columns}
         data={this.state.copies}
         isSearch={this.state.isSearch}
+        member={this.state.member}
         modal={this.getModal()}
         onAddButton={() => this.setState({ isSearch: false })}
         openModal={this.openModal}
