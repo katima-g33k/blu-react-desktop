@@ -40,6 +40,7 @@ export default class Table extends Component {
       <BootstrapTable
         condensed
         striped={this.props.striped}
+        hover
         data={this.state.data}
         options={{
           ...this.props.options,
