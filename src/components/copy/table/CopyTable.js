@@ -33,6 +33,10 @@ export default class CopyTable extends Component {
         <Table
           columns={this.props.columns}
           data={this.props.data}
+          options={{
+            defaultSortName: this.props.columns.find(column => column.defaultSort).dataField,
+            defaultSortOrder: 'asc',
+          }}
           placeholder={I18n.t('MemberView.copies.none')}
           sortable
           rowClass={this.formatRow}

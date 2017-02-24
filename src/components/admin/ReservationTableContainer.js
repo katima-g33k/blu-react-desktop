@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Glyphicon, Label } from 'react-bootstrap';
+import { Link } from 'react-router';
 import moment from 'moment';
 
 import { ConfirmModal } from '../general/modals';
@@ -7,6 +8,8 @@ import HTTP from '../../lib/HTTP';
 import Reservation from '../../lib/models/Reservation';
 import settings from '../../settings';
 import TableLayout from '../general/TableLayout';
+
+const link = (href, label) => (<Link to={{ pathname: href }}>{label}</Link>);
 
 const actions = [
   {
@@ -19,20 +22,27 @@ const actions = [
 
 const columns = [
   {
-    dataField: 'parent',
+    dataField: 'id',
     isKey: true,
+    hidden: true,
+  },
+  {
+    dataField: 'parent',
     label: 'Parent',
     dataFormat(field, reservation) {
-      return reservation.parent.name;
+      return link(`/member/view/${reservation.parent.no}`, reservation.parent.name);
     },
+  },
+  {
+    dataField: 'item',
+    label: 'Ouvrage',
+    dataFormat: field => link(`/item/view/${field.id}`, field.name),
   },
   {
     dataField: 'date',
     label: 'Date',
     width: '150px',
-    dataFormat(date) {
-      return moment(date).format('LL');
-    },
+    dataFormat: date => moment(date).format('LL'),
   },
   {
     dataField: 'received',
