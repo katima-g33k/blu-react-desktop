@@ -13,6 +13,7 @@ import {
 import { Link } from 'react-router';
 import Table from '../general/Table.js';
 import I18n, { Translate } from '../../lib/i18n/i18n';
+import Spinner from '../general/Spinner';
 
 export default class Search extends Component {
   render() {
@@ -85,13 +86,15 @@ export default class Search extends Component {
                 </Button>
               </Link>
             )}
-            <Table
-              columns={this.props.columns}
-              data={this.props.data}
-              highlight={this.props.search}
-              options={this.props.tableOptions}
-              striped
-            />
+            {this.props.isLoading ? (<Spinner/>) : (
+              <Table
+                columns={this.props.columns}
+                data={this.props.data}
+                highlight={this.props.search}
+                options={this.props.tableOptions}
+                striped
+              />
+            )}
           </Col>
         </Row>
       </Panel>
