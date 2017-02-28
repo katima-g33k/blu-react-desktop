@@ -5,6 +5,7 @@ import HTTP from '../../../lib/HTTP';
 import Member from '../../../lib/models/Member';
 import MemberView from './MemberView';
 import settings from '../../../settings.json';
+import Spinner from '../../general/Spinner';
 import Transaction from '../../../lib/models/Transaction';
 
 export default class MemberViewContainer extends Component {
@@ -157,7 +158,7 @@ export default class MemberViewContainer extends Component {
         member={this.state.member}
         modal={this.getModal()}
       />
-    ) : null;
+    ) : (<Spinner/>);
   }
 }
 
