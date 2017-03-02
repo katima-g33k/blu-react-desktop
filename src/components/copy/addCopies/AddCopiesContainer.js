@@ -26,17 +26,26 @@ export default class AddCopiesContainer extends Component {
     this.getModal = this.getModal.bind(this);
     this.openModal = this.openModal.bind(this);
     this.save = this.save.bind(this);
+    this.updatePrice = this.updatePrice.bind(this);
 
     this.columns = addCopiesColums;
     this.columns.find(column => column.dataField === 'actions').dataFormat = (cell, copy) => {
-      return !copy.reservation ? (
-        <Button
-          bsStyle="danger"
-          onClick={() => this.deleteCopy(copy.id)}
-        >
-          <Glyphicon glyph="trash" />
-        </Button>
-      ) : null;
+      return !copy.reservation && (
+        <div>
+          <Button
+            bsStyle="default"
+            onClick={() => this.openModal({ copy })}
+          >
+            <Glyphicon glyph="pencil" />
+          </Button>
+          <Button
+            bsStyle="danger"
+            onClick={() => this.deleteCopy(copy.id)}
+          >
+            <Glyphicon glyph="trash" />
+          </Button>
+        </div>
+      );
     };
   }
 
@@ -59,13 +68,13 @@ export default class AddCopiesContainer extends Component {
         return;
       }
 
-      const copies = this.state.copies.filter((copy) => copy.id !== id);
+      const copies = this.state.copies.filter(copy => copy.id !== id);
       this.setState({ copies });
     });
   }
 
   closeModal(state = {}) {
-    this.setState({ ...state, item: null, showModal: false });
+    this.setState({ ...state, item: null, copy: null, showModal: false });
   }
 
   getActions() {
@@ -77,19 +86,22 @@ export default class AddCopiesContainer extends Component {
   }
 
   getModal() {
-    return this.state.showModal ? (
+    const isCopy = this.state.copy;
+
+    return this.state.showModal && (
       <InputModal
-        onCancel={this.closeModal}
-        onSave={this.save}
-        title={this.state.item.name}
-        type={'number'}
         message={'Entrer le montant souhaité'}
+        onCancel={this.closeModal}
+        onSave={isCopy ? this.updatePrice : this.save}
+        title={isCopy ? this.state.copy.item.name : this.state.item.name}
+        type="number"
+        value={isCopy && this.state.copy.price}
       />
-    ) : null;
+    );
   }
 
-  openModal(item) {
-    this.setState({ item, showModal: true, isSearch: true });
+  openModal(data = {}) {
+    this.setState({ ...data, showModal: true, isSearch: true });
   }
 
   save(event, value) {
@@ -124,6 +136,27 @@ export default class AddCopiesContainer extends Component {
 
       copies.push(copy);
 
+      this.closeModal({ copies });
+    });
+  }
+
+  updatePrice(event, value) {
+    const price = parseInt(value, 10);
+    const currentCopy = this.state.copy;
+    const data = {
+      id: currentCopy.id,
+      price,
+    };
+
+    HTTP.post(`${settings.apiUrl}/copy/update`, data, (err) => {
+      if (err) {
+        this.closeModal();
+        // TODO: Display error message
+        return;
+      }
+
+      const copies = this.state.copies;
+      copies.find(copy => copy.id === currentCopy.id).price = price;
       this.closeModal({ copies });
     });
   }
