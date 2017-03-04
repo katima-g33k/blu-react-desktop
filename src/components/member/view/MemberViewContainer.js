@@ -5,6 +5,7 @@ import HTTP from '../../../lib/HTTP';
 import Member from '../../../lib/models/Member';
 import MemberView from './MemberView';
 import settings from '../../../settings.json';
+import Spinner from '../../general/Spinner';
 import Transaction from '../../../lib/models/Transaction';
 
 export default class MemberViewContainer extends Component {
@@ -18,6 +19,8 @@ export default class MemberViewContainer extends Component {
     this.getActions = this.getActions.bind(this);
     this.getModal = this.getModal.bind(this);
     this.printReceipt = this.printReceipt.bind(this);
+    this.renewAccount = this.renewAccount.bind(this);
+    this.transferAccount = this.transferAccount.bind(this);
   }
 
   componentWillMount() {
@@ -85,34 +88,24 @@ export default class MemberViewContainer extends Component {
       },
     ];
 
-    const inactiveActions = [{
-      label: 'Réactiver le compte',
-      style: 'primary',
-      onClick: (event) => {
-        event.preventDefault();
-
-        const member = this.state.member;
-        const copies = member.account.getAddedCopies();
-        copies.push(...member.account.getSoldCopies());
-        const data = {
-          copies: copies.map(copy => copy.id),
-          member: member.no,
-          type: Transaction.TYPES.DONATE,
-        };
-
-        HTTP.post(`${settings.apiUrl}/transaction/insert`, data, (err) => {
-          if (err) {
-            // TODO: display error message
-            return;
-          }
-
-          member.account.donateAll();
-          this.setState({ member });
-          this.renewAccount();
-
-        });
+    const inactiveActions = [
+      {
+        label: 'Réactiver le compte',
+        style: 'primary',
+        onClick: event => {
+          event.preventDefault();
+          this.setState({ showModal: 'reactivate' });
+        },
       },
-    }];
+      {
+        label: 'Transférer à la BLU',
+        style: 'primary',
+        onClick: event => {
+          event.preventDefault();
+          this.setState({ showModal: 'transfer' });
+        },
+      },
+    ];
 
     return generalActions.concat(this.state.member.account.isActive ? activeActions : inactiveActions);
   }
@@ -132,6 +125,27 @@ export default class MemberViewContainer extends Component {
     });
   }
 
+  transferAccount() {
+    const member = this.state.member;
+    const copies = member.account.getAddedCopies();
+    copies.push(...member.account.getSoldCopies());
+    const data = {
+      copies: copies.map(copy => copy.id),
+      member: member.no,
+      type: Transaction.TYPES.DONATE,
+    };
+
+    HTTP.post(`${settings.apiUrl}/transaction/insert`, data, (err) => {
+      if (err) {
+        // TODO: display error message
+        return;
+      }
+
+      member.account.donateAll();
+      this.setState({ member });
+    });
+  }
+
   getModal() {
     switch (this.state.showModal) {
       case 'paySuccessfull':
@@ -143,6 +157,41 @@ export default class MemberViewContainer extends Component {
             onCancel={() => this.setState({ showModal: null })}
             onConfirm={this.printReceipt}
             title="Remboursement réussi"
+          />
+        );
+      case 'reactivate':
+        return (
+          <ConfirmModal
+            customActions={[
+              {
+                label: 'Annuler',
+                onClick: () => this.setState({ showModal: null }),
+              },
+              {
+                label: 'Transférer et Réactiver',
+                onClick: () => {
+                  this.transferAccount();
+                  this.renewAccount();
+                },
+              },
+              {
+                label: 'Réactiver',
+                onClick: this.renewAccount,
+              },
+            ]}
+            message="Attention, vous êtes sur le point de réactiver le compte. Souhaitez-vous transférer son contenu à la BLU avant la réactivation ?" // eslint-disable-line
+            title="Réactivation du compte"
+          />
+        );
+      case 'transfer':
+        return (
+          <ConfirmModal
+            cancelText="Non"
+            confirmText="Oui"
+            message="Souhaitez-vous transférer le contenu du compte à la BLU ?"
+            onCancel={() => this.setState({ showModal: null })}
+            onConfirm={this.transferAccount}
+            title="Transfert à la BLU"
           />
         );
       default:
@@ -157,7 +206,7 @@ export default class MemberViewContainer extends Component {
         member={this.state.member}
         modal={this.getModal()}
       />
-    ) : null;
+    ) : (<Spinner/>);
   }
 }
 

@@ -13,7 +13,7 @@ export default class AddCopies extends Component {
       <SearchContainer
         noHeader
         type="item"
-        onRowClick={this.props.openModal}
+        onRowClick={item => this.props.openModal({ item })}
         onAddButton={this.props.onAddButton}
       />
     );
@@ -24,7 +24,7 @@ export default class AddCopies extends Component {
       <ItemFormContainer
         params={this.props.params}
         onCancel={this.props.onFormCancel}
-        onSave={this.props.onFormSave}
+        onSave={item => this.props.onFormSave({ item })}
       />
     );
   }
