@@ -5,6 +5,7 @@ import InputModal from '../../general/modals/InputModal';
 import Item from '../../../lib/models/Item';
 import ItemView from './ItemView';
 import settings from '../../../settings';
+import Spinner from '../../general/Spinner';
 
 const status = {
   VALID: {
@@ -148,7 +149,7 @@ export default class ItemViewContainer extends Component {
         actions={this.getActions()}
         modal={this.getModal()}
       />
-    ) : null;
+    ) : (<Spinner/>);
   }
 }
 
