@@ -38,7 +38,7 @@ export default class MemberViewContainer extends Component {
   }
 
   printReceipt() {
-    // TODO: Open new page with receipt and launch printing
+    window.open(`/member/receipt/${this.props.params.no}`, '_blank').focus();
   }
 
   getActions() {

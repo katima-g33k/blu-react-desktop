@@ -6,6 +6,7 @@ import Admin from '../components/admin/Admin';
 import ItemFormContainer from '../components/item/form/ItemFormContainer';
 import ItemViewContainer from '../components/item/view/ItemViewContainer';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
+import MemberReceipt from '../components/member/receipt/MemberReceipt';
 import MemberViewContainer from '../components/member/view/MemberViewContainer';
 import SearchContainer from '../components/search/SearchContainer';
 
@@ -78,6 +79,7 @@ export default class Routes extends Component {
         </Route>
         <Route name="Member" path="/member">
           <IndexRedirect to="add" />
+          <Route name="MemberReceipt" path="receipt/:no" component={MemberReceipt} />          
           <Route name="MemberView" path="view/:no" component={MemberViewContainer} />
           <Route name="MemberAdd" path="add" component={MemberFormContainer} />
           <Route name="MemberEdit" path="edit/:no" component={MemberFormContainer} />
