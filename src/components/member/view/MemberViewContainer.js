@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import ConfirmModal from '../../general/modals/ConfirmModal';
+import { ConfirmModal, InformationModal } from '../../general/modals';
 import HTTP from '../../../lib/HTTP';
 import Member from '../../../lib/models/Member';
 import MemberView from './MemberView';
@@ -18,6 +18,7 @@ export default class MemberViewContainer extends Component {
 
     this.getActions = this.getActions.bind(this);
     this.getModal = this.getModal.bind(this);
+    this.pay = this.pay.bind(this);
     this.printReceipt = this.printReceipt.bind(this);
     this.renewAccount = this.renewAccount.bind(this);
     this.transferAccount = this.transferAccount.bind(this);
@@ -37,7 +38,7 @@ export default class MemberViewContainer extends Component {
   }
 
   printReceipt() {
-    this.setState({ showModal: null });
+    window.open(`/member/receipt/${this.props.params.no}`, '_blank').focus();
   }
 
   getActions() {
@@ -56,7 +57,7 @@ export default class MemberViewContainer extends Component {
       {
         label: 'Renouveler le compte',
         style: 'primary',
-        onClick: (event) => {
+        onClick: event => {
           event.preventDefault();
           this.renewAccount();
         },
@@ -64,26 +65,17 @@ export default class MemberViewContainer extends Component {
       {
         label: 'Remettre l\'argent',
         style: 'primary',
-        onClick: (event) => {
+        onClick: event => {
           event.preventDefault();
-
-          const member = this.state.member;
-          const data = { no: member.no };
-
-          HTTP.post(`${settings.apiUrl}/member/pay`, data, (err) => {
-            if (err) {
-              // TODO: display error message
-              return;
-            }
-
-            member.account.copies.forEach(copy => {
-              if (copy.isSold) {
-                copy.pay();
-              }
-            });
-
-            this.setState({ member, showModal: 'paySuccessfull' });
-          });
+          this.setState({ showModal: 'pay' });
+        },
+      },
+      {
+        label: 'Imprimer l\'état du compte',
+        style: 'primary',
+        onClick: event => {
+          event.preventDefault();
+          this.printReceipt();
         },
       },
     ];
@@ -108,6 +100,22 @@ export default class MemberViewContainer extends Component {
     ];
 
     return generalActions.concat(this.state.member.account.isActive ? activeActions : inactiveActions);
+  }
+
+  pay() {
+    const member = this.state.member;
+    const data = { no: member.no };
+
+    HTTP.post(`${settings.apiUrl}/member/pay`, data, (err) => {
+      if (err) {
+        // TODO: display error message
+        return;
+      }
+
+      this.renewAccount();
+      member.account.copies.forEach(copy => copy.isSold && copy.pay());
+      this.setState({ member, showModal: 'paySuccessfull' });
+    });
   }
 
   renewAccount() {
@@ -148,15 +156,71 @@ export default class MemberViewContainer extends Component {
 
   getModal() {
     switch (this.state.showModal) {
+      case 'pay':
+        return (
+          <ConfirmModal
+            customActions={[
+              {
+                label: 'Annuler',
+                onClick: () => this.setState({ showModal: null }),
+              },
+              {
+                label: 'Imprimer un reçu',
+                onClick: () => {
+                  this.pay();
+                  this.printReceipt();
+                },
+              },
+              {
+                label: 'Remettre l\'argent',
+                onClick: this.pay,
+              },
+            ]}
+            message="Souhaitez-vous imprimer un reçu lors de la remise d'argent ?"
+            title="Remise d'argent"
+          />
+        );
       case 'paySuccessfull':
+        return (
+          <InformationModal
+            message="L'argent a été remis avec succès"
+            onClick={() => this.setState({ showModal: null })}
+            title="Argent remis"
+          />
+        );
+      case 'reactivate':
+        return (
+          <ConfirmModal
+            customActions={[
+              {
+                label: 'Annuler',
+                onClick: () => this.setState({ showModal: null }),
+              },
+              {
+                label: 'Transférer et Réactiver',
+                onClick: () => {
+                  this.transferAccount();
+                  this.renewAccount();
+                },
+              },
+              {
+                label: 'Réactiver',
+                onClick: this.renewAccount,
+              },
+            ]}
+            message="Attention, vous êtes sur le point de réactiver le compte. Souhaitez-vous transférer son contenu à la BLU avant la réactivation ?" // eslint-disable-line
+            title="Réactivation du compte"
+          />
+        );
+      case 'transfer':
         return (
           <ConfirmModal
             cancelText="Non"
             confirmText="Oui"
-            message="Le remboursement a été complété, souhaitez-vous imprimer un reçu ?"
+            message="Souhaitez-vous transférer le contenu du compte à la BLU ?"
             onCancel={() => this.setState({ showModal: null })}
-            onConfirm={this.printReceipt}
-            title="Remboursement réussi"
+            onConfirm={this.transferAccount}
+            title="Transfert à la BLU"
           />
         );
       case 'reactivate':
