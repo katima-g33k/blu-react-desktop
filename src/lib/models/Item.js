@@ -42,6 +42,10 @@ export default class Item {
     }
   }
 
+  get isInStock() {
+    return this.copies.filter(copy => copy.isAdded).length > 0;
+  }
+
   get isValid() {
     return !this.status.REMOVED && !this.status.OUTDATED;
   }

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 
 import HTTP from '../../../lib/HTTP';
-import InputModal from '../../general/modals/InputModal';
+import { ConfirmModal, InputModal, SearchModal } from '../../general/modals';
+import Member from '../../../lib/models/Member';
 import Item from '../../../lib/models/Item';
 import ItemView from './ItemView';
 import settings from '../../../settings';
@@ -32,6 +34,7 @@ export default class ItemViewContainer extends Component {
 
     this.decreaseStatus = this.decreaseStatus.bind(this);
     this.increaseStatus = this.increaseStatus.bind(this);
+    this.reserve = this.reserve.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
     this.updateStorage = this.updateStorage.bind(this);
     this.getActions = this.getActions.bind(this);
@@ -58,6 +61,29 @@ export default class ItemViewContainer extends Component {
   increaseStatus() {
     const newStatus = this.state.item.isRemoved ? Item.STATUS.OUTDATED : Item.STATUS.VALID;
     this.updateStatus(newStatus);
+  }
+
+  reserve(parent) {
+    const item = this.state.item;
+    const data = {
+      member: parent.no,
+      item: item.id,
+    };
+
+    HTTP.post(`${settings.apiUrl}/reservation/insert`, data, (err, res) => {
+      if (err) {
+        // TODO: Display error message
+        return;
+      }
+
+      item.reservation.push({
+        id: res.id,
+        date: moment().format(),
+        parent: new Member(parent),
+      });
+
+      this.setState({ item, showModal: null });
+    });
   }
 
   updateStatus(newStatus) {
@@ -127,19 +153,50 @@ export default class ItemViewContainer extends Component {
           this.setState({ showModal: 'storage' });
         },
       },
+      {
+        label: 'Réserver',
+        style: 'primary',
+        onClick: (event) => {
+          event.preventDefault();
+          this.setState({ showModal: this.state.item.isInStock ? 'reserveWarning' : 'reserve' });
+        },
+      },
     ];
   }
 
   getModal() {
-    return this.state.showModal === 'storage' ? (
-      <InputModal
-        message={'Veuillez entrer les caisses de rangements, séparé par ;'}
-        onCancel={() => this.setState({ showModal: null })}
-        onSave={this.updateStorage}
-        title={'Modifier les caisses de rangements'}
-        value={this.state.item.storage.join('; ')}
-      />
-    ) : null;
+    switch (this.state.showModal) {
+      case 'reserve':
+        return (
+          <SearchModal
+            disableArchive
+            onCancel={() => this.setState({ activeCopy: null, showModal: null })}
+            onRowClick={this.reserve}
+            type="parent"
+          />
+        );
+      case 'reserveWarning':
+        return (
+          <ConfirmModal
+            message={'Attention! Il y a des exemplaires en stock Voulez-vous vraiment réserver l\'ouvrage ?'}
+            onCancel={() => this.setState({ showModal: null })}
+            onConfirm={() => this.setState({ showModal: 'reserve' })}
+            title={'Réservation d\'un ouvrage'}
+          />
+        );
+      case 'storage':
+        return (
+          <InputModal
+            message={'Veuillez entrer les caisses de rangements, séparé par ;'}
+            onCancel={() => this.setState({ showModal: null })}
+            onSave={this.updateStorage}
+            title={'Modifier les caisses de rangements'}
+            value={this.state.item.storage.join('; ')}
+          />
+        );
+      default:
+        return null;
+    }
   }
 
   render() {
