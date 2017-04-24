@@ -35,6 +35,7 @@ export default class ItemViewContainer extends Component {
     this.decreaseStatus = this.decreaseStatus.bind(this);
     this.increaseStatus = this.increaseStatus.bind(this);
     this.reserve = this.reserve.bind(this);
+    this.removeReservation = this.removeReservation.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
     this.updateStorage = this.updateStorage.bind(this);
     this.getActions = this.getActions.bind(this);
@@ -58,6 +59,12 @@ export default class ItemViewContainer extends Component {
     this.updateStatus(newStatus);
   }
 
+  removeReservation(deletedReservation) {
+    const { item } = this.state;
+    item.reservation = item.reservation.filter(reservation => reservation !== deletedReservation);
+    this.setState({ item });
+  }
+
   increaseStatus() {
     const newStatus = this.state.item.isRemoved ? Item.STATUS.OUTDATED : Item.STATUS.VALID;
     this.updateStatus(newStatus);
@@ -79,6 +86,7 @@ export default class ItemViewContainer extends Component {
       item.reservation.push({
         id: res.id,
         date: moment().format(),
+        item,
         parent: new Member(parent),
       });
 
@@ -205,6 +213,7 @@ export default class ItemViewContainer extends Component {
         data={this.state.item}
         actions={this.getActions()}
         modal={this.getModal()}
+        onReservationDeleted={this.removeReservation}
       />
     ) : (<Spinner/>);
   }

@@ -1,5 +1,6 @@
 import Author from './Author';
 import Copy from './Copy';
+import Reservation from './Reservation';
 
 export default class Item {
   constructor(item = {}) {
@@ -15,7 +16,7 @@ export default class Item {
     this.copies = item.copies ? item.copies.map(copy => new Copy(copy)) : [];
     this.status = item.status || {};
     this.storage = item.storage || [];
-    this.reservation = item.reservation || [];
+    this.reservation = (item.reservation || []).map(reservation => new Reservation(reservation));
   }
 
   getStatus() {

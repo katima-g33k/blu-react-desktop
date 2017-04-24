@@ -13,7 +13,7 @@ export default class TableLayout extends Component {
     return (
       <section>
         <h4>{this.props.title}</h4>
-        {this.props.actions.map(action => (
+        {this.props.actions && this.props.actions.map(action => (
           <Button
             key={action.name}
             bsStyle={action.bsStyle}
@@ -27,7 +27,7 @@ export default class TableLayout extends Component {
         <Table
           columns={this.props.columns}
           data={this.props.data}
-          placeholder={this.props.placeholder}
+          placeholder={this.props.placeholder || 'No Data'}
           striped
         />
         {this.props.modal}
@@ -38,9 +38,9 @@ export default class TableLayout extends Component {
 
 TableLayout.propTypes = {
   actions: React.PropTypes.array,
-  columns: React.PropTypes.array,
-  data: React.PropTypes.array,
+  columns: React.PropTypes.array.isRequired,
+  data: React.PropTypes.array.isRequired,
   modal: React.PropTypes.shape(),
   placeholder: React.PropTypes.string,
-  title: React.PropTypes.string,
+  title: React.PropTypes.string.isRequired,
 };
