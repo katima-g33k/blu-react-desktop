@@ -50,6 +50,11 @@ export default class Copy {
     return transaction ? transaction.date : '';
   }
 
+  get dateReserved() {
+    const transaction = this.transaction.find(t => t.code === Transaction.TYPES.RESERVE);
+    return transaction ? transaction.date : '';
+  }
+
   get isDonated() {
     return !!this.transaction.find(t => t.code === Transaction.TYPES.DONATE);
   }
@@ -68,6 +73,11 @@ export default class Copy {
 
   get isReserved() {
     return this.status === Copy.STATUS.RESERVED;
+  }
+
+  get reservee() {
+    const transaction = this.transaction.find(t => t.code === Transaction.TYPES.RESERVE);
+    return transaction ? transaction.member : {};
   }
 
   cancelReservation() {

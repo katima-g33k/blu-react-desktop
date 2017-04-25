@@ -7,6 +7,8 @@ import CopyTableContainer from '../../copy/table/CopyTableContainer';
 import I18n, { Translate } from '../../../lib/i18n/i18n';
 import { INFORMATION_FIELDS, LABEL_STYLE, PANEL_STYLE } from './constant';
 import ProfileStats from '../../general/ProfileStats';
+import Reservation from '../../../lib/models/Reservation';
+import ReservationList from './ReservationList';
 
 const border = {
   borderRight: '1px #e0e0e0 solid',
@@ -15,8 +17,17 @@ const border = {
 export default class ItemView extends Component {
   constructor(props) {
     super(props);
+    this.getReservations = this.getReservations.bind(this);
     this.renderInformation = this.renderInformation.bind(this);
     this.renderInternalManagement = this.renderInternalManagement.bind(this);
+  }
+
+  getReservations() {
+    const { copies, reservation } = this.props.data;
+    const reservedCopies = copies.filter(copy => copy.isReserved);
+    const copyReservations = reservedCopies.map(copy => new Reservation({ copy }));
+
+    return reservation.concat(copyReservations);
   }
 
   renderInformation() {
@@ -68,14 +79,16 @@ export default class ItemView extends Component {
   }
 
   render() {
+    const { actions, data, modal, onReservationDeleted } = this.props;
+
     return (
       <Row>
         <Col md={10}>
           <Panel
             header={I18n.t('ItemView.title')}
-            bsStyle={PANEL_STYLE[this.props.data.getStatus()]}
+            bsStyle={PANEL_STYLE[data.getStatus()]}
           >
-            <h3>{this.props.data.name}</h3>
+            <h3>{data.name}</h3>
             <Row>
               <Col sm={12} md={6} style={border}>
                 {this.renderInformation()}
@@ -86,16 +99,22 @@ export default class ItemView extends Component {
                 <h4>
                   <Translate value="ItemView.stats.title" />
                 </h4>
-                <ProfileStats copies={this.props.data.copies}/>
+                <ProfileStats copies={data.copies}/>
               </Col>
             </Row>
-            <CopyTableContainer copies={this.props.data.copies} />
+            {data.reservation.length > 0 && (
+              <ReservationList
+                onReservationDeleted={onReservationDeleted}
+                reservations={this.getReservations()}
+              />
+            )}
+            <CopyTableContainer copies={data.copies} />
           </Panel>
         </Col>
         <Col md={2}>
-          <ActionPanel actions={this.props.actions} />
+          <ActionPanel actions={actions} />
         </Col>
-        {this.props.modal}
+        {modal}
       </Row>
     );
   }
@@ -105,4 +124,5 @@ ItemView.propTypes = {
   actions: React.PropTypes.array,
   data: React.PropTypes.shape(),
   modal: React.PropTypes.shape(),
+  onReservationDeleted: React.PropTypes.func,
 };
