@@ -61,7 +61,13 @@ export default class ItemViewContainer extends Component {
 
   removeReservation(deletedReservation) {
     const { item } = this.state;
-    item.reservation = item.reservation.filter(reservation => reservation !== deletedReservation);
+
+    if (deletedReservation.copy) {
+      item.copies.find(copy => copy.id === deletedReservation.copy.id).cancelReservation();
+    } else {
+      item.reservation = item.reservation.filter(reservation => reservation !== deletedReservation);
+    }
+
     this.setState({ item });
   }
 

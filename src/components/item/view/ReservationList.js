@@ -20,8 +20,9 @@ const columns = [
   {
     dataField: 'parent',
     label: 'Parent',
-    dataFormat(field, reservation) {
-      return link(`/member/view/${reservation.parent.no}`, reservation.parent.name);
+    dataFormat(parent, { copy }) {
+      const member = copy ? copy.reservee : parent;
+      return link(`/member/view/${member.no}`, member.name);
     },
   },
   {
@@ -35,9 +36,7 @@ const columns = [
     label: 'Reçu',
     width: '70px',
     dataAlign: 'center',
-    dataFormat(field, reservation) {
-      return reservation.copy ? <Label bsStyle="success"><Glyphicon glyph="ok-sign" /></Label> : '';
-    },
+    dataFormat: (_, { copy }) => copy && <Label bsStyle="success"><Glyphicon glyph="ok-sign" /></Label>,
   },
   {
     dataField: 'actions',
@@ -86,7 +85,6 @@ export default class ReservationList extends Component {
       member: parent.no,
       item: item.id,
     };
-
 
     HTTP.post(`${settings.apiUrl}/${object}/delete`, data, (err) => {
       if (err) {
