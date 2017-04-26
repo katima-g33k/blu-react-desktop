@@ -144,6 +144,36 @@ export default class AutoForm extends Component {
     );
   }
 
+  renderTextarea(input) {
+    const data = this.state.data;
+    const value = input.value ? input.value(data[input.key], data) : data[input.key];
+    const onChange = this.onChange;
+    const actions = {
+      onChange(event) {
+        if (input.onChange) {
+          onChange(event, input.onChange(event, data));
+        } else {
+          onChange(event);
+        }
+      },
+    };
+
+    return (
+      <FormGroup key={input.key} controlId={input.key}>
+        <Col componentClass={ControlLabel} sm={2} md={3}>
+          {input.label}
+        </Col>
+        <Col sm={10} md={9}>
+          <textarea
+            placeholder={input.placeholder}
+            onChange={actions.onChange}
+            value={value}
+          />
+        </Col>
+      </FormGroup>
+    );
+  }
+
   renderInput(input) {
     const data = this.state.data;
     const value = input.value ? input.value(data[input.key], data) : data[input.key];
@@ -200,15 +230,16 @@ export default class AutoForm extends Component {
       value = value ? value[key] : value;
     });
 
-    if (field.type === 'checkbox') {
-      return this.renderCheckbox(field);
+    switch (field.type) {
+      case 'checkbox':
+        return this.renderCheckbox(field);
+      case 'select':
+        return this.renderSelect(field);
+      case 'textarea':
+        return this.renderTextarea(field);
+      default:
+        return this.renderInput(field);
     }
-
-    if (field.type === 'select') {
-      return this.renderSelect(field);
-    }
-
-    return this.renderInput(field);
   }
 
   renderFields(fields) {

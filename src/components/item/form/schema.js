@@ -46,6 +46,11 @@ const schema = {
             },
           ],
         },
+        {
+          label: 'Commentaires',
+          key: 'comment',
+          type: 'textarea',
+        },
       ],
     },
   ],
