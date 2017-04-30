@@ -144,6 +144,33 @@ export default class AutoForm extends Component {
     );
   }
 
+  renderTextarea(input) {
+    const data = this.state.data;
+    const value = input.value ? input.value(data[input.key], data) : data[input.key];
+    const onChange = this.onChange;
+    const actions = {
+      onChange(event) {
+        if (input.onChange) {
+          onChange(event, input.onChange(event, data));
+        } else {
+          onChange(event);
+        }
+      },
+    };
+
+    return (
+      <FormGroup key={input.key} controlId={input.key}>
+        <ControlLabel>{input.label}</ControlLabel>
+        <FormControl
+          componentClass="textarea"
+          placeholder={input.placeholder}
+          onChange={actions.onChange}
+          value={value}
+        />
+      </FormGroup>
+    );
+  }
+
   renderInput(input) {
     const data = this.state.data;
     const value = input.value ? input.value(data[input.key], data) : data[input.key];
@@ -168,7 +195,8 @@ export default class AutoForm extends Component {
             type={input.type}
             placeholder={input.placeholder}
             onChange={actions.onChange}
-            value={value}
+            value={value || ''}
+            disabled={input.disabled}
           />
         </Col>
       </FormGroup>
@@ -200,33 +228,41 @@ export default class AutoForm extends Component {
       value = value ? value[key] : value;
     });
 
-    if (field.type === 'checkbox') {
-      return this.renderCheckbox(field);
+    switch (field.type) {
+      case 'checkbox':
+        return this.renderCheckbox(field);
+      case 'custom':
+        return (
+          <field.component
+            {...field}
+            data={value}
+          />
+        );
+      case 'select':
+        return this.renderSelect(field);
+      case 'textarea':
+        return this.renderTextarea(field);
+      default:
+        return this.renderInput(field);
     }
-
-    if (field.type === 'select') {
-      return this.renderSelect(field);
-    }
-
-    return this.renderInput(field);
   }
 
   renderFields(fields) {
-    return fields.map((field) => {
-      return field.inline ? this.renderInline(field.inline) : this.renderField(field);
-    });
+    return fields.map(field => field.inline ? this.renderInline(field.inline) : this.renderField(field));
   }
 
   renderSections(sections) {
     return sections.map((section, index) => {
+      const { fields, title, titleClass } = section;
+
       return (
         <FormGroup key={`section${index}`}>
-          {section.title ? (
-            <Col componentClass={section.titleClass || 'h2'}>
-              {section.title}
+          {title ? (
+            <Col componentClass={titleClass || 'h2'}>
+              {title}
             </Col>
           ) : ''}
-          {this.renderFields(section.fields)}
+          {this.renderFields(fields)}
           <hr/>
         </FormGroup>
       );
@@ -234,19 +270,22 @@ export default class AutoForm extends Component {
   }
 
   render() {
+    const { options, sections, titleClass } = this.state.schema;
+    const { onCancel, onSave } = this.props;
+
     return (
-      <Form {...this.state.schema.options}>
-        <Col componentClass={this.state.schema.titleClass || 'h1'}>
+      <Form {...options}>
+        <Col componentClass={titleClass || 'h1'}>
           {this.state.schema.title}
         </Col>
-        {this.renderSections(this.state.schema.sections)}
+        {this.renderSections(sections)}
         <ButtonToolbar>
-          <Button onClick={this.props.onCancel}>
+          <Button onClick={onCancel}>
             {'Annuler'}
           </Button>
           <Button
             bsStyle="primary"
-            onClick={(event) => this.props.onSave(event, this.state.data)}
+            onClick={event => onSave(event, this.state.data)}
           >
             {'Sauvegarder'}
           </Button>
