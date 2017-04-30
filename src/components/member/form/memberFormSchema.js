@@ -24,6 +24,7 @@ const memberFormSchema = {
           placeholder: 'Nom',
         },
         {
+          key: 'no',
           inline: [
             {
               key: 'no',
