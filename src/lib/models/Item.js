@@ -44,6 +44,14 @@ export default class Item {
     }
   }
 
+  get isBook() {
+    return this.is_book;
+  }
+
+  set isBook(isBook) {
+    this.is_book = isBook;
+  }
+
   get isInStock() {
     return this.copies.filter(copy => copy.isAdded).length > 0;
   }
