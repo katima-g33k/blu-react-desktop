@@ -77,8 +77,8 @@ export default class ItemViewContainer extends Component {
     this.updateStatus(newStatus);
   }
 
-  renewParentAccount(no, callback) {
-    HTTP.post(`${settings.apiUrl}/member/renew`, { no }, callback);
+  renewParentAccount(no) {
+    HTTP.post(`${settings.apiUrl}/member/renew`, { no });
   }
 
   reserve(parent) {
@@ -94,16 +94,15 @@ export default class ItemViewContainer extends Component {
         return;
       }
 
-      this.renewParentAccount(parent.no, () => {
-        item.reservation.push({
-          id: res.id,
-          date: moment().format(),
-          item,
-          parent: new Member(parent),
-        });
-
-        this.setState({ item, showModal: null });
+      this.renewParentAccount(parent.no);
+      item.reservation.push({
+        id: res.id,
+        date: moment().format(),
+        item,
+        parent: new Member(parent),
       });
+
+      this.setState({ item, showModal: null });
     });
   }
 
