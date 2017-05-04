@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Label, Panel, Row } from 'react-bootstrap';
+import { Alert, Col, Label, Panel, Row } from 'react-bootstrap';
 import { I18n, Translate } from 'react-i18nify';
 
 import moment from 'moment';
@@ -23,6 +23,7 @@ export default class MemberView extends Component {
     super(props);
 
     this.renderAccountState = this.renderAccountState.bind(this);
+    this.renderAlert = this.renderAlert.bind(this);
     this.renderGeneralInformation = this.renderGeneralInformation.bind(this);
     this.renderPhones = this.renderPhones.bind(this);
     this.renderStats = this.renderStats.bind(this);
@@ -56,6 +57,16 @@ export default class MemberView extends Component {
           value={formatDate(account.deactivationDate)}
         />
       </section>
+    );
+  }
+
+  renderAlert() {
+    const transfers = this.props.member.account.transfers;
+    const dates = transfers.map(date => moment(date).format('LL')).join('');
+    return transfers.length > 0 && (
+      <Alert bsStyle="warning">
+        {`Ce compte a été transféré à la BLU ${transfers.length === 1 ? 'le' : 'les'} ${dates}`}
+      </Alert>
     );
   }
 
@@ -118,6 +129,7 @@ export default class MemberView extends Component {
             header={I18n.t('MemberView.title')}
             bsStyle={this.props.member.account.isActive ? 'default' : 'danger'}
           >
+            {this.renderAlert()}
             <h3>
               {this.props.member.name}
             </h3>
