@@ -71,6 +71,36 @@ export default class MemberFormContainer extends Component {
     this.props.router.push(no ? `/member/view/${no}` : '/search');
   }
 
+  canSave(member) {
+    const required = [];
+    this.schema.sections.forEach((section) => {
+      section.fields.forEach((field) => {
+        if (field.inline) {
+          field.inline.forEach((inlineField) => {
+            if (inlineField.required) {
+              required.push(inlineField);
+            }
+          });
+        } else if (field.required) {
+          required.push(field);
+        }
+      });
+    });
+
+    let canSave = true;
+    required.forEach((field) => {
+      if (field.validationFn) {
+        if (!field.validationFn(member)) {
+          canSave = false;
+        }
+      } else if (!member[field.key]) {
+        canSave = false;
+      }
+    });
+
+    return canSave;
+  }
+
   insert(data) {
     HTTP.post(`${settings.apiUrl}/member/insert`, data, (err, res) => {
       if (err) {
@@ -106,8 +136,15 @@ export default class MemberFormContainer extends Component {
   save(event, member) {
     event.preventDefault();
     const no = this.props.params.no;
-    const data = removeEmptyPropperties({ ...member });
-    return no ? this.update(no, data) : this.insert(data);
+    if (this.canSave(member)) {
+      const data = removeEmptyPropperties({ ...member });
+
+      if (no) {
+        this.update(no, data);
+      } else {
+        this.insert(data);
+      }
+    }
   }
 
   update(no, data) {

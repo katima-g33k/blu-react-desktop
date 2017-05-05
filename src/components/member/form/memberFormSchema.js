@@ -14,14 +14,16 @@ const memberFormSchema = {
         {
           key: 'firstName',
           type: 'text',
-          label: 'Prénom',
+          label: 'Prénom*',
           placeholder: 'Prénom',
+          required: true,
         },
         {
           key: 'lastName',
           type: 'text',
-          label: 'Nom',
+          label: 'Nom*',
           placeholder: 'Nom',
+          required: true,
         },
         {
           key: 'no',
@@ -29,8 +31,10 @@ const memberFormSchema = {
             {
               key: 'no',
               type: 'number',
-              label: 'Numéro de membre',
+              label: 'Numéro de membre*',
               placeholder: '200000000',
+              required: true,
+              validationFn: ({ no, noNo }) => no || noNo,
             },
             {
               label: 'Pas de numéro',
@@ -87,8 +91,9 @@ const memberFormSchema = {
         {
           key: 'email',
           type: 'email',
-          label: 'Courriel',
+          label: 'Courriel*',
           placeholder: 'courriel@exemple.com',
+          required: true,
         },
         {
           inline: [
