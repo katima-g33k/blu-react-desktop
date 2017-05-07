@@ -21,7 +21,6 @@
     "moment": "^2.17.1",
     "react": "^15.4.1",
     "react-bootstrap": "^0.30.6",
-    "react-bootstrap-autoform": "git+https://github.com/katima-g33k/react-bootstrap-autoform.git",
     "react-bootstrap-table": "3.0.0-beta.11",
     "react-dom": "^15.4.1",
     "react-i18nify": "^1.6.3",
@@ -29,9 +28,16 @@
     "request": "^2.79.0"
   },
   "main": "src/electron.js",
+  "homepage": "/",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "electron": "electron ."
+    "electron": "electron .",
+    "init-blu": "yarn global add electron-packager && yarn install"
+  },
+  "build": {
+    "appId": "com.blu.react-desktop",
+    "productName": "BLU",
+    "icon": "public/favicon.ico"
   }
 }
