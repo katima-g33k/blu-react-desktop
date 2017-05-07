@@ -36,6 +36,7 @@ export default class ItemViewContainer extends Component {
     this.increaseStatus = this.increaseStatus.bind(this);
     this.reserve = this.reserve.bind(this);
     this.removeReservation = this.removeReservation.bind(this);
+    this.renewParentAccount = this.renewParentAccount.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
     this.updateStorage = this.updateStorage.bind(this);
     this.getActions = this.getActions.bind(this);
@@ -76,6 +77,10 @@ export default class ItemViewContainer extends Component {
     this.updateStatus(newStatus);
   }
 
+  renewParentAccount(no) {
+    HTTP.post(`${settings.apiUrl}/member/renew`, { no });
+  }
+
   reserve(parent) {
     const item = this.state.item;
     const data = {
@@ -89,6 +94,7 @@ export default class ItemViewContainer extends Component {
         return;
       }
 
+      this.renewParentAccount(parent.no);
       item.reservation.push({
         id: res.id,
         date: moment().format(),

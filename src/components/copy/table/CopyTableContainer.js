@@ -19,6 +19,7 @@ export default class CopyTableContainer extends Component {
     this.cancelReservation = this.cancelReservation.bind(this);
     this.delete = this.delete.bind(this);
     this.refund = this.refund.bind(this);
+    this.renewParentAccount = this.renewParentAccount.bind(this);
     this.reserve = this.reserve.bind(this);
     this.sell = this.sell.bind(this);
     this.updatePrice = this.updatePrice.bind(this);
@@ -148,6 +149,10 @@ export default class CopyTableContainer extends Component {
     });
   }
 
+  renewParentAccount(no) {
+    HTTP.post(`${settings.apiUrl}/member/renew`, { no });
+  }
+
   reserve(parent) {
     const id = this.state.activeCopy.id;
     const data = {
@@ -160,6 +165,8 @@ export default class CopyTableContainer extends Component {
         // TODO: Display error message
         return;
       }
+
+      this.renewParentAccount(parent.no);
 
       const copies = this.state.copies;
       copies.find(copy => copy.id === id).reserve(parent);
