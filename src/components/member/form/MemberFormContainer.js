@@ -73,8 +73,8 @@ export default class MemberFormContainer extends Component {
 
   canSave(member) {
     const required = [];
-    this.schema.sections.forEach((section) => {
-      section.fields.forEach((field) => {
+    this.schema.sections.forEach(({ fields }) => {
+      fields.forEach((field) => {
         if (field.inline) {
           field.inline.forEach((inlineField) => {
             if (inlineField.required) {
@@ -88,12 +88,12 @@ export default class MemberFormContainer extends Component {
     });
 
     let canSave = true;
-    required.forEach((field) => {
-      if (field.validationFn) {
-        if (!field.validationFn(member)) {
+    required.forEach(({ key, validationFn }) => {
+      if (validationFn) {
+        if (!validationFn(member)) {
           canSave = false;
         }
-      } else if (!member[field.key]) {
+      } else if (!member[key]) {
         canSave = false;
       }
     });
