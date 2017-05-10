@@ -2,51 +2,61 @@ import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 
 import Header from './components/general/Header';
-import Sidebar from './components/general/Sidebar';
+import HTTP from './lib/HTTP';
 import Routes from './routes/Routes';
+import scanner from './lib/Scanner';
+import settings from './settings.json';
+import Sidebar from './components/general/Sidebar';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      barcode: '',
-    };
   }
 
   componentWillMount() {
-    // Will be used to handle scanner events
-    document.onkeydown = (event) => {
-      if (event.key === 'à') {
-        this.setState({ barcode: event.key });
-      } else if (this.state.barcode.slice(0, 1) === 'à') {
-        this.setState({ barcode: `${this.state.barcode}${event.key}` });
+    scanner.addListener('onMemberScan', (no) => {
+      const canChangeLocation = !window.location.pathname.match(/add|edit|copies/);
+
+      if (canChangeLocation) {
+        HTTP.post(`${settings.apiUrl}/member/exists`, { no }, (err, res) => {
+          if (err) {
+            // TODO: Display message
+            return;
+          }
+
+          if (res.code === 200) {
+            window.location.href = `http://localhost:3000/member/view/${no}`;
+          } else {
+            window.location.href = `http://localhost:3000/member/add?no=${no}`;
+          }
+        });
       }
+    });
 
-      if (event.key === 'À') {
-        const code = this.state.barcode.replace(/\D/g, '');
+    scanner.addListener('onItemScan', (ean13) => {
+      const canChangeLocation = !window.location.pathname.match(/add|edit|copies/);
 
-        switch (code.length) {
-          case 10:
-            const no = 2 + code.slice(1, 9);
-            // TODO: call member/exists
-            location.href = `/member/view/${no}`;
-            break;
-          case 13:
-            // TODO call  item/exists
-            const id = 0;
-            location.href = `/item/view/${id}`;
-            break;
-          default:
-            // TODO: Alert code not supported
-        }
+      if (canChangeLocation) {
+        HTTP.post(`${settings.apiUrl}/item/exists`, { ean13 }, (err, res) => {
+          if (err) {
+            // TODO: Display message
+            return;
+          }
 
-        this.setState({ barcode: '' });
+
+          if (res.id) {
+            window.location.href = `http://localhost:3000/item/view/${res.id}`;
+          } else {
+            window.location.href = `http://localhost:3000/item/add?ean13=${ean13}`;
+          }
+        });
       }
+    });
 
-      if (this.state.barcode.length > 25) {
-        this.setState({ barcode: '' });
-      }
-    };
+    // eslint-disable-next-line no-unused-vars
+    scanner.addListener('onInvalidScan', (code) => {
+      // TODO: Display message
+    });
   }
 
   render() {
