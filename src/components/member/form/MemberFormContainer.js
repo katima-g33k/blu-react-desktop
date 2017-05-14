@@ -62,6 +62,9 @@ export default class MemberFormContainer extends Component {
           this.setState({ member: new Member(res) });
         }
       });
+    } else if (this.props.location.query.no) {
+      const { no } = this.props.location.query;
+      this.setState({ member: new Member({ no }) });
     }
   }
 
@@ -140,5 +143,6 @@ export default class MemberFormContainer extends Component {
 
 MemberFormContainer.propTypes = {
   params: React.PropTypes.shape(),
+  location: React.PropTypes.shape(),
   router: React.PropTypes.shape(),
 };

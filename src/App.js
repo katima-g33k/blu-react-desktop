@@ -11,52 +11,54 @@ import Sidebar from './components/general/Sidebar';
 export default class App extends Component {
   constructor(props) {
     super(props);
+
+    this.canChangeLocation = this.canChangeLocation.bind(this);
+    this.onInvalidScan = this.onInvalidScan.bind(this);
+    this.onItemScan = this.onItemScan.bind(this);
+    this.onMemberScan = this.onMemberScan.bind(this);
   }
 
   componentWillMount() {
-    scanner.addListener('onMemberScan', (no) => {
-      const canChangeLocation = !window.location.pathname.match(/add|edit|copies/);
+    scanner.addListener('onInvalidScan', this.onInvalidScan);
+    scanner.addListener('onItemScan', this.onItemScan);
+    scanner.addListener('onMemberScan', this.onMemberScan);
+  }
 
-      if (canChangeLocation) {
-        HTTP.post(`${settings.apiUrl}/member/exists`, { no }, (err, res) => {
-          if (err) {
-            // TODO: Display message
-            return;
-          }
+  canChangeLocation() {
+    return !window.location.pathname.match(/add|edit|copies/);
+  }
 
-          if (res.code === 200) {
-            window.location.href = `http://localhost:3000/member/view/${no}`;
-          } else {
-            window.location.href = `http://localhost:3000/member/add?no=${no}`;
-          }
-        });
-      }
-    });
+  onMemberScan(no) {
+    if (this.canChangeLocation()) {
+      HTTP.post(`${settings.apiUrl}/member/exists`, { no }, (err, res) => {
+        if (err) {
+          // TODO: Display message
+          return;
+        }
 
-    scanner.addListener('onItemScan', (ean13) => {
-      const canChangeLocation = !window.location.pathname.match(/add|edit|copies/);
+        const path = res.code === 200 ? `view/${no}` : `add?no=${no}`;
+        window.location.href = `${window.location.host}/member/${path}`;
+      });
+    }
+  }
 
-      if (canChangeLocation) {
-        HTTP.post(`${settings.apiUrl}/item/exists`, { ean13 }, (err, res) => {
-          if (err) {
-            // TODO: Display message
-            return;
-          }
+  onItemScan(ean13) {
+    if (this.canChangeLocation()) {
+      HTTP.post(`${settings.apiUrl}/item/exists`, { ean13 }, (err, res) => {
+        if (err) {
+          // TODO: Display message
+          return;
+        }
 
+        const path = res.id ? `view/${res.id}` : `add?ean13=${ean13}`;
+        window.location.href = `${window.location.host}/item/${path}`;
+      });
+    }
+  }
 
-          if (res.id) {
-            window.location.href = `http://localhost:3000/item/view/${res.id}`;
-          } else {
-            window.location.href = `http://localhost:3000/item/add?ean13=${ean13}`;
-          }
-        });
-      }
-    });
-
-    // eslint-disable-next-line no-unused-vars
-    scanner.addListener('onInvalidScan', (code) => {
-      // TODO: Display message
-    });
+  // eslint-disable-next-line no-unused-vars
+  onInvalidScan(code) {
+    // TODO: Display message
   }
 
   render() {

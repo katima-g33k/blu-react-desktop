@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import Author from '../../../lib/models/Author';
 import HTTP from '../../../lib/HTTP';
@@ -50,6 +50,9 @@ export default class ItemFormContainer extends Component {
 
         this.setState({ item: new Item(res) });
       });
+    } else if (this.props.location.query.ean13) {
+      const { ean13 } = this.props.location.query;
+      this.setState({ item: new Item({ ean13, isBook: true, author: [new Author()] }) });
     }
   }
 
@@ -218,8 +221,9 @@ export default class ItemFormContainer extends Component {
 }
 
 ItemFormContainer.propTypes = {
-  onCancel: React.PropTypes.func,
-  onSave: React.PropTypes.func,
-  params: React.PropTypes.shape(),
-  router: React.PropTypes.shape(),
+  location: PropTypes.shape(),
+  onCancel: PropTypes.func,
+  onSave: PropTypes.func,
+  params: PropTypes.shape(),
+  router: PropTypes.shape(),
 };

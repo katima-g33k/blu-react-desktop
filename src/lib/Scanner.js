@@ -1,5 +1,8 @@
-const SCAN_FIRST_CHAR = 'à';
-const SCAN_LAST_CHAR = 'À';
+import fs from 'fs';
+import settings from '../settings.json';
+
+const SCAN_FIRST_CHAR = settings.barcode.firstChar;
+const SCAN_LAST_CHAR = settings.barcode.lastChar;
 
 class Scanner {
   constructor() {
@@ -11,9 +14,10 @@ class Scanner {
       onInvalidScan: [],
     };
 
-    this.initScanner = this.initScanner.bind(this);
     this.addListener = this.addListener.bind(this);
+    this.calibrate = this.calibrate.bind(this);
     this.dispatch = this.dispatch.bind(this);
+    this.initScanner = this.initScanner.bind(this);
 
     this.initScanner();
   }
@@ -22,6 +26,25 @@ class Scanner {
     if (this.listeners[listener]) {
       this.listeners[listener].push(func);
     }
+  }
+
+  calibrate(code) {
+    const firstChar = code.charAt();
+    const lastChar = code.charAt(code.length - 1);
+
+    const newSettings = {
+      ...settings,
+      barcode: { firstChar, lastChar },
+    };
+
+    fs.writeFile('../settings.json', JSON.stringify(newSettings), (err) => {
+      if (err) {
+        // TODO: Display message
+        return;
+      }
+
+      // TODO: Display message
+    });
   }
 
   dispatch(listener, ...args) {
