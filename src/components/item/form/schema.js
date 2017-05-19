@@ -23,10 +23,12 @@ const ean13 = {
       label: 'EAN13',
       key: 'ean13',
       type: 'text',
+      required: true,
+      validationFn: (item) => item.ean13 || item.noEan13,
     },
     {
       label: 'Pas de numéro',
-      key: 'no-ean13',
+      key: 'noEan13',
       type: 'checkbox',
     },
   ],
@@ -44,11 +46,13 @@ const schema = {
             label: 'Titre',
             key: 'name',
             type: 'text',
+            required: true,
           },
           {
             label: 'Éditeur',
             key: 'editor',
             type: 'text',
+            required: true,
           },
           {
             label: 'Édition',
@@ -65,6 +69,18 @@ const schema = {
             key: 'author',
             type: 'custom',
             component: AuthorInput,
+            required: true,
+            validationFn: (data) => {
+              let valid = true;
+
+              data.author.forEach((author) => {
+                if (!author.lastName || author.lastName === '') {
+                  valid = false;
+                }
+              });
+
+              return valid;
+            },
           },
           subject,
           ean13,
@@ -88,6 +104,7 @@ const schema = {
             label: 'Nom',
             key: 'name',
             type: 'text',
+            required: true,
           },
           subject,
           ean13,
