@@ -106,10 +106,8 @@ export default class AutoForm extends Component {
     event.preventDefault();
 
     if (this.canSave()) {
-      console.log('Can Save');
       this.props.onSave(this.state.data);
     } else {
-      console.log('Invalid');
       // TODO: display message
     }
   }
