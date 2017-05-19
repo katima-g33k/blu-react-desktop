@@ -15,9 +15,12 @@ export default class AutoForm extends Component {
     super(props);
     this.state = {
       data: props.data || {},
+      canSave: true,
       schema: props.schema || {},
     };
 
+    this.canSave = this.canSave.bind(this);
+    this.onSave = this.onSave.bind(this);
     this.renderSections = this.renderSections.bind(this);
     this.renderCheckbox = this.renderCheckbox.bind(this);
     this.renderOptions = this.renderOptions.bind(this);
@@ -38,6 +41,47 @@ export default class AutoForm extends Component {
     });
   }
 
+  canSave() {
+    let canSave = true;
+    const { data, schema } = this.state;
+    const required = [];
+
+    schema.sections.forEach(({ fields }) => {
+      fields.forEach((field) => {
+        if (field.inline) {
+          field.inline.forEach((inlineField) => {
+            if (inlineField.required) {
+              required.push(inlineField);
+            }
+          });
+        } else if (field.required) {
+          required.push(field);
+        }
+      });
+    });
+
+    required.forEach((requiredField) => {
+      const field = requiredField;
+      const { key, validationFn } = field;
+      if (validationFn) {
+        if (!validationFn(data)) {
+          field.invalid = true;
+          canSave = false;
+        } else {
+          delete field.invalid;
+        }
+      } else if (!data[key]) {
+        field.invalid = true;
+        canSave = false;
+      } else {
+        delete field.invalid;
+      }
+    });
+
+    this.setState({ canSave, schema });
+    return canSave;
+  }
+
   onChange(event, inputOnChange) {
     const data = inputOnChange || this.state.data;
 
@@ -56,6 +100,18 @@ export default class AutoForm extends Component {
     }
 
     this.setState({ data });
+  }
+
+  onSave(event) {
+    event.preventDefault();
+
+    if (this.canSave()) {
+      console.log('Can Save');
+      this.props.onSave(this.state.data);
+    } else {
+      console.log('Invalid');
+      // TODO: display message
+    }
   }
 
   renderCheckbox(input) {
@@ -186,7 +242,11 @@ export default class AutoForm extends Component {
     };
 
     return (
-      <FormGroup key={input.key} controlId={input.key}>
+      <FormGroup
+        controlId={input.key}
+        key={input.key}
+        validationState={input.invalid && 'error'}
+      >
         <Col componentClass={ControlLabel} sm={2} md={3}>
           {input.label}
         </Col>
@@ -198,6 +258,7 @@ export default class AutoForm extends Component {
             value={value || ''}
             disabled={input.disabled}
           />
+          <FormControl.Feedback />
         </Col>
       </FormGroup>
     );
@@ -271,7 +332,7 @@ export default class AutoForm extends Component {
 
   render() {
     const { options, sections, titleClass } = this.state.schema;
-    const { onCancel, onSave } = this.props;
+    const { onCancel } = this.props;
 
     return (
       <Form {...options}>
@@ -285,7 +346,7 @@ export default class AutoForm extends Component {
           </Button>
           <Button
             bsStyle="primary"
-            onClick={event => onSave(event, this.state.data)}
+            onClick={this.onSave}
           >
             {'Sauvegarder'}
           </Button>

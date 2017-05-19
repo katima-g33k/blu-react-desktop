@@ -1,3 +1,5 @@
+const emailRegex = /^[a-zA-Z0-9.!#$%&’*+\/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+
 const memberFormSchema = {
   titleClass: 'h3',
   options: {
@@ -34,7 +36,9 @@ const memberFormSchema = {
               label: 'Numéro de membre*',
               placeholder: '200000000',
               required: true,
-              validationFn: ({ no, noNo }) => no || noNo,
+              validationFn: ({ no, noNo }) => {
+                return noNo || /^(\d{7}|\d{9})$/.test(no);
+              },
             },
             {
               label: 'Pas de numéro',
@@ -94,6 +98,7 @@ const memberFormSchema = {
           label: 'Courriel*',
           placeholder: 'courriel@exemple.com',
           required: true,
+          validationFn: ({ email }) => emailRegex.test(email),
         },
         {
           inline: [
