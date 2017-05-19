@@ -87,7 +87,7 @@ export default class ItemFormContainer extends Component {
     Object.keys(this.schema).forEach((key) => {
       const inlineEan13 = this.schema[key].sections[0].fields.find(field => field.key === 'ean13');
       const ean13TextField = inlineEan13.inline.find(field => field.key === 'ean13');
-      const ean13Checkbox = inlineEan13.inline.find(field => field.key === 'no-ean13');
+      const ean13Checkbox = inlineEan13.inline.find(field => field.key === 'noEan13');
 
       ean13Checkbox.onChange = (event) => {
         const item = this.state.item;
@@ -127,7 +127,6 @@ export default class ItemFormContainer extends Component {
   insert(item) {
     HTTP.post(`${settings.apiUrl}/item/insert`, { item }, (err, res) => {
       if (err) {
-        console.log(err);
         // TODO: Display message
         return;
       }
@@ -166,12 +165,12 @@ export default class ItemFormContainer extends Component {
       delete item.publication;
     }
 
-    if (item['no-ean13']) {
+    if (item.noEan13) {
       delete item.ean13;
     }
 
     delete item.id;
-    delete item['no-ean13'];
+    delete item.noEan13;
     return id ? this.update(item) : this.insert(item);
   }
 
