@@ -40,11 +40,15 @@ export default class AuthorInput extends Component {
   }
 
   renderAuthor(author = {}, index = 1) {
-    const { data, onRemoveButton } = this.props;
+    const { data, invalid, onRemoveButton } = this.props;
 
     return (
-      <FormGroup controlId={`author${index}`} key={`author${index}`}>
-        {this.renderInput(author, 'lastName')}
+      <FormGroup
+        controlId={`author${index}`}
+        key={`author${index}`}
+        validationState={invalid && author.lastName === '' && 'error'}
+      >
+        {this.renderInput(author, 'lastName', true)}
         {this.renderInput(author, 'firstName')}
         {data.length > 1 && (
           <Col sm={1} md={1}>
@@ -60,7 +64,7 @@ export default class AuthorInput extends Component {
     );
   }
 
-  renderInput(author, field) {
+  renderInput(author, field, feedback) {
     const { onChange } = this.props;
 
     return (
@@ -76,6 +80,7 @@ export default class AuthorInput extends Component {
             type="text"
             value={author[field]}
           />
+          {feedback && <FormControl.Feedback />}
         </Col>
       </Col>
     );
@@ -97,6 +102,7 @@ export default class AuthorInput extends Component {
 
 AuthorInput.propTypes = {
   data: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+  invalid: PropTypes.string,
   onAddButton: PropTypes.func,
   onChange: PropTypes.func,
   onRemoveButton: PropTypes.func,

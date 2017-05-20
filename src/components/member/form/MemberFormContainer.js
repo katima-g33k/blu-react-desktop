@@ -103,11 +103,15 @@ export default class MemberFormContainer extends Component {
     }
   }
 
-  save(event, member) {
-    event.preventDefault();
+  save(member) {
     const no = this.props.params.no;
     const data = removeEmptyPropperties({ ...member });
-    return no ? this.update(no, data) : this.insert(data);
+
+    if (no) {
+      this.update(no, data);
+    } else {
+      this.insert(data);
+    }
   }
 
   update(no, data) {
