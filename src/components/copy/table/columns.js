@@ -6,15 +6,12 @@ import highlightSearchResults from '../../../lib/highlightSearchResults';
 import I18n from '../../../lib/i18n/i18n';
 
 const formatDate = date => date ? moment(date).format('YYYY-MM-DD') : '';
-const link = (href, label) => {
-  return (
-    <Link
-      to={{ pathname: href }}
-      dangerouslySetInnerHTML={{ __html: label }}
-    >
-    </Link>
-  );
-};
+const link = (href, label) => (
+  <Link
+    to={{ pathname: href }}
+    dangerouslySetInnerHTML={{ __html: label }}
+  />
+);
 
 export default [
   {
@@ -54,8 +51,10 @@ export default [
     tdStyle: { whiteSpace: 'normal' },
     memberOnly: true,
     formatExtraData: { props: ['highlight'] },
-    dataFormat: (cell, { item }, extra = {}) =>
-      link(`/item/view/${item.id}`, highlightSearchResults(item.name, extra.highlight)),
+    dataFormat: (cell, { item }, extra = {}) => {
+      const label = highlightSearchResults(item.name, extra.highlight);
+      return link(`/item/view/${item.id}`, label);
+    },
     sortFunc: (a, b, order) => {
       if (a.item.name < b.item.name) {
         return order === 'asc' ? -1 : 1;
