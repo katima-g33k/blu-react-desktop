@@ -223,41 +223,6 @@ export default class MemberViewContainer extends Component {
             title="Transfert à la BLU"
           />
         );
-      case 'reactivate':
-        return (
-          <ConfirmModal
-            customActions={[
-              {
-                label: 'Annuler',
-                onClick: () => this.setState({ showModal: null }),
-              },
-              {
-                label: 'Transférer et Réactiver',
-                onClick: () => {
-                  this.transferAccount();
-                  this.renewAccount();
-                },
-              },
-              {
-                label: 'Réactiver',
-                onClick: this.renewAccount,
-              },
-            ]}
-            message="Attention, vous êtes sur le point de réactiver le compte. Souhaitez-vous transférer son contenu à la BLU avant la réactivation ?" // eslint-disable-line
-            title="Réactivation du compte"
-          />
-        );
-      case 'transfer':
-        return (
-          <ConfirmModal
-            cancelText="Non"
-            confirmText="Oui"
-            message="Souhaitez-vous transférer le contenu du compte à la BLU ?"
-            onCancel={() => this.setState({ showModal: null })}
-            onConfirm={this.transferAccount}
-            title="Transfert à la BLU"
-          />
-        );
       default:
         return null;
     }
