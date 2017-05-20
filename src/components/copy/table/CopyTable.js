@@ -110,6 +110,7 @@ export default class CopyTable extends Component {
         <Table
           columns={this.props.columns}
           data={this.filterData()}
+          highlight={this.state.filters.search}
           options={{
             defaultSortName: this.props.columns.find(column => column.defaultSort).dataField,
             defaultSortOrder: 'asc',
