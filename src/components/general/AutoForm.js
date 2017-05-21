@@ -8,6 +8,7 @@ import {
   Form,
   FormControl,
   FormGroup,
+  Row,
 } from 'react-bootstrap';
 
 export default class AutoForm extends Component {
@@ -112,7 +113,7 @@ export default class AutoForm extends Component {
     }
   }
 
-  renderCheckbox(input) {
+  renderCheckbox(input, labelWidth = 3, inputWidth) {
     const data = this.state.data;
     const checked = input.value ? input.value(data[input.key], data) : data[input.key];
     const onChange = this.onCheckChange;
@@ -127,7 +128,12 @@ export default class AutoForm extends Component {
     };
     return (
       <FormGroup key={input.key}>
-        <Col smOffset={2} mdOffset={3} sm={10} md={9}>
+        <Col
+          smOffset={inputWidth ? 0 : 2}
+          mdOffset={inputWidth ? 0 : 3}
+          sm={inputWidth ? inputWidth + 1 : 10}
+          md={inputWidth || 9}
+        >
           <Checkbox
             id={input.key}
             onChange={actions.onChange}
@@ -213,19 +219,27 @@ export default class AutoForm extends Component {
     };
 
     return (
-      <FormGroup key={input.key} controlId={input.key}>
-        <ControlLabel>{input.label}</ControlLabel>
-        <FormControl
-          componentClass="textarea"
-          placeholder={input.placeholder}
-          onChange={actions.onChange}
-          value={value}
-        />
-      </FormGroup>
+      <Col
+        key={input.key}
+        smOffset={1}
+        mdOffset={2}
+      >
+        <FormGroup controlId={input.key}>
+          <ControlLabel style={{ paddingBottom: 5 }}>
+            {input.label}
+          </ControlLabel>
+          <FormControl
+            componentClass="textarea"
+            placeholder={input.placeholder}
+            onChange={actions.onChange}
+            value={value}
+          />
+        </FormGroup>
+      </Col>
     );
   }
 
-  renderInput(input) {
+  renderInput(input, labelWidth = 3, inputWidth = 9) {
     const data = this.state.data;
     const value = input.value ? input.value(data[input.key], data) : data[input.key];
     const onChange = this.onChange;
@@ -245,10 +259,17 @@ export default class AutoForm extends Component {
         key={input.key}
         validationState={input.invalid && 'error'}
       >
-        <Col componentClass={ControlLabel} sm={2} md={3}>
+        <Col
+          componentClass={ControlLabel}
+          sm={labelWidth - 1}
+          md={labelWidth}
+        >
           {input.label}
         </Col>
-        <Col sm={10} md={9}>
+        <Col
+          sm={inputWidth + 1}
+          md={inputWidth}
+        >
           <FormControl
             type={input.type}
             placeholder={input.placeholder}
@@ -263,24 +284,14 @@ export default class AutoForm extends Component {
   }
 
   renderInline(fields) {
-    const width = Math.floor(12 / fields.length);
-    const inlineFields = fields.map((field, index) => {
-      return (
-        <Col
-          md={width}
-          key={`inline${index}`}
-        >
-          {this.renderField(field)}
-        </Col>
-      );
-    });
+    const inlineFields = fields.map((field) => this.renderField(field, 3, 3));
 
     return (
       <Col key={fields[0].key}>{inlineFields}</Col>
     );
   }
 
-  renderField(field) {
+  renderField(field, labelWidth, inputWidth) {
     const keys = field.key.split('.');
     let value = this.state.data;
     keys.forEach((key) => {
@@ -289,7 +300,7 @@ export default class AutoForm extends Component {
 
     switch (field.type) {
       case 'checkbox':
-        return this.renderCheckbox(field);
+        return this.renderCheckbox(field, labelWidth, inputWidth);
       case 'custom':
         return (
           <field.component
@@ -298,16 +309,16 @@ export default class AutoForm extends Component {
           />
         );
       case 'select':
-        return this.renderSelect(field);
+        return this.renderSelect(field, labelWidth, inputWidth);
       case 'textarea':
-        return this.renderTextarea(field);
+        return this.renderTextarea(field, labelWidth, inputWidth);
       default:
-        return this.renderInput(field);
+        return this.renderInput(field, labelWidth, inputWidth);
     }
   }
 
   renderFields(fields) {
-    return fields.map(field => field.inline ? this.renderInline(field.inline) : this.renderField(field));
+    return fields.map((field) => field.inline ? this.renderInline(field.inline) : this.renderField(field));
   }
 
   renderSections(sections) {
@@ -315,7 +326,7 @@ export default class AutoForm extends Component {
       const { fields, title, titleClass } = section;
 
       return (
-        <FormGroup key={`section${index}`}>
+        <Row key={`section${index}`}>
           {title ? (
             <Col componentClass={titleClass || 'h2'}>
               {title}
@@ -323,7 +334,7 @@ export default class AutoForm extends Component {
           ) : ''}
           {this.renderFields(fields)}
           <hr/>
-        </FormGroup>
+        </Row>
       );
     });
   }
