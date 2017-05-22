@@ -12,6 +12,7 @@ export default class MemberViewContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      amount: 0,
       member: null,
       showModal: null,
     };
@@ -38,7 +39,10 @@ export default class MemberViewContainer extends Component {
   }
 
   printReceipt() {
-    window.open(`/member/receipt/${this.props.params.no}`, '_blank').focus();
+    const { no } = this.props.params;
+    const { amount } = this.state;
+
+    window.open(`/member/receipt/${no}/${amount}`, '_blank').focus();
   }
 
   getActions() {
@@ -103,6 +107,7 @@ export default class MemberViewContainer extends Component {
   }
 
   pay() {
+    let amount = 0;
     const member = this.state.member;
     const data = { no: member.no };
 
@@ -113,8 +118,13 @@ export default class MemberViewContainer extends Component {
       }
 
       this.renewAccount();
-      member.account.copies.forEach(copy => copy.isSold && copy.pay());
-      this.setState({ member, showModal: 'paySuccessfull' });
+      member.account.copies.forEach((copy) => {
+        if (copy.isSold) {
+          amount += copy.price;
+          copy.pay();
+        }
+      });
+      this.setState({ amount, member, showModal: 'paySuccessfull' });
     });
   }
 
@@ -181,10 +191,11 @@ export default class MemberViewContainer extends Component {
           />
         );
       case 'paySuccessfull':
+        const { amount } = this.state;
         return (
           <InformationModal
-            message="L'argent a été remis avec succès"
-            onClick={() => this.setState({ showModal: null })}
+            message={`Le montant de ${amount} $  a été remis avec succès`}
+            onClick={() => this.setState({ amount: 0, showModal: null })}
             title="Argent remis"
           />
         );

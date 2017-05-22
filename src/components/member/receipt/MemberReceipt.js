@@ -21,7 +21,7 @@ const columns = [
     label: 'Titre',
     defaultSort: true,
     tdStyle: { whiteSpace: 'normal' },
-    dataFormat: (cell, row) => row.item.name,
+    dataFormat: (cell, { item }) => item.name,
     sortFunc: (a, b, order) => {
       if (a.item.name < b.item.name) {
         return order === 'asc' ? -1 : 1;
@@ -38,42 +38,43 @@ const columns = [
     dataField: 'author',
     label: 'Auteur.e.s',
     tdStyle: { whiteSpace: 'normal' },
-    dataFormat: (cell, row) => row.item.authorString,
+    dataFormat: (cell, { item }) => item.authorString,
   },
   {
     dataField: 'edition',
     label: 'Édition',
-    dataFormat: (cell, row) => row.item.edition,
-  },
-  {
-    dataField: 'publication',
-    label: 'Année de parution',
-    dataFormat: (cell, row) => row.item.publication,
+    dataFormat: (cell, { item }) => item.edition,
+    width: '45px',
   },
   {
     dataField: 'editor',
     label: 'Éditeur',
     tdStyle: { whiteSpace: 'normal' },
-    dataFormat: (cell, row) => row.item.editor,
+    dataFormat: (cell, { item }) => item.editor,
+    width: '100px',
   },
   {
     dataField: 'dateAdded',
-    label: 'Date d\'ajout (AAAA-MM-JJ)',
+    label: 'Date d\'ajout*',
     dataFormat: date => formatDate(date),
+    width: '67px',
   },
   {
     dataField: 'dateSold',
-    label: 'Date de vente (AAAA-MM-JJ)',
+    label: 'Date de vente*',
     dataFormat: date => formatDate(date),
+    width: '75px',
   },
   {
     dataField: 'datePaid',
-    label: 'Date de remise d\'argent (AAAA-MM-JJ)',
+    label: 'Date de remise d\'argent*',
     dataFormat: date => formatDate(date),
+    width: '120px',
   },
   {
     dataField: 'priceString',
     label: 'Prix',
+    width: '30px',
   },
 ];
 
@@ -85,12 +86,13 @@ export default class MemberReceipt extends Component {
     };
 
     this.renderAccount = this.renderAccount.bind(this);
+    this.renderAutorisation = this.renderAutorisation.bind(this);
     this.renderCopies = this.renderCopies.bind(this);
     this.renderPhone = this.renderPhone.bind(this);
   }
 
   componentWillMount() {
-    const no = this.props.params.no;
+    const { no } = this.props.params;
 
     HTTP.post(`${settings.apiUrl}/member/select`, { no }, (err, res) => {
       if (err) {
@@ -99,11 +101,9 @@ export default class MemberReceipt extends Component {
       }
 
       this.setState({ member: new Member(res) });
+      print();
+      // close();
     });
-  }
-
-  componentDidMount() {
-    // window.print();
   }
 
   renderCopies() {
@@ -146,6 +146,7 @@ export default class MemberReceipt extends Component {
     return (
       <section>
         <h3>{'Compte étudiant'}</h3>
+        <hr/>
         {fields.map(field => {
           return (
             <AlignedData
@@ -160,6 +161,28 @@ export default class MemberReceipt extends Component {
     );
   }
 
+  renderAutorisation() {
+    const { amount } = this.props.params;
+    const { name } = this.state.member.name;
+    const date = moment().format('LL');
+    const signatureStyle = {
+      marginTop: 30,
+      borderTop: '1px solid black',
+    };
+    // eslint-disable-next-line
+    const message = `Je, ${name}, atteste que les informations précitées sont valides et que l\'Association Étudiante du Cégep de Sherbrooke (AÉCS) m\'a remis le montant de ${amount} $ en date du ${date}.`;
+    return (
+      <Row>
+        {message}
+        <Row>
+          <Col md={3} style={signatureStyle}>
+            {'Signature'}
+          </Col>
+        </Row>
+      </Row>
+    );
+  }
+
   render() {
     return this.state.member ? (
       <div>
@@ -170,8 +193,11 @@ export default class MemberReceipt extends Component {
           </Col>
         </Row>
         <Row>
+          <h3>{'Livres mis en vente'}</h3>
+          <hr/>
           {this.renderCopies()}
         </Row>
+        {this.renderAutorisation()}
       </div>
     ) : <Spinner/>;
   }
