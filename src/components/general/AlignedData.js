@@ -1,29 +1,36 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Col, Row } from 'react-bootstrap';
 
 export default class AlignedData extends Component {
   render() {
+    const {
+      className,
+      componentClass = 'div',
+      label,
+      value,
+    } = this.props;
+
     return (
       <Row
-        className={this.props.className}
-        componentClass={this.props.componentClass || 'div'}
+        className={className}
+        componentClass={componentClass}
         style={{ marginTop: 5, marginBottom: 5 }}
       >
-        <Col md={4}>{this.props.label}</Col>
-        <Col>{this.props.value}</Col>
+        <Col md={4}>{label}</Col>
+        <Col>{value}</Col>
       </Row>
     );
   }
 }
 
-const propType = React.PropTypes.oneOfType([
-  React.PropTypes.string,
-  React.PropTypes.object,
+const propType = PropTypes.oneOfType([
+  PropTypes.string,
+  PropTypes.object,
 ]).isRequired;
 
 AlignedData.propTypes = {
-  className: React.PropTypes.string,
-  componentClass: React.PropTypes.string,
+  className: PropTypes.string,
+  componentClass: PropTypes.string,
   label: propType,
   value: propType,
 };
