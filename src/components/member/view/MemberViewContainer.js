@@ -106,9 +106,9 @@ export default class MemberViewContainer extends Component {
     return generalActions.concat(this.state.member.account.isActive ? activeActions : inactiveActions);
   }
 
-  pay() {
+  pay(callback = () => {}) {
     let amount = 0;
-    const member = this.state.member;
+    const { member } = this.state;
     const data = { no: member.no };
 
     HTTP.post(`${settings.apiUrl}/member/pay`, data, (err) => {
@@ -120,11 +120,13 @@ export default class MemberViewContainer extends Component {
       this.renewAccount();
       member.account.copies.forEach((copy) => {
         if (copy.isSold) {
-          amount += copy.price;
+          amount += +copy.price;
           copy.pay();
         }
       });
       this.setState({ amount, member, showModal: 'paySuccessfull' });
+
+      callback();
     });
   }
 
@@ -177,8 +179,7 @@ export default class MemberViewContainer extends Component {
               {
                 label: 'Imprimer un reçu',
                 onClick: () => {
-                  this.pay();
-                  this.printReceipt();
+                  this.pay(this.printReceipt);
                 },
               },
               {
