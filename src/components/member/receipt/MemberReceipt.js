@@ -87,8 +87,10 @@ export default class MemberReceipt extends Component {
 
     this.renderAccount = this.renderAccount.bind(this);
     this.renderAutorisation = this.renderAutorisation.bind(this);
+    this.renderConditions = this.renderConditions.bind(this);
     this.renderCopies = this.renderCopies.bind(this);
     this.renderPhone = this.renderPhone.bind(this);
+    this.renderNote = this.renderNote.bind(this);
   }
 
   componentWillMount() {
@@ -129,6 +131,7 @@ export default class MemberReceipt extends Component {
           key={phone.number}
           label={<span>{`Téléphone ${index + 1}`}</span>}
           value={phone.toString()}
+          className="userdata"
         />
       );
     });
@@ -146,13 +149,13 @@ export default class MemberReceipt extends Component {
     return (
       <section>
         <h3>{'Compte étudiant'}</h3>
-        <hr/>
         {fields.map(field => {
           return (
             <AlignedData
               key={field.key}
               label={field.label}
               value={member[field.key]}
+              className="userdata"
             />
           );
         })}
@@ -163,22 +166,42 @@ export default class MemberReceipt extends Component {
 
   renderAutorisation() {
     const { amount } = this.props.params;
-    const { name } = this.state.member.name;
+    const { name } = this.state.member;
     const date = moment().format('LL');
-    const signatureStyle = {
-      marginTop: 30,
-      borderTop: '1px solid black',
-    };
     // eslint-disable-next-line
     const message = `Je, ${name}, atteste que les informations précitées sont valides et que l\'Association Étudiante du Cégep de Sherbrooke (AÉCS) m\'a remis le montant de ${amount} $ en date du ${date}.`;
     return (
-      <Row>
-        {message}
+      <Row className="autorisation">
         <Row>
-          <Col md={3} style={signatureStyle}>
-            {'Signature'}
+          <Col md={12}>
+            {message}
           </Col>
         </Row>
+        <Row className="signature">
+          {'Signature'}
+        </Row>
+      </Row>
+    );
+  }
+
+  renderConditions() {
+    // eslint-disable-next-line max-len
+    const conditions = 'La Banque de Livres Usagés (BLU) de l\'Association Étudiante du Cégep de Sherbrooke (AÉCS) fait la vente des livres déposés en consigne par les étudiant.e.s, qui choisissent le prix. Les déposant.e.s ont la responsabilité de venir collecter l\'argent de leurs ventes. Si un dossier demeure inactif pour une période consécutive de 12 mois, celui-ci est fermé sans préavis. Les livres et le solde restant deviennent la propriété exclusive de la BLU. Les dons de livres, les livres déposés à la BLU qui ne sont utilisés dans aucun cheminement ou encore qui sont remplacés par des éditions plus récentes seront acheminés sans péavis, s\'ils sont d\'une valeur inféreieure à 40 dollars, vers un programme de récupération de volumes à des fins humanitaires. La BLU n\'est pas responsable des vols et des bris de livres et n\'offre aucun remboursement dans de tels cas.';
+    return (
+      <Row className="conditions">
+        <Col md={12}>
+          {conditions}
+        </Col>
+      </Row>
+    );
+  }
+
+  renderNote() {
+    return (
+      <Row className="note">
+        <Col md={12}>
+          {'* Les dates sont inscrites au format (AAAA-MM-JJ)'}
+        </Col>
       </Row>
     );
   }
@@ -187,17 +210,21 @@ export default class MemberReceipt extends Component {
     return this.state.member ? (
       <div>
         <h2>{'Banque de livres usagés'}</h2>
+        <p className="semester">{moment.semester()}</p>
         <Row>
           <Col md={4}>
             {this.renderAccount()}
           </Col>
         </Row>
         <Row>
-          <h3>{'Livres mis en vente'}</h3>
-          <hr/>
-          {this.renderCopies()}
+          <Col md={12}>
+            <h3>{'Livres mis en vente'}</h3>
+            {this.renderCopies()}
+          </Col>
         </Row>
+        {this.renderNote()}
         {this.renderAutorisation()}
+        {this.renderConditions()}
       </div>
     ) : <Spinner/>;
   }

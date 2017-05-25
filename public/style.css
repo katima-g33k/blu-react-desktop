@@ -47,10 +47,40 @@ h4 {
 
   h3 {
     font-size: 12px;
-    margin: 0 0 10px 0;
+    margin: 15px 0 10px 0;
   }
 
   aside, header, nav {
     display: none;
+  }
+
+  .userdata div {
+    display: inline-block;
+  }
+
+  .userdata div:first-of-type {
+    font-weight: bold;
+    width: 120px;
+  }
+
+  .note {
+    margin-bottom: 20px;
+  }
+
+  .autorisation {
+    margin: auto;
+    margin-bottom: 30px;
+  }
+
+  .signature {
+    border-top: 1px solid black;
+    margin-top: 40px;
+    margin-left: 65%;
+    text-align: center;
+    width: 35%;
+  }
+
+  .conditions {
+    font-size: 7px;
   }
 }
