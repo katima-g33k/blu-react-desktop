@@ -104,7 +104,7 @@ export default class MemberReceipt extends Component {
 
       this.setState({ member: new Member(res) });
       print();
-      // close();
+      close();
     });
   }
 
