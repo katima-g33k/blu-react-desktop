@@ -66,7 +66,7 @@ export default class App extends Component {
       <div>
         <Header />
         <main>
-          <Col md={2}>
+          <Col componentClass="aside" md={2}>
             <Sidebar />
           </Col>
           <Col sm={12} md={10}>
