@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import Author from '../../../lib/models/Author';
 import HTTP from '../../../lib/HTTP';
@@ -31,6 +31,8 @@ export default class ItemFormContainer extends Component {
   }
 
   componentWillMount() {
+    const { ean13, location, params } = this.props;
+
     HTTP.post(`${settings.apiUrl}/category/select`, {}, (err, res) => {
       if (err) {
         // TODO: display error
@@ -39,7 +41,7 @@ export default class ItemFormContainer extends Component {
       this.setState({ categories: res });
     });
 
-    if (this.props.params && this.props.params.id) {
+    if (params && params.id) {
       const data = {
         id: this.props.params.id,
       };
@@ -50,6 +52,9 @@ export default class ItemFormContainer extends Component {
 
         this.setState({ item: new Item(res) });
       });
+    } else if (ean13 || (location && location.query.ean13)) {
+      const code = ean13 || location.query.ean13;
+      this.setState({ item: new Item({ ean13: code, isBook: true, author: [new Author()] }) });
     }
   }
 
@@ -217,8 +222,10 @@ export default class ItemFormContainer extends Component {
 }
 
 ItemFormContainer.propTypes = {
-  onCancel: React.PropTypes.func,
-  onSave: React.PropTypes.func,
-  params: React.PropTypes.shape(),
-  router: React.PropTypes.shape(),
+  ean13: PropTypes.string,
+  location: PropTypes.shape(),
+  onCancel: PropTypes.func,
+  onSave: PropTypes.func,
+  params: PropTypes.shape(),
+  router: PropTypes.shape(),
 };
