@@ -4,6 +4,7 @@ import { browserHistory } from 'react-router';
 
 import Header from './components/general/Header';
 import HTTP from './lib/HTTP';
+import { InformationModal } from './components/general/modals';
 import Routes from './routes/Routes';
 import scanner from './lib/Scanner';
 import settings from './settings.json';
@@ -12,11 +13,15 @@ import Sidebar from './components/general/Sidebar';
 export default class App extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      showModal: null,
+    };
 
     this.canChangeLocation = this.canChangeLocation.bind(this);
     this.onInvalidScan = this.onInvalidScan.bind(this);
     this.onItemScan = this.onItemScan.bind(this);
     this.onMemberScan = this.onMemberScan.bind(this);
+    this.renderModal = this.renderModal.bind(this);
   }
 
   componentWillMount() {
@@ -57,9 +62,23 @@ export default class App extends Component {
     }
   }
 
-  // eslint-disable-next-line no-unused-vars
-  onInvalidScan(code) {
-    // TODO: Display message
+  onInvalidScan() {
+    this.setState({ showModal: 'invalidCode' });
+  }
+
+  renderModal() {
+    switch (this.state.showModal) {
+      case 'invalidCode':
+        return (
+          <InformationModal
+            message={'Le code que vous venez de scanner n\'est pas supporté par le système de la BLU'}
+            onClick={() => this.setState({ showModal: null })}
+            title={'Code invalide'}
+          />
+        );
+      default:
+        return null;
+    }
   }
 
   render() {
@@ -73,6 +92,7 @@ export default class App extends Component {
           <Col sm={12} md={10}>
             <Routes />
           </Col>
+          {this.renderModal()}
         </main>
       </div>
     );
