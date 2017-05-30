@@ -14,21 +14,16 @@ class Scanner {
       onInvalidScan: [],
     };
 
-    this.addListener = this.addListener.bind(this);
-    this.calibrate = this.calibrate.bind(this);
-    this.dispatch = this.dispatch.bind(this);
-    this.initScanner = this.initScanner.bind(this);
-
     this.initScanner();
   }
 
-  addListener(listener, func) {
+  addListener = (listener, func) => {
     if (this.listeners[listener]) {
       this.listeners[listener].push(func);
     }
   }
 
-  calibrate(code) {
+  calibrate = (code) => {
     const firstChar = code.charAt();
     const lastChar = code.charAt(code.length - 1);
 
@@ -47,11 +42,11 @@ class Scanner {
     });
   }
 
-  dispatch(listener, ...args) {
+  dispatch = (listener, ...args) => {
     this.listeners[listener].forEach(func => func(...args));
   }
 
-  initScanner() {
+  initScanner = () => {
     document.onkeydown = (event) => {
       if (event.key === SCAN_FIRST_CHAR) {
         this.barcode = event.key;
@@ -82,6 +77,10 @@ class Scanner {
         this.barcode = '';
       }
     };
+  }
+
+  removeListener = (listener, func) => {
+    this.listeners[listener] = this.listeners[listener].filter(currentFunc => currentFunc !== func);
   }
 }
 

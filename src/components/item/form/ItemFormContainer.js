@@ -31,6 +31,8 @@ export default class ItemFormContainer extends Component {
   }
 
   componentWillMount() {
+    const { ean13, location, params } = this.props;
+
     HTTP.post(`${settings.apiUrl}/category/select`, {}, (err, res) => {
       if (err) {
         // TODO: display error
@@ -39,7 +41,7 @@ export default class ItemFormContainer extends Component {
       this.setState({ categories: res });
     });
 
-    if (this.props.params && this.props.params.id) {
+    if (params && params.id) {
       const data = {
         id: this.props.params.id,
       };
@@ -50,9 +52,9 @@ export default class ItemFormContainer extends Component {
 
         this.setState({ item: new Item(res) });
       });
-    } else if (this.props.location.query.ean13) {
-      const { ean13 } = this.props.location.query;
-      this.setState({ item: new Item({ ean13, isBook: true, author: [new Author()] }) });
+    } else if (ean13 || (location && location.query.ean13)) {
+      const code = ean13 || location.query.ean13;
+      this.setState({ item: new Item({ ean13: code, isBook: true, author: [new Author()] }) });
     }
   }
 
@@ -220,6 +222,7 @@ export default class ItemFormContainer extends Component {
 }
 
 ItemFormContainer.propTypes = {
+  ean13: PropTypes.string,
   location: PropTypes.shape(),
   onCancel: PropTypes.func,
   onSave: PropTypes.func,

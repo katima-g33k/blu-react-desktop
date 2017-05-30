@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
+import { browserHistory } from 'react-router';
 
 import Header from './components/general/Header';
 import HTTP from './lib/HTTP';
@@ -25,7 +26,7 @@ export default class App extends Component {
   }
 
   canChangeLocation() {
-    return !window.location.pathname.match(/add|edit|copies/);
+    return !browserHistory.getCurrentLocation().pathname.match(/add|edit|copies/);
   }
 
   onMemberScan(no) {
@@ -37,7 +38,7 @@ export default class App extends Component {
         }
 
         const path = res.code === 200 ? `view/${no}` : `add?no=${no}`;
-        window.location.href = `${window.location.host}/member/${path}`;
+        browserHistory.push(`/member/${path}`);
       });
     }
   }
@@ -51,7 +52,7 @@ export default class App extends Component {
         }
 
         const path = res.id ? `view/${res.id}` : `add?ean13=${ean13}`;
-        window.location.href = `${window.location.host}/item/${path}`;
+        browserHistory.push(`/item/${path}`);
       });
     }
   }
