@@ -6,7 +6,6 @@ import {
   FormControl,
   FormGroup,
   Glyphicon,
-  Row,
 } from 'react-bootstrap';
 
 const MAX_AUTHORS = 5;
