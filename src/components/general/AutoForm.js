@@ -199,6 +199,7 @@ export default class AutoForm extends Component {
   }
 
   renderTextarea(input) {
+    const inputWidth = input.inputWidth || { md: 9, mdOffset: 3, sm: 10, smOffset: 2 };
     const data = this.state.data;
     const value = input.value ? input.value(data[input.key], data) : data[input.key];
     const onChange = this.onChange;
@@ -213,10 +214,7 @@ export default class AutoForm extends Component {
     };
 
     return (
-      <Col
-        smOffset={1}
-        mdOffset={2}
-      >
+      <Col key={`textarea${input.key}`} {...inputWidth}>
         <ControlLabel style={{ paddingBottom: 5 }}>
           {input.label}
         </ControlLabel>
