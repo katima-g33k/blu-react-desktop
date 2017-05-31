@@ -113,7 +113,8 @@ export default class AutoForm extends Component {
     }
   }
 
-  renderCheckbox(input, labelWidth = 3, inputWidth) {
+  renderCheckbox(input) {
+    const inputWidth = input.inputWidth || { md: 9, mdOffset: 3, sm: 10, smOffset: 2 };
     const data = this.state.data;
     const checked = input.value ? input.value(data[input.key], data) : data[input.key];
     const onChange = this.onCheckChange;
@@ -127,13 +128,8 @@ export default class AutoForm extends Component {
       },
     };
     return (
-      <FormGroup key={input.key}>
-        <Col
-          smOffset={inputWidth ? 0 : 2}
-          mdOffset={inputWidth ? 0 : 3}
-          sm={inputWidth ? inputWidth + 1 : 10}
-          md={inputWidth || 9}
-        >
+      <div key={`checkbox${input.key}`}>
+        <Col {...inputWidth}>
           <Checkbox
             id={input.key}
             onChange={actions.onChange}
@@ -142,37 +138,35 @@ export default class AutoForm extends Component {
             {input.label}
           </Checkbox>
         </Col>
-      </FormGroup>
+      </div>
     );
   }
 
   renderOptions(options) {
-    return options.map((option, index) => {
-      return (
-        <option
-          key={index}
-          value={option.value}
-        >
-          {option.label}
-        </option>
-      );
-    });
+    return options.map((option, index) => (
+      <option
+        key={index}
+        value={option.value}
+      >
+        {option.label}
+      </option>
+    ));
   }
 
   renderOptgroups(optgroups) {
-    return optgroups.map((optgroup, index) => {
-      return (
-        <optgroup
-          key={`optgroup${index}`}
-          label={optgroup.label}
-        >
-          {this.renderOptions(optgroup.options)}
-        </optgroup>
-      );
-    });
+    return optgroups.map((optgroup, index) => (
+      <optgroup
+        key={`optgroup${index}`}
+        label={optgroup.label}
+      >
+        {this.renderOptions(optgroup.options)}
+      </optgroup>
+    ));
   }
 
   renderSelect(input) {
+    const labelWidth = input.labelWidth || { md: 3, sm: 2 };
+    const inputWidth = input.inputWidth || { md: 9, sm: 10 };
     const data = this.state.data;
     const onChange = this.onChange;
     const value = input.value ? input.value(data[input.key], data) || input.default : data[input.key] || input.default;
@@ -187,11 +181,11 @@ export default class AutoForm extends Component {
     };
 
     return (
-      <FormGroup key={input.key} controlId={input.key}>
-        <Col componentClass={ControlLabel} sm={2} md={3}>
+      <div key={`select${input.key}`}>
+        <Col componentClass={ControlLabel} {...labelWidth}>
           {input.label}
         </Col>
-        <Col sm={10} md={9}>
+        <Col {...inputWidth}>
           <FormControl
             componentClass='select'
             value={value}
@@ -200,7 +194,7 @@ export default class AutoForm extends Component {
             {input.optgroups ? this.renderOptgroups(input.optgroups) : this.renderOptions(input.options || [])}
           </FormControl>
         </Col>
-      </FormGroup>
+      </div>
     );
   }
 
@@ -220,26 +214,25 @@ export default class AutoForm extends Component {
 
     return (
       <Col
-        key={input.key}
         smOffset={1}
         mdOffset={2}
       >
-        <FormGroup controlId={input.key}>
-          <ControlLabel style={{ paddingBottom: 5 }}>
-            {input.label}
-          </ControlLabel>
-          <FormControl
-            componentClass="textarea"
-            placeholder={input.placeholder}
-            onChange={actions.onChange}
-            value={value}
-          />
-        </FormGroup>
+        <ControlLabel style={{ paddingBottom: 5 }}>
+          {input.label}
+        </ControlLabel>
+        <FormControl
+          componentClass="textarea"
+          placeholder={input.placeholder}
+          onChange={actions.onChange}
+          value={value}
+        />
       </Col>
     );
   }
 
-  renderInput(input, labelWidth = 3, inputWidth = 9) {
+  renderInput(input) {
+    const labelWidth = input.labelWidth || { md: 3, sm: 2 };
+    const inputWidth = input.inputWidth || { md: 9, sm: 10 };
     const data = this.state.data;
     const value = input.value ? input.value(data[input.key], data) : data[input.key];
     const onChange = this.onChange;
@@ -254,21 +247,15 @@ export default class AutoForm extends Component {
     };
 
     return (
-      <FormGroup
-        controlId={input.key}
-        key={input.key}
-        validationState={input.invalid && 'error'}
-      >
+      <div key={`input${input.key}`}>
         <Col
           componentClass={ControlLabel}
-          sm={labelWidth - 1}
-          md={labelWidth}
+          {...labelWidth}
         >
           {input.label}
         </Col>
         <Col
-          sm={inputWidth + 1}
-          md={inputWidth}
+          {...inputWidth}
         >
           <FormControl
             type={input.type}
@@ -279,19 +266,15 @@ export default class AutoForm extends Component {
           />
           <FormControl.Feedback />
         </Col>
-      </FormGroup>
+      </div>
     );
   }
 
   renderInline(fields) {
-    const inlineFields = fields.map((field) => this.renderField(field, 3, 3));
-
-    return (
-      <Col key={fields[0].key}>{inlineFields}</Col>
-    );
+    return fields.map((field) => this.renderField(field));
   }
 
-  renderField(field, labelWidth, inputWidth) {
+  renderField(field) {
     const keys = field.key.split('.');
     let value = this.state.data;
     keys.forEach((key) => {
@@ -300,7 +283,7 @@ export default class AutoForm extends Component {
 
     switch (field.type) {
       case 'checkbox':
-        return this.renderCheckbox(field, labelWidth, inputWidth);
+        return this.renderCheckbox(field);
       case 'custom':
         return (
           <field.component
@@ -309,16 +292,29 @@ export default class AutoForm extends Component {
           />
         );
       case 'select':
-        return this.renderSelect(field, labelWidth, inputWidth);
+        return this.renderSelect(field);
       case 'textarea':
-        return this.renderTextarea(field, labelWidth, inputWidth);
+        return this.renderTextarea(field);
       default:
-        return this.renderInput(field, labelWidth, inputWidth);
+        return this.renderInput(field);
     }
   }
 
   renderFields(fields) {
-    return fields.map((field) => field.inline ? this.renderInline(field.inline) : this.renderField(field));
+    return fields.map((field) => {
+      const key = field.key || field.inline[0].key;
+      const validationState = (field.invalid || field.inline && field.inline[0].invalid) && 'error';
+
+      return (
+        <FormGroup
+          controlId={key}
+          key={key}
+          validationState={validationState}
+        >
+          {field.inline ? this.renderInline(field.inline) : this.renderField(field)}
+        </FormGroup>
+      );
+    });
   }
 
   renderSections(sections) {
