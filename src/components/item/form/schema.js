@@ -24,12 +24,21 @@ const ean13 = {
       key: 'ean13',
       type: 'text',
       required: true,
+      labelWidth: {
+        md: 3,
+      },
+      inputWidth: {
+        md: 3,
+      },
       validationFn: (item) => item.ean13 || item.noEan13,
     },
     {
       label: 'Pas de numéro',
       key: 'noEan13',
       type: 'checkbox',
+      inputWidth: {
+        md: 3,
+      },
     },
   ],
 };

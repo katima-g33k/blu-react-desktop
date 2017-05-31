@@ -21,7 +21,7 @@ const columns = [
     label: 'Titre',
     defaultSort: true,
     tdStyle: { whiteSpace: 'normal' },
-    dataFormat: (cell, row) => row.item.name,
+    dataFormat: (cell, { item }) => item.name,
     sortFunc: (a, b, order) => {
       if (a.item.name < b.item.name) {
         return order === 'asc' ? -1 : 1;
@@ -38,42 +38,43 @@ const columns = [
     dataField: 'author',
     label: 'Auteur.e.s',
     tdStyle: { whiteSpace: 'normal' },
-    dataFormat: (cell, row) => row.item.authorString,
+    dataFormat: (cell, { item }) => item.authorString,
   },
   {
     dataField: 'edition',
     label: 'Édition',
-    dataFormat: (cell, row) => row.item.edition,
-  },
-  {
-    dataField: 'publication',
-    label: 'Année de parution',
-    dataFormat: (cell, row) => row.item.publication,
+    dataFormat: (cell, { item }) => item.edition,
+    width: '45px',
   },
   {
     dataField: 'editor',
     label: 'Éditeur',
     tdStyle: { whiteSpace: 'normal' },
-    dataFormat: (cell, row) => row.item.editor,
+    dataFormat: (cell, { item }) => item.editor,
+    width: '100px',
   },
   {
     dataField: 'dateAdded',
-    label: 'Date d\'ajout (AAAA-MM-JJ)',
+    label: 'Date d\'ajout*',
     dataFormat: date => formatDate(date),
+    width: '67px',
   },
   {
     dataField: 'dateSold',
-    label: 'Date de vente (AAAA-MM-JJ)',
+    label: 'Date de vente*',
     dataFormat: date => formatDate(date),
+    width: '75px',
   },
   {
     dataField: 'datePaid',
-    label: 'Date de remise d\'argent (AAAA-MM-JJ)',
+    label: 'Date de remise d\'argent*',
     dataFormat: date => formatDate(date),
+    width: '120px',
   },
   {
     dataField: 'priceString',
     label: 'Prix',
+    width: '30px',
   },
 ];
 
@@ -85,12 +86,15 @@ export default class MemberReceipt extends Component {
     };
 
     this.renderAccount = this.renderAccount.bind(this);
+    this.renderAutorisation = this.renderAutorisation.bind(this);
+    this.renderConditions = this.renderConditions.bind(this);
     this.renderCopies = this.renderCopies.bind(this);
     this.renderPhone = this.renderPhone.bind(this);
+    this.renderNote = this.renderNote.bind(this);
   }
 
   componentWillMount() {
-    const no = this.props.params.no;
+    const { no } = this.props.params;
 
     HTTP.post(`${settings.apiUrl}/member/select`, { no }, (err, res) => {
       if (err) {
@@ -99,11 +103,9 @@ export default class MemberReceipt extends Component {
       }
 
       this.setState({ member: new Member(res) });
+      print();
+      close();
     });
-  }
-
-  componentDidMount() {
-    // window.print();
   }
 
   renderCopies() {
@@ -129,6 +131,7 @@ export default class MemberReceipt extends Component {
           key={phone.number}
           label={<span>{`Téléphone ${index + 1}`}</span>}
           value={phone.toString()}
+          className="userdata"
         />
       );
     });
@@ -152,6 +155,7 @@ export default class MemberReceipt extends Component {
               key={field.key}
               label={field.label}
               value={member[field.key]}
+              className="userdata"
             />
           );
         })}
@@ -160,18 +164,67 @@ export default class MemberReceipt extends Component {
     );
   }
 
+  renderAutorisation() {
+    const { amount } = this.props.params;
+    const { name } = this.state.member;
+    const date = moment().format('LL');
+    // eslint-disable-next-line
+    const message = `Je, ${name}, atteste que les informations précitées sont valides et que l\'Association Étudiante du Cégep de Sherbrooke (AÉCS) m\'a remis le montant de ${amount} $ en date du ${date}.`;
+    return (
+      <Row className="autorisation">
+        <Row>
+          <Col md={12}>
+            {message}
+          </Col>
+        </Row>
+        <Row className="signature">
+          {'Signature'}
+        </Row>
+      </Row>
+    );
+  }
+
+  renderConditions() {
+    // eslint-disable-next-line max-len
+    const conditions = 'La Banque de Livres Usagés (BLU) de l\'Association Étudiante du Cégep de Sherbrooke (AÉCS) fait la vente des livres déposés en consigne par les étudiant.e.s, qui choisissent le prix. Les déposant.e.s ont la responsabilité de venir collecter l\'argent de leurs ventes. Si un dossier demeure inactif pour une période consécutive de 12 mois, celui-ci est fermé sans préavis. Les livres et le solde restant deviennent la propriété exclusive de la BLU. Les dons de livres, les livres déposés à la BLU qui ne sont utilisés dans aucun cheminement ou encore qui sont remplacés par des éditions plus récentes seront acheminés sans péavis, s\'ils sont d\'une valeur inféreieure à 40 dollars, vers un programme de récupération de volumes à des fins humanitaires. La BLU n\'est pas responsable des vols et des bris de livres et n\'offre aucun remboursement dans de tels cas.';
+    return (
+      <Row className="conditions">
+        <Col md={12}>
+          {conditions}
+        </Col>
+      </Row>
+    );
+  }
+
+  renderNote() {
+    return (
+      <Row className="note">
+        <Col md={12}>
+          {'* Les dates sont inscrites au format (AAAA-MM-JJ)'}
+        </Col>
+      </Row>
+    );
+  }
+
   render() {
     return this.state.member ? (
       <div>
         <h2>{'Banque de livres usagés'}</h2>
+        <p className="semester">{moment.semester()}</p>
         <Row>
           <Col md={4}>
             {this.renderAccount()}
           </Col>
         </Row>
         <Row>
-          {this.renderCopies()}
+          <Col md={12}>
+            <h3>{'Livres mis en vente'}</h3>
+            {this.renderCopies()}
+          </Col>
         </Row>
+        {this.renderNote()}
+        {this.renderAutorisation()}
+        {this.renderConditions()}
       </div>
     ) : <Spinner/>;
   }

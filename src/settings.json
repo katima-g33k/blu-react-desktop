@@ -1,3 +1,7 @@
 {
-  "apiUrl": "http://localhost/blu-api"
+  "apiUrl": "http://localhost/blu-api",
+  "barcode": {
+    "firstChar": "à",
+    "lastChar": "À"
+  }
 }

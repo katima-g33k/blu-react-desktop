@@ -6,7 +6,6 @@ import {
   FormControl,
   FormGroup,
   Glyphicon,
-  Row,
 } from 'react-bootstrap';
 
 const MAX_AUTHORS = 5;
@@ -88,13 +87,14 @@ export default class AuthorInput extends Component {
 
   render() {
     const authors = this.props.data;
+    const inputWidth = { md: 10, mdOffset: 2, sm: 11, smOffset: 1 };
 
     return (
-      <Row componentClass="fieldset">
+      <Col {...inputWidth} componentClass="fieldset">
         <legend>{'Auteur.e.s'}</legend>
         {authors.map((author, index) => this.renderAuthor(author, index + 1))}
         {authors.length < MAX_AUTHORS && this.renderAddAuthor()}
-      </Row>
+      </Col>
     );
 
   }
