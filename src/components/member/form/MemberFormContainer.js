@@ -49,9 +49,9 @@ export default class MemberFormContainer extends Component {
   componentWillMount() {
     HTTP.post(`${settings.apiUrl}/state/select`, {}, (err, states) => {
       if (states) {
-        this.setState({ states });
         const stateSelect = this.schema.sections[1].fields.find(field => field.key === 'state');
-        stateSelect.options = this.state.states.map(state => ({ value: state, label: state }));
+        stateSelect.options = states.map(state => ({ value: state, label: state }));
+        this.setState({ states });
       }
     });
 

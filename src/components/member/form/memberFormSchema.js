@@ -36,6 +36,12 @@ const memberFormSchema = {
               label: 'Numéro de membre*',
               placeholder: '200000000',
               required: true,
+              labelWidth: {
+                md: 3,
+              },
+              inputWidth: {
+                md: 3,
+              },
               validationFn: ({ no, noNo }) => {
                 return noNo || /^(\d{7}|\d{9})$/.test(no);
               },
@@ -44,6 +50,9 @@ const memberFormSchema = {
               label: 'Pas de numéro',
               key: 'noNo',
               type: 'checkbox',
+              inputWidth: {
+                md: 3,
+              },
             },
           ],
         },
@@ -107,6 +116,12 @@ const memberFormSchema = {
               type: 'phone',
               label: 'Téléphone 1',
               placeholder: 'XXX-XXX-XXXX',
+              labelWidth: {
+                md: 3,
+              },
+              inputWidth: {
+                md: 3,
+              },
               value(value, member) {
                 return member.phone && member.phone[0] ? member.phone[0].number : '';
               },
@@ -120,6 +135,12 @@ const memberFormSchema = {
               key: 'note1',
               type: 'text',
               label: 'Note',
+              labelWidth: {
+                md: 1,
+              },
+              inputWidth: {
+                md: 3,
+              },
               value(value, member) {
                 return member.phone && member.phone[0] ? member.phone[0].note : '';
               },
@@ -138,6 +159,12 @@ const memberFormSchema = {
               type: 'phone',
               label: 'Téléphone 2',
               placeholder: 'XXX-XXX-XXXX',
+              labelWidth: {
+                md: 3,
+              },
+              inputWidth: {
+                md: 3,
+              },
               value(value, member) {
                 return member.phone && member.phone[1] ? member.phone[1].number : '';
               },
@@ -158,6 +185,12 @@ const memberFormSchema = {
               key: 'note2',
               type: 'text',
               label: 'Note',
+              labelWidth: {
+                md: 1,
+              },
+              inputWidth: {
+                md: 3,
+              },
               value(value, member) {
                 return member.phone && member.phone[1] ? member.phone[1].note : '';
               },
