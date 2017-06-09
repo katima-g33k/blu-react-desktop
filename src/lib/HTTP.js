@@ -6,7 +6,7 @@ const API_KEY = settings.apiKey;
 
 const HTTP = {
   call: (method, url, data, callback = () => {}) => {
-    const params = url.replace(API_BASE_URL, '').split('/');
+    const params = url.replace(`${API_BASE_URL}/`, '').split('/');
     const req = {
       data,
       object: params[0],
@@ -14,7 +14,7 @@ const HTTP = {
       'api-key': API_KEY,
     };
 
-    const apiURL = `${API_BASE_URL}index.php?req=${JSON.stringify(req)}`;
+    const apiURL = `${API_BASE_URL}/index.php?req=${JSON.stringify(req)}`;
     const allowedHeaders = [
       'Origin',
       'X-Authorization',
