@@ -1,11 +1,12 @@
 import request from 'request';
+import settings from '../settings.json';
 
-const API_BASE_URL = 'http://localhost/blu-api/';
-const API_KEY = '8ecf71749e3a5a5f02d585943e81849f';
+const API_BASE_URL = settings.apiUrl;
+const API_KEY = settings.apiKey;
 
 const HTTP = {
   call: (method, url, data, callback = () => {}) => {
-    const params = url.replace(API_BASE_URL, '').split('/');
+    const params = url.replace(`${API_BASE_URL}/`, '').split('/');
     const req = {
       data,
       object: params[0],
@@ -13,8 +14,24 @@ const HTTP = {
       'api-key': API_KEY,
     };
 
-    const apiURL = `${API_BASE_URL}index.php?req=${JSON.stringify(req)}`;
-    request[method.toLowerCase()](apiURL, (err, res, body) => {
+    const apiURL = `${API_BASE_URL}/index.php?req=${JSON.stringify(req)}`;
+    const allowedHeaders = [
+      'Origin',
+      'X-Authorization',
+      'Access-Control-Allow-Methods',
+      'Access-Control-Allow-Headers',
+      'Access-Control-Allow-Origin',
+    ];
+    const options = {
+      url: apiURL,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': allowedHeaders.join(', '),
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Content-Type': 'application/json',
+      },
+    };
+    request[method.toLowerCase()](options, (err, res, body) => {
       try {
         callback(err, err ? null : JSON.parse(body).data);
       } catch (e) {
