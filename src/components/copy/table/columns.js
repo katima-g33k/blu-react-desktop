@@ -2,10 +2,16 @@ import React from 'react';
 import { Link } from 'react-router';
 import moment from 'moment';
 
+import highlightSearchResults from '../../../lib/highlightSearchResults';
 import I18n from '../../../lib/i18n/i18n';
 
 const formatDate = date => date ? moment(date).format('YYYY-MM-DD') : '';
-const link = (href, label) => (<Link to={{ pathname: href }}>{label}</Link>);
+const link = (href, label) => (
+  <Link
+    to={{ pathname: href }}
+    dangerouslySetInnerHTML={{ __html: label }}
+  />
+);
 
 export default [
   {
@@ -20,9 +26,10 @@ export default [
     defaultSort: true,
     tdStyle: { whiteSpace: 'normal' },
     itemOnly: true,
-    dataFormat: (member, copy) => {
+    formatExtraData: { props: ['highlight'] },
+    dataFormat: (member, copy, extra = {}) => {
       const label = `${copy.isDonated ? 'BLU - ' : ''}${copy.member.name}`;
-      return link(`/member/view/${member.no}`, label);
+      return link(`/member/view/${member.no}`, highlightSearchResults(label, extra.highlight));
     },
     sortFunc: (a, b, order) => {
       if (a.member.name < b.member.name) {
@@ -43,7 +50,11 @@ export default [
     defaultSort: true,
     tdStyle: { whiteSpace: 'normal' },
     memberOnly: true,
-    dataFormat: (cell, row) => link(`/item/view/${row.item.id}`, row.item.name),
+    formatExtraData: { props: ['highlight'] },
+    dataFormat: (cell, { item }, extra = {}) => {
+      const label = highlightSearchResults(item.name, extra.highlight);
+      return link(`/item/view/${item.id}`, label);
+    },
     sortFunc: (a, b, order) => {
       if (a.item.name < b.item.name) {
         return order === 'asc' ? -1 : 1;
@@ -63,7 +74,8 @@ export default [
     width: '170px',
     dataSort: true,
     memberOnly: true,
-    dataFormat: (cell, row) => row.item.editor,
+    formatExtraData: { props: ['highlight'] },
+    dataFormat: (cell, { item }, extra = {}) => highlightSearchResults(item.editor, extra.highlight),
     sortFunc: (a, b, order) => {
       if (a.item.editor < b.item.editor) {
         return order === 'asc' ? -1 : 1;
@@ -82,7 +94,7 @@ export default [
     dataSort: true,
     width: '85px',
     memberOnly: true,
-    dataFormat: (cell, row) => row.item.edition,
+    dataFormat: (cell, { item }) => item.edition,
     sortFunc: (a, b, order) => {
       if (order === 'asc') {
         return a.item.edition - b.item.edition;

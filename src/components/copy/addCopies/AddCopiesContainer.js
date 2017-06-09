@@ -6,24 +6,28 @@ import addCopiesColums from './addCopiesColumns';
 import Copy from '../../../lib/models/Copy';
 import HTTP from '../../../lib/HTTP';
 import InputModal from '../../general/modals/InputModal';
+import Item from '../../../lib/models/Item';
+import Member from '../../../lib/models/Member';
+import scanner from '../../../lib/Scanner';
 import settings from '../../../settings.json';
 import Transaction from '../../../lib/models/Transaction';
-import Member from '../../../lib/models/Member';
 
 export default class AddCopiesContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
       copies: [],
+      ean13: null,
       isSearch: true,
+      member: new Member({ no: props.params.no }),
       showModal: false,
-      member: new Member({ no: this.props.params.no }),
     };
 
     this.deleteCopy = this.deleteCopy.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.getActions = this.getActions.bind(this);
     this.getModal = this.getModal.bind(this);
+    this.onItemScan = this.onItemScan.bind(this);
     this.openModal = this.openModal.bind(this);
     this.save = this.save.bind(this);
     this.updatePrice = this.updatePrice.bind(this);
@@ -50,6 +54,8 @@ export default class AddCopiesContainer extends Component {
   }
 
   componentWillMount() {
+    scanner.addListener('onItemScan', this.onItemScan);
+
     const no = this.props.params.no;
     HTTP.post(`${settings.apiUrl}/member/getName`, { no }, (err, res) => {
       if (err) {
@@ -59,6 +65,10 @@ export default class AddCopiesContainer extends Component {
 
       this.setState({ member: new Member({ no, ...res }) });
     });
+  }
+
+  componentWillUnmount() {
+    scanner.removeListener('onItemScan', this.onItemScan);
   }
 
   deleteCopy(id) {
@@ -88,7 +98,7 @@ export default class AddCopiesContainer extends Component {
   getModal() {
     const isCopy = this.state.copy;
 
-    return this.state.showModal && (
+    return this.state.showModal ? (
       <InputModal
         message={'Entrer le montant souhaité'}
         onCancel={this.closeModal}
@@ -97,7 +107,27 @@ export default class AddCopiesContainer extends Component {
         type="number"
         value={isCopy && this.state.copy.price}
       />
-    );
+    ) : null;
+  }
+
+  onItemScan(ean13) {
+    const data = {
+      ean13,
+      forCopy: true,
+    };
+
+    HTTP.post(`${settings.apiUrl}/item/select`, data, (err, res) => {
+      if (err) {
+        // TODO: Display message
+        return;
+      }
+
+      if (res.id) {
+        this.openModal({ item: new Item(res) });
+      } else {
+        this.setState({ ean13, isSearch: false });
+      }
+    });
   }
 
   openModal(data = {}) {
@@ -162,18 +192,22 @@ export default class AddCopiesContainer extends Component {
   }
 
   render() {
+    const { columns, getActions, getModal, openModal, props } = this;
+    const { copies, ean13, isSearch, member } = this.state;
+
     return (
       <AddCopies
-        {...this.props}
-        actions={this.getActions()}
-        columns={this.columns}
-        data={this.state.copies}
-        isSearch={this.state.isSearch}
-        member={this.state.member}
-        modal={this.getModal()}
+        {...props}
+        actions={getActions()}
+        columns={columns}
+        data={copies}
+        ean13={ean13}
+        isSearch={isSearch}
+        member={member}
+        modal={getModal()}
         onAddButton={() => this.setState({ isSearch: false })}
-        openModal={this.openModal}
-        onFormSave={this.openModal}
+        openModal={openModal}
+        onFormSave={openModal}
         onFormCancel={() => this.setState({ isSearch: true })}
       />
     );

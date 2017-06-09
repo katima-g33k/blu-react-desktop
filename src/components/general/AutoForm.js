@@ -8,6 +8,7 @@ import {
   Form,
   FormControl,
   FormGroup,
+  Row,
 } from 'react-bootstrap';
 
 export default class AutoForm extends Component {
@@ -15,9 +16,12 @@ export default class AutoForm extends Component {
     super(props);
     this.state = {
       data: props.data || {},
+      canSave: true,
       schema: props.schema || {},
     };
 
+    this.canSave = this.canSave.bind(this);
+    this.onSave = this.onSave.bind(this);
     this.renderSections = this.renderSections.bind(this);
     this.renderCheckbox = this.renderCheckbox.bind(this);
     this.renderOptions = this.renderOptions.bind(this);
@@ -36,6 +40,47 @@ export default class AutoForm extends Component {
       data: props.data || this.state.data,
       schema: props.schema || this.state.schema,
     });
+  }
+
+  canSave() {
+    let canSave = true;
+    const { data, schema } = this.state;
+    const required = [];
+
+    schema.sections.forEach(({ fields }) => {
+      fields.forEach((field) => {
+        if (field.inline) {
+          field.inline.forEach((inlineField) => {
+            if (inlineField.required) {
+              required.push(inlineField);
+            }
+          });
+        } else if (field.required) {
+          required.push(field);
+        }
+      });
+    });
+
+    required.forEach((requiredField) => {
+      const field = requiredField;
+      const { key, validationFn } = field;
+      if (validationFn) {
+        if (!validationFn(data)) {
+          field.invalid = true;
+          canSave = false;
+        } else {
+          delete field.invalid;
+        }
+      } else if (!data[key]) {
+        field.invalid = true;
+        canSave = false;
+      } else {
+        delete field.invalid;
+      }
+    });
+
+    this.setState({ canSave, schema });
+    return canSave;
   }
 
   onChange(event, inputOnChange) {
@@ -58,7 +103,18 @@ export default class AutoForm extends Component {
     this.setState({ data });
   }
 
+  onSave(event) {
+    event.preventDefault();
+
+    if (this.canSave()) {
+      this.props.onSave(this.state.data);
+    } else {
+      // TODO: display message
+    }
+  }
+
   renderCheckbox(input) {
+    const inputWidth = input.inputWidth || { md: 9, mdOffset: 3, sm: 10, smOffset: 2 };
     const data = this.state.data;
     const checked = input.value ? input.value(data[input.key], data) : data[input.key];
     const onChange = this.onCheckChange;
@@ -72,8 +128,8 @@ export default class AutoForm extends Component {
       },
     };
     return (
-      <FormGroup key={input.key}>
-        <Col smOffset={2} mdOffset={3} sm={10} md={9}>
+      <div key={`checkbox${input.key}`}>
+        <Col {...inputWidth}>
           <Checkbox
             id={input.key}
             onChange={actions.onChange}
@@ -82,37 +138,35 @@ export default class AutoForm extends Component {
             {input.label}
           </Checkbox>
         </Col>
-      </FormGroup>
+      </div>
     );
   }
 
   renderOptions(options) {
-    return options.map((option, index) => {
-      return (
-        <option
-          key={index}
-          value={option.value}
-        >
-          {option.label}
-        </option>
-      );
-    });
+    return options.map((option, index) => (
+      <option
+        key={index}
+        value={option.value}
+      >
+        {option.label}
+      </option>
+    ));
   }
 
   renderOptgroups(optgroups) {
-    return optgroups.map((optgroup, index) => {
-      return (
-        <optgroup
-          key={`optgroup${index}`}
-          label={optgroup.label}
-        >
-          {this.renderOptions(optgroup.options)}
-        </optgroup>
-      );
-    });
+    return optgroups.map((optgroup, index) => (
+      <optgroup
+        key={`optgroup${index}`}
+        label={optgroup.label}
+      >
+        {this.renderOptions(optgroup.options)}
+      </optgroup>
+    ));
   }
 
   renderSelect(input) {
+    const labelWidth = input.labelWidth || { md: 3, sm: 2 };
+    const inputWidth = input.inputWidth || { md: 9, sm: 10 };
     const data = this.state.data;
     const onChange = this.onChange;
     const value = input.value ? input.value(data[input.key], data) || input.default : data[input.key] || input.default;
@@ -127,11 +181,11 @@ export default class AutoForm extends Component {
     };
 
     return (
-      <FormGroup key={input.key} controlId={input.key}>
-        <Col componentClass={ControlLabel} sm={2} md={3}>
+      <div key={`select${input.key}`}>
+        <Col componentClass={ControlLabel} {...labelWidth}>
           {input.label}
         </Col>
-        <Col sm={10} md={9}>
+        <Col {...inputWidth}>
           <FormControl
             componentClass='select'
             value={value}
@@ -140,11 +194,12 @@ export default class AutoForm extends Component {
             {input.optgroups ? this.renderOptgroups(input.optgroups) : this.renderOptions(input.options || [])}
           </FormControl>
         </Col>
-      </FormGroup>
+      </div>
     );
   }
 
-  renderInput(input) {
+  renderTextarea(input) {
+    const inputWidth = input.inputWidth || { md: 9, mdOffset: 3, sm: 10, smOffset: 2 };
     const data = this.state.data;
     const value = input.value ? input.value(data[input.key], data) : data[input.key];
     const onChange = this.onChange;
@@ -159,38 +214,62 @@ export default class AutoForm extends Component {
     };
 
     return (
-      <FormGroup key={input.key} controlId={input.key}>
-        <Col componentClass={ControlLabel} sm={2} md={3}>
+      <Col key={`textarea${input.key}`} {...inputWidth}>
+        <ControlLabel style={{ paddingBottom: 5 }}>
+          {input.label}
+        </ControlLabel>
+        <FormControl
+          componentClass="textarea"
+          placeholder={input.placeholder}
+          onChange={actions.onChange}
+          value={value}
+        />
+      </Col>
+    );
+  }
+
+  renderInput(input) {
+    const labelWidth = input.labelWidth || { md: 3, sm: 2 };
+    const inputWidth = input.inputWidth || { md: 9, sm: 10 };
+    const data = this.state.data;
+    const value = input.value ? input.value(data[input.key], data) : data[input.key];
+    const onChange = this.onChange;
+    const actions = {
+      onChange(event) {
+        if (input.onChange) {
+          onChange(event, input.onChange(event, data));
+        } else {
+          onChange(event);
+        }
+      },
+    };
+
+    return (
+      <div key={`input${input.key}`}>
+        <Col
+          componentClass={ControlLabel}
+          {...labelWidth}
+        >
           {input.label}
         </Col>
-        <Col sm={10} md={9}>
+        <Col
+          {...inputWidth}
+        >
           <FormControl
             type={input.type}
             placeholder={input.placeholder}
             onChange={actions.onChange}
-            value={value}
+            value={value || ''}
+            disabled={input.disabled}
           />
+          <FormControl.Feedback />
         </Col>
-      </FormGroup>
+      </div>
     );
   }
 
   renderInline(fields) {
-    const width = Math.floor(12 / fields.length);
-    const inlineFields = fields.map((field, index) => {
-      return (
-        <Col
-          md={width}
-          key={`inline${index}`}
-        >
-          {this.renderField(field)}
-        </Col>
-      );
-    });
-
-    return (
-      <Col key={fields[0].key}>{inlineFields}</Col>
-    );
+    return fields.map((field) => this.renderField(field));
   }
 
   renderField(field) {
@@ -200,53 +279,77 @@ export default class AutoForm extends Component {
       value = value ? value[key] : value;
     });
 
-    if (field.type === 'checkbox') {
-      return this.renderCheckbox(field);
+    switch (field.type) {
+      case 'checkbox':
+        return this.renderCheckbox(field);
+      case 'custom':
+        return (
+          <field.component
+            {...field}
+            data={value}
+          />
+        );
+      case 'select':
+        return this.renderSelect(field);
+      case 'textarea':
+        return this.renderTextarea(field);
+      default:
+        return this.renderInput(field);
     }
-
-    if (field.type === 'select') {
-      return this.renderSelect(field);
-    }
-
-    return this.renderInput(field);
   }
 
   renderFields(fields) {
     return fields.map((field) => {
-      return field.inline ? this.renderInline(field.inline) : this.renderField(field);
-    });
-  }
+      const key = field.key || field.inline[0].key;
+      const validationState = (field.invalid || field.inline && field.inline[0].invalid) && 'error';
 
-  renderSections(sections) {
-    return sections.map((section, index) => {
       return (
-        <FormGroup key={`section${index}`}>
-          {section.title ? (
-            <Col componentClass={section.titleClass || 'h2'}>
-              {section.title}
-            </Col>
-          ) : ''}
-          {this.renderFields(section.fields)}
-          <hr/>
+        <FormGroup
+          controlId={key}
+          key={key}
+          validationState={validationState}
+        >
+          {field.inline ? this.renderInline(field.inline) : this.renderField(field)}
         </FormGroup>
       );
     });
   }
 
+  renderSections(sections) {
+    return sections.map((section, index) => {
+      const { fields, title, titleClass } = section;
+
+      return (
+        <Row key={`section${index}`}>
+          {title ? (
+            <Col componentClass={titleClass || 'h2'}>
+              {title}
+            </Col>
+          ) : ''}
+          {this.renderFields(fields)}
+          <hr/>
+        </Row>
+      );
+    });
+  }
+
   render() {
+    const { options, sections, titleClass } = this.state.schema;
+    const { onCancel } = this.props;
+
     return (
-      <Form {...this.state.schema.options}>
-        <Col componentClass={this.state.schema.titleClass || 'h1'}>
+      <Form {...options}>
+        <Col componentClass={titleClass || 'h1'}>
           {this.state.schema.title}
         </Col>
-        {this.renderSections(this.state.schema.sections)}
+        {this.renderSections(sections)}
         <ButtonToolbar>
-          <Button onClick={this.props.onCancel}>
+          <Button onClick={onCancel}>
             {'Annuler'}
           </Button>
           <Button
             bsStyle="primary"
-            onClick={(event) => this.props.onSave(event, this.state.data)}
+            onClick={this.onSave}
           >
             {'Sauvegarder'}
           </Button>

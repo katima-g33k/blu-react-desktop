@@ -1,52 +1,84 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
+import { browserHistory } from 'react-router';
 
 import Header from './components/general/Header';
-import Sidebar from './components/general/Sidebar';
+import HTTP from './lib/HTTP';
+import { InformationModal } from './components/general/modals';
 import Routes from './routes/Routes';
+import scanner from './lib/Scanner';
+import settings from './settings.json';
+import Sidebar from './components/general/Sidebar';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      barcode: '',
+      showModal: null,
     };
+
+    this.canChangeLocation = this.canChangeLocation.bind(this);
+    this.onInvalidScan = this.onInvalidScan.bind(this);
+    this.onItemScan = this.onItemScan.bind(this);
+    this.onMemberScan = this.onMemberScan.bind(this);
+    this.renderModal = this.renderModal.bind(this);
   }
 
   componentWillMount() {
-    // Will be used to handle scanner events
-    document.onkeydown = (event) => {
-      if (event.key === 'à') {
-        this.setState({ barcode: event.key });
-      } else if (this.state.barcode.slice(0, 1) === 'à') {
-        this.setState({ barcode: `${this.state.barcode}${event.key}` });
-      }
+    scanner.addListener('onInvalidScan', this.onInvalidScan);
+    scanner.addListener('onItemScan', this.onItemScan);
+    scanner.addListener('onMemberScan', this.onMemberScan);
+  }
 
-      if (event.key === 'À') {
-        const code = this.state.barcode.replace(/\D/g, '');
+  canChangeLocation() {
+    return !browserHistory.getCurrentLocation().pathname.match(/add|edit|copies/);
+  }
 
-        switch (code.length) {
-          case 10:
-            const no = 2 + code.slice(1, 9);
-            // TODO: call member/exists
-            location.href = `/member/view/${no}`;
-            break;
-          case 13:
-            // TODO call  item/exists
-            const id = 0;
-            location.href = `/item/view/${id}`;
-            break;
-          default:
-            // TODO: Alert code not supported
+  onMemberScan(no) {
+    if (this.canChangeLocation()) {
+      HTTP.post(`${settings.apiUrl}/member/exists`, { no }, (err, res) => {
+        if (err) {
+          // TODO: Display message
+          return;
         }
 
-        this.setState({ barcode: '' });
-      }
+        const path = res.code === 200 ? `view/${no}` : `add?no=${no}`;
+        browserHistory.push(`/member/${path}`);
+      });
+    }
+  }
 
-      if (this.state.barcode.length > 25) {
-        this.setState({ barcode: '' });
-      }
-    };
+  onItemScan(ean13) {
+    if (this.canChangeLocation()) {
+      HTTP.post(`${settings.apiUrl}/item/exists`, { ean13 }, (err, res) => {
+        if (err) {
+          // TODO: Display message
+          return;
+        }
+
+        const path = res.id ? `view/${res.id}` : `add?ean13=${ean13}`;
+        browserHistory.push(`/item/${path}`);
+      });
+    }
+  }
+
+  onInvalidScan() {
+    this.setState({ showModal: 'invalidCode' });
+  }
+
+  renderModal() {
+    switch (this.state.showModal) {
+      case 'invalidCode':
+        return (
+          <InformationModal
+            message={'Le code que vous venez de scanner n\'est pas supporté par le système de la BLU'}
+            onClick={() => this.setState({ showModal: null })}
+            title={'Code invalide'}
+          />
+        );
+      default:
+        return null;
+    }
   }
 
   render() {
@@ -54,12 +86,13 @@ export default class App extends Component {
       <div>
         <Header />
         <main>
-          <Col md={2}>
+          <Col componentClass="aside" md={2}>
             <Sidebar />
           </Col>
           <Col sm={12} md={10}>
             <Routes />
           </Col>
+          {this.renderModal()}
         </main>
       </div>
     );

@@ -8,7 +8,7 @@ import SearchContainer from '../../search/SearchContainer';
 import Table from '../../general/Table';
 
 export default class AddCopies extends Component {
-  renderSearch() {
+  renderSearch = () => {
     return (
       <SearchContainer
         noHeader
@@ -19,17 +19,20 @@ export default class AddCopies extends Component {
     );
   }
 
-  renderForm() {
+  renderForm = () => {
+    const { ean13, onFormCancel, onFormSave, params } = this.props;
+
     return (
       <ItemFormContainer
-        params={this.props.params}
-        onCancel={this.props.onFormCancel}
-        onSave={item => this.props.onFormSave({ item })}
+        ean13={ean13}
+        params={params}
+        onCancel={onFormCancel}
+        onSave={item => onFormSave({ item })}
       />
     );
   }
 
-  render() {
+  render = () => {
     return (
       <Row>
         <Col md={10}>
@@ -69,6 +72,7 @@ AddCopies.propTypes = {
   actions: React.PropTypes.array,
   columns: React.PropTypes.array,
   data: React.PropTypes.array,
+  ean13: React.PropTypes.string,
   isSearch: React.PropTypes.bool,
   member: React.PropTypes.shape(),
   modal: React.PropTypes.shape(),

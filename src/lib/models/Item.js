@@ -17,6 +17,7 @@ export default class Item {
     this.status = item.status || {};
     this.storage = item.storage || [];
     this.reservation = (item.reservation || []).map(reservation => new Reservation(reservation));
+    this.comment = item.comment || '';
   }
 
   getStatus() {
@@ -41,6 +42,14 @@ export default class Item {
         this.status[status] = new Date();
         break;
     }
+  }
+
+  get isBook() {
+    return this.is_book;
+  }
+
+  set isBook(isBook) {
+    this.is_book = isBook;
   }
 
   get isInStock() {

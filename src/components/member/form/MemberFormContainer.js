@@ -8,7 +8,7 @@ import settings from '../../../settings.json';
 
 const removeEmptyPropperties = (data) => {
   Object.keys(data).forEach(key => {
-    if (data[key] === null) {
+    if (data[key] === null || typeof data[key] === 'boolean') {
       delete data[key];
     } else if (typeof data[key] === 'string' && data[key] === '') {
       delete data[key];
@@ -36,20 +36,22 @@ export default class MemberFormContainer extends Component {
     };
 
     this.cancel = this.cancel.bind(this);
+    this.handleNo = this.handleNo.bind(this);
     this.insert = this.insert.bind(this);
     this.save = this.save.bind(this);
     this.update = this.update.bind(this);
 
     this.schema = memberFormSchema;
     this.schema.title = !this.props.params.no ? 'Ajouter un membre' : 'Modifier un membre';
+    this.handleNo();
   }
 
   componentWillMount() {
     HTTP.post(`${settings.apiUrl}/state/select`, {}, (err, states) => {
       if (states) {
-        this.setState({ states });
         const stateSelect = this.schema.sections[1].fields.find(field => field.key === 'state');
-        stateSelect.options = this.state.states.map(state => ({ value: state, label: state }));
+        stateSelect.options = states.map(state => ({ value: state, label: state }));
+        this.setState({ states });
       }
     });
 
@@ -60,6 +62,9 @@ export default class MemberFormContainer extends Component {
           this.setState({ member: new Member(res) });
         }
       });
+    } else if (this.props.location.query.no) {
+      const { no } = this.props.location.query;
+      this.setState({ member: new Member({ no }) });
     }
   }
 
@@ -70,23 +75,46 @@ export default class MemberFormContainer extends Component {
   }
 
   insert(data) {
-    HTTP.post(`${settings.apiUrl}/member/insert`, data, (err) => {
+    HTTP.post(`${settings.apiUrl}/member/insert`, data, (err, res) => {
       if (err) {
         // TODO: Display error message
         return;
       }
 
-      this.props.router.push({
-        pathname: `/member/view/${data.no}`,
-      });
+      const { router } = this.props;
+      const no = res.no || data.no;
+      router.push({ pathname: `/member/view/${no}` });
     });
   }
 
-  save(event, member) {
-    event.preventDefault();
+  handleNo() {
+    const { member } = this.state;
+    const isEdit = !!this.props.params.no;
+    const inlineNo = this.schema.sections[0].fields.find(field => field.key === 'no');
+
+    if (isEdit) {
+      inlineNo.inline = inlineNo.inline.filter(field => field.key === 'no');
+    } else {
+      const noInput = inlineNo.inline.find(field => field.key === 'no');
+
+      inlineNo.inline.find(field => field.key === 'noNo').onChange = (event) => {
+        member.no = null;
+        noInput.disabled = event.target.checked;
+
+        this.setState({ member });
+      };
+    }
+  }
+
+  save(member) {
     const no = this.props.params.no;
     const data = removeEmptyPropperties({ ...member });
-    return no ? this.update(no, data) : this.insert(data);
+
+    if (no) {
+      this.update(no, data);
+    } else {
+      this.insert(data);
+    }
   }
 
   update(no, data) {
@@ -119,5 +147,6 @@ export default class MemberFormContainer extends Component {
 
 MemberFormContainer.propTypes = {
   params: React.PropTypes.shape(),
+  location: React.PropTypes.shape(),
   router: React.PropTypes.shape(),
 };
