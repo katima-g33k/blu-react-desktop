@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 
+import API from '../../../lib/API';
 import { ConfirmModal, InformationModal } from '../../general/modals';
-import HTTP from '../../../lib/HTTP';
 import Member from '../../../lib/models/Member';
 import MemberView from './MemberView';
-import settings from '../../../settings.json';
 import Spinner from '../../general/Spinner';
 import Transaction from '../../../lib/models/Transaction';
 
@@ -26,15 +25,13 @@ export default class MemberViewContainer extends Component {
   }
 
   componentWillMount() {
-    const url = `${settings.apiUrl}/member/select`;
-    const data = {
-      no: this.props.params.no,
-    };
-
-    HTTP.post(url, data, (err, res) => {
-      if (res) {
-        this.setState({ member: new Member(res) });
+    API.member.select(this.props.params.no, (err, res) => {
+      if (err) {
+        // TODO: Display message
+        return;
       }
+
+      this.setState({ member: new Member(res) });
     });
   }
 
@@ -109,9 +106,8 @@ export default class MemberViewContainer extends Component {
   pay(callback = () => {}) {
     let amount = 0;
     const { member } = this.state;
-    const data = { no: member.no };
 
-    HTTP.post(`${settings.apiUrl}/member/pay`, data, (err) => {
+    API.member.pay(member.no, (err) => {
       if (err) {
         // TODO: display error message
         return;
@@ -124,17 +120,16 @@ export default class MemberViewContainer extends Component {
           copy.pay();
         }
       });
-      this.setState({ amount, member, showModal: 'paySuccessfull' });
 
+      this.setState({ amount, member, showModal: 'paySuccessfull' });
       callback();
     });
   }
 
   renewAccount() {
-    const member = this.state.member;
-    const data = { no: member.no };
+    const { member } = this.state;
 
-    HTTP.post(`${settings.apiUrl}/member/renew`, data, (err) => {
+    API.member.renew(member.no, (err) => {
       if (err) {
         // TODO: display error message
         return;
@@ -149,13 +144,10 @@ export default class MemberViewContainer extends Component {
     const member = this.state.member;
     const copies = member.account.getAddedCopies();
     copies.push(...member.account.getSoldCopies());
-    const data = {
-      copies: copies.map(copy => copy.id),
-      member: member.no,
-      type: Transaction.TYPES.DONATE,
-    };
 
-    HTTP.post(`${settings.apiUrl}/transaction/insert`, data, (err) => {
+    const copyIDs = copies.map(copy => copy.id);
+
+    API.transaction.insert(member.no, copyIDs, Transaction.TYPES.DONATE, (err) => {
       if (err) {
         // TODO: display error message
         return;

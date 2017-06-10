@@ -3,11 +3,10 @@ import { Button, Glyphicon, Label } from 'react-bootstrap';
 import { Link } from 'react-router';
 import moment from 'moment';
 
+import API from '../../../lib/API';
 import { ConfirmModal } from '../../general/modals';
-import HTTP from '../../../lib/HTTP';
-import settings from '../../../settings';
-import Transaction from '../../../lib/models/Transaction';
 import TableLayout from '../../general/TableLayout';
+import Transaction from '../../../lib/models/Transaction';
 
 const link = (href, label) => (<Link to={{ pathname: href }}>{label}</Link>);
 
@@ -77,16 +76,7 @@ export default class ReservationList extends Component {
   deleteReservation() {
     const reservation = this.state.activeReservation;
     const { copy, item, parent } = reservation;
-    const object = copy ? 'transaction' : 'reservation';
-    const data = copy ? {
-      copy: copy.id,
-      type: Transaction.TYPES.RESERVE,
-    } : {
-      member: parent.no,
-      item: item.id,
-    };
-
-    HTTP.post(`${settings.apiUrl}/${object}/delete`, data, (err) => {
+    const onDelete = (err) => {
       if (err) {
         // TODO: Display error message
         return;
@@ -97,7 +87,13 @@ export default class ReservationList extends Component {
       if (this.props.onReservationDeleted) {
         this.props.onReservationDeleted(reservation);
       }
-    });
+    };
+
+    if (copy) {
+      API.transaction.delete(copy.id, Transaction.TYPES.RESERVE, onDelete);
+    } else {
+      API.reservation.delete(parent.no, item.id, onDelete);
+    }
   }
 
   getModal() {

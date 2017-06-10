@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 
+import API from '../../../lib/API';
 import CopyTable from './CopyTable';
 import CopyColumns from './columns';
 import { ConfirmModal, InputModal, SearchModal } from '../../general/modals';
-import HTTP from '../../../lib/HTTP';
-import settings from '../../../settings.json';
 import Transaction from '../../../lib/models/Transaction';
 
 export default class CopyTableContainer extends Component {
@@ -101,66 +100,58 @@ export default class CopyTableContainer extends Component {
   }
 
   cancelReservation() {
-    const id = this.state.activeCopy.id;
-    const data = {
-      copy: id,
-      type: Transaction.TYPES.RESERVE,
-    };
-    HTTP.post(`${settings.apiUrl}/transaction/delete`, data, (err) => {
+    const { id } = this.state.activeCopy;
+
+    API.transaction.delete(id, Transaction.TYPES.RESERVE, (err) => {
       if (err) {
         // TODO: Display error message
         return;
       }
 
-      const copies = this.state.copies;
+      const { copies } = this.state;
       copies.find(copy => copy.id === id).cancelReservation();
       this.setState({ copies, showModal: null, activeCopy: null });
     });
   }
 
   delete() {
-    const id = this.state.activeCopy.id;
+    const { id } = this.state.activeCopy;
 
-    HTTP.post(`${settings.apiUrl}/copy/delete`, { id }, (err) => {
+    API.copy.delete(id, (err) => {
       if (err) {
         // TODO: Display error message
         return;
       }
 
-      const copies = this.state.copies.filter((copy) => copy.id !== id);
-      this.setState({ copies, showModal: null, activeCopy: null });
+      this.setState({
+        copies: this.state.copies.filter((copy) => copy.id !== id),
+        showModal: null,
+        activeCopy: null,
+      });
     });
   }
 
   refund(id) {
-    const data = {
-      copy: id,
-      type: Transaction.TYPES.SELL,
-    };
-    HTTP.post(`${settings.apiUrl}/transaction/delete`, data, (err) => {
+    API.transaction.delete(id, Transaction.TYPES.SEL, (err) => {
       if (err) {
         // TODO: Display error message
         return;
       }
 
-      const copies = this.state.copies;
+      const { copies } = this.state;
       copies.find(copy => copy.id === id).refund();
       this.setState({ copies });
     });
   }
 
   renewParentAccount(no) {
-    HTTP.post(`${settings.apiUrl}/member/renew`, { no });
+    API.member.renew(no);
   }
 
   reserve(parent) {
-    const id = this.state.activeCopy.id;
-    const data = {
-      member: parent.no,
-      copies: [id],
-      type: Transaction.TYPES.RESERVE,
-    };
-    HTTP.post(`${settings.apiUrl}/transaction/insert`, data, (err) => {
+    const { id } = this.state.activeCopy;
+
+    API.transaction.insert(parent.no, [id], Transaction.TYPES.RESERVE, (err) => {
       if (err) {
         // TODO: Display error message
         return;
@@ -168,25 +159,23 @@ export default class CopyTableContainer extends Component {
 
       this.renewParentAccount(parent.no);
 
-      const copies = this.state.copies;
+      const { copies } = this.state;
       copies.find(copy => copy.id === id).reserve(parent);
       this.setState({ copies, activeCopy: null, showModal: null });
     });
   }
 
   sell(copy, halfPrice) {
-    const data = {
-      member: this.props.member || copy.member.no,
-      copies: [copy.id],
-      type: Transaction.TYPES[halfPrice ? 'SELL_PARENT' : 'SELL'],
-    };
-    HTTP.post(`${settings.apiUrl}/transaction/insert`, data, (err) => {
+    const member = this.props.member || copy.member.no;
+    const transactionType = Transaction.TYPES[halfPrice ? 'SELL_PARENT' : 'SELL'];
+
+    API.transaction.insert(member, [copy.id], transactionType, (err) => {
       if (err) {
         // TODO: Display error message
         return;
       }
 
-      const copies = this.state.copies;
+      const { copies } = this.state;
 
       if (halfPrice) {
         copies.find(c => c.id === copy.id).sellParent();
@@ -199,17 +188,16 @@ export default class CopyTableContainer extends Component {
   }
 
   updatePrice(event, value) {
+    const { id } = this.state.activeCopy;
     const price = parseInt(value, 10);
-    const id = this.state.activeCopy.id;
-    const data = { id, price };
 
-    HTTP.post(`${settings.apiUrl}/copy/update`, data, (err) => {
+    API.copy.update(id, price, (err) => {
       if (err) {
         // TODO: Display error message
         return;
       }
 
-      const copies = this.state.copies;
+      const { copies } = this.state;
       copies.find(copy => copy.id === id).price = price;
       this.setState({ copies, showModal: null, activeCopy: null });
     });

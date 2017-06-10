@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 
-import HTTP from '../../../lib/HTTP';
+import API from '../../../lib/API';
 import Member from '../../../lib/models/Member';
 import MemberForm from './MemberForm';
 import memberFormSchema from './memberFormSchema';
-import settings from '../../../settings.json';
 
 const removeEmptyPropperties = (data) => {
   Object.keys(data).forEach(key => {
@@ -47,20 +46,26 @@ export default class MemberFormContainer extends Component {
   }
 
   componentWillMount() {
-    HTTP.post(`${settings.apiUrl}/state/select`, {}, (err, states) => {
-      if (states) {
-        const stateSelect = this.schema.sections[1].fields.find(field => field.key === 'state');
-        stateSelect.options = states.map(state => ({ value: state, label: state }));
-        this.setState({ states });
+    API.state.select((err, res) => {
+      if (err) {
+        // TODO: Displau message
+        return;
       }
+
+      const stateSelect = this.schema.sections[1].fields.find(field => field.key === 'state');
+      stateSelect.options = res.map(state => ({ value: state, label: state }));
+
+      this.setState({ states: res });
     });
 
     if (this.props.params.no) {
-      const no = this.props.params.no;
-      HTTP.post(`${settings.apiUrl}/member/select`, { no }, (err, res) => {
-        if (res) {
-          this.setState({ member: new Member(res) });
+      API.member.select(this.props.params.no, (err, res) => {
+        if (err) {
+          // TODO: Display message
+          return;
         }
+
+        this.setState({ member: new Member(res) });
       });
     } else if (this.props.location.query.no) {
       const { no } = this.props.location.query;
@@ -75,7 +80,7 @@ export default class MemberFormContainer extends Component {
   }
 
   insert(data) {
-    HTTP.post(`${settings.apiUrl}/member/insert`, data, (err, res) => {
+    API.member.insert(data, (err, res) => {
       if (err) {
         // TODO: Display error message
         return;
@@ -118,7 +123,7 @@ export default class MemberFormContainer extends Component {
   }
 
   update(no, data) {
-    HTTP.post(`${settings.apiUrl}/member/update`, { no, member: data }, (err) => {
+    API.member.update(no, data, (err) => {
       if (err) {
         // TODO: Display error message
         return;
