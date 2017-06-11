@@ -43,7 +43,7 @@ export default class ItemViewContainer extends Component {
   }
 
   componentWillMount() {
-    API.item.select(this.props.params.id, (err, res) => {
+    API.item.select(this.props.params.id, {}, (err, res) => {
       if (err) {
         // TODO: Display message
         return;

@@ -111,7 +111,7 @@ export default class AddCopiesContainer extends Component {
   }
 
   onItemScan(ean13) {
-    API.item.select({ ean13, forCopy: true }, (err, res) => {
+    API.item.select(ean13, { forCopy: true }, (err, res) => {
       if (err) {
         // TODO: Display message
         return;

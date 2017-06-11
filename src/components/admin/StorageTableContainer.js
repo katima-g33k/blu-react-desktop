@@ -74,7 +74,7 @@ export default class StorageTableContainer extends Component {
   }
 
   deleteStorage() {
-    API.storage.delete((err) => {
+    API.storage.clear((err) => {
       if (err) {
         // TODO: Display erorr message
         return;

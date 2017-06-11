@@ -83,7 +83,7 @@ export default class ReservationTableContainer extends Component {
   }
 
   deleteReservations() {
-    API.reservation.deleteAll((err) => {
+    API.reservation.clear((err) => {
       if (err) {
         // TODO: Display erorr message
         return;

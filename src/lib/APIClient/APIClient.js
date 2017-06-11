@@ -36,14 +36,8 @@ export default class APIClient {
       delete: (id, callback) => {
         HTTP.post(`${this.url}/copy/delete`, { id }, callback);
       },
-      insert: (memberNo, itemId, price, callback) => {
-        const data = {
-          item_id: itemId,
-          member_no: memberNo,
-          price,
-        };
-
-        HTTP.post(`${this.url}/copy/insert`, data, callback);
+      insert: (member, item, price, callback) => {
+        HTTP.post(`${this.url}/copy/insert`, { item, member, price }, callback);
       },
       update: (id, price, callback) => {
         HTTP.post(`${this.url}/copy/update`, { id, price }, callback);
@@ -62,7 +56,8 @@ export default class APIClient {
       search: (search, options, callback) => {
         HTTP.post(`${this.url}/item/search`, { ...options, search }, callback);
       },
-      select: (options, callback) => {
+      select: (identifier, options, callback) => {
+        options[/\d{13}/.test(identifier) ? 'ean13' : 'id'] = identifier;
         HTTP.post(`${this.url}/item/select`, options, callback);
       },
       update: (id, item, callback) => {
@@ -108,11 +103,11 @@ export default class APIClient {
 
   get reservation() {
     return {
+      clear: (callback) => {
+        HTTP.post(`${this.url}/reservation/deleteAll`, {}, callback);
+      },
       delete: (member, item, callback) => {
         HTTP.post(`${this.url}/reservation/delete`, { member, item }, callback);
-      },
-      deleteAll: (callback) => {
-        HTTP.post(`${this.url}/reservation/deleteAll`, {}, callback);
       },
       insert: (member, item, callback) => {
         HTTP.post(`${this.url}/reservation/insert`, { member, item }, callback);
@@ -133,7 +128,7 @@ export default class APIClient {
 
   get storage() {
     return {
-      delete: (callback) => {
+      clear: (callback) => {
         HTTP.post(`${this.url}/storage/delete`, {}, callback);
       },
       select: (callback) => {
@@ -147,13 +142,8 @@ export default class APIClient {
       delete: (copy, type, callback) => {
         HTTP.post(`${this.url}/transaction/delete`, { copy, type }, callback);
       },
-      insert: (memberNo, copyIDs, transactionType, callback) => {
-        const data = {
-          copies: copyIDs,
-          member: memberNo,
-          type: transactionType,
-        };
-        HTTP.post(`${this.url}/transaction/insert`, data, callback);
+      insert: (member, copies, type, callback) => {
+        HTTP.post(`${this.url}/transaction/insert`, { copies, member, type }, callback);
       },
     };
   }

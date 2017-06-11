@@ -42,7 +42,7 @@ export default class ItemFormContainer extends Component {
     });
 
     if (params && params.id) {
-      API.item.select({ id: params.id }, (err, res) => {
+      API.item.select(params.id, {}, (err, res) => {
         if (err) {
           // TODO: display error
           return;
