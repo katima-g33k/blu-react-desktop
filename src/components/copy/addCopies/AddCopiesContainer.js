@@ -3,13 +3,12 @@ import { Button, Glyphicon } from 'react-bootstrap';
 
 import AddCopies from './AddCopies';
 import addCopiesColums from './addCopiesColumns';
+import API from '../../../lib/API';
 import Copy from '../../../lib/models/Copy';
-import HTTP from '../../../lib/HTTP';
 import InputModal from '../../general/modals/InputModal';
 import Item from '../../../lib/models/Item';
 import Member from '../../../lib/models/Member';
 import scanner from '../../../lib/Scanner';
-import settings from '../../../settings.json';
 import Transaction from '../../../lib/models/Transaction';
 
 export default class AddCopiesContainer extends Component {
@@ -54,16 +53,17 @@ export default class AddCopiesContainer extends Component {
   }
 
   componentWillMount() {
+    const { no } = this.props.params;
+
     scanner.addListener('onItemScan', this.onItemScan);
 
-    const no = this.props.params.no;
-    HTTP.post(`${settings.apiUrl}/member/getName`, { no }, (err, res) => {
+    API.member.getName(no, (err, res) => {
       if (err) {
         // TODO: Display erorr message
         return;
       }
 
-      this.setState({ member: new Member({ no, ...res }) });
+      this.setState({ member: new Member({ ...res, no }) });
     });
   }
 
@@ -72,7 +72,7 @@ export default class AddCopiesContainer extends Component {
   }
 
   deleteCopy(id) {
-    HTTP.post(`${settings.apiUrl}/copy/delete`, { id }, (err) => {
+    API.copy.delete(id, (err) => {
       if (err) {
         // TODO: Display error message
         return;
@@ -111,12 +111,7 @@ export default class AddCopiesContainer extends Component {
   }
 
   onItemScan(ean13) {
-    const data = {
-      ean13,
-      forCopy: true,
-    };
-
-    HTTP.post(`${settings.apiUrl}/item/select`, data, (err, res) => {
+    API.item.select(ean13, { forCopy: true }, (err, res) => {
       if (err) {
         // TODO: Display message
         return;
@@ -136,13 +131,10 @@ export default class AddCopiesContainer extends Component {
 
   save(event, value) {
     const price = parseInt(value, 10);
-    const data = {
-      member_no: this.props.params.no,
-      item_id: this.state.item.id,
-      price,
-    };
+    const memberNo = this.props.params.no;
+    const itemId = this.state.item.id;
 
-    HTTP.post(`${settings.apiUrl}/copy/insert`, data, (err, res) => {
+    API.copy.insert(memberNo, itemId, price, (err, res) => {
       if (err) {
         this.closeModal();
         // TODO: Display error message
@@ -172,21 +164,17 @@ export default class AddCopiesContainer extends Component {
 
   updatePrice(event, value) {
     const price = parseInt(value, 10);
-    const currentCopy = this.state.copy;
-    const data = {
-      id: currentCopy.id,
-      price,
-    };
+    const { id } = this.state.copy.currentCopy;
 
-    HTTP.post(`${settings.apiUrl}/copy/update`, data, (err) => {
+    API.copy.update(id, price, (err) => {
       if (err) {
         this.closeModal();
         // TODO: Display error message
         return;
       }
 
-      const copies = this.state.copies;
-      copies.find(copy => copy.id === currentCopy.id).price = price;
+      const { copies } = this.state;
+      copies.find(copy => copy.id === id).price = price;
       this.closeModal({ copies });
     });
   }

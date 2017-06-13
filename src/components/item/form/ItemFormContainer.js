@@ -1,10 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 
+import API from '../../../lib/API';
 import Author from '../../../lib/models/Author';
-import HTTP from '../../../lib/HTTP';
 import Item from '../../../lib/models/Item';
 import ItemForm from './ItemForm';
-import settings from '../../../settings.json';
 import schema from './schema';
 
 export default class ItemFormContainer extends Component {
@@ -33,21 +32,20 @@ export default class ItemFormContainer extends Component {
   componentWillMount() {
     const { ean13, location, params } = this.props;
 
-    HTTP.post(`${settings.apiUrl}/category/select`, {}, (err, res) => {
+    API.category.select((err, res) => {
       if (err) {
         // TODO: display error
+        return;
       }
 
       this.setState({ categories: res });
     });
 
     if (params && params.id) {
-      const data = {
-        id: this.props.params.id,
-      };
-      HTTP.post(`${settings.apiUrl}/item/select`, data, (err, res) => {
+      API.item.select(params.id, {}, (err, res) => {
         if (err) {
           // TODO: display error
+          return;
         }
 
         this.setState({ item: new Item(res) });
@@ -130,7 +128,7 @@ export default class ItemFormContainer extends Component {
   }
 
   insert(item) {
-    HTTP.post(`${settings.apiUrl}/item/insert`, { item }, (err, res) => {
+    API.item.insert(item, (err, { id }) => {
       if (err) {
         // TODO: Display message
         return;
@@ -138,10 +136,10 @@ export default class ItemFormContainer extends Component {
 
       if (this.props.onSave) {
         // TODO: update item with res
-        item.id = res.id;
+        item.id = id;
         this.props.onSave(item);
       } else {
-        this.props.router.push(`/item/view/${res.id}`);
+        this.props.router.push(`/item/view/${id}`);
       }
     });
   }
@@ -180,13 +178,9 @@ export default class ItemFormContainer extends Component {
   }
 
   update(item) {
-    const id = this.props.params.id;
-    const data = {
-      id,
-      item,
-    };
+    const { id } = this.props.params;
 
-    HTTP.post(`${settings.apiUrl}/item/update`, data, (err) => {
+    API.item.update(id, item, (err) => {
       if (err) {
         // TODO: Display message
         return;

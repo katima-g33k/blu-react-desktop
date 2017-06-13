@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 
+import API from '../../../lib/API';
 import CommentColumns from './CommentColumns';
 import { ConfirmModal, InputModal } from '../../general/modals';
 import MemberComments from './MemberComments';
-import HTTP from '../../../lib/HTTP';
-import settings from '../../../settings.json';
 
 export default class MemberCommentContainer extends Component {
   constructor(props) {
@@ -54,29 +53,24 @@ export default class MemberCommentContainer extends Component {
 
   deleteComment(event) {
     event.preventDefault();
-    const id = this.state.activeComment.id;
+    const { id } = this.state.activeComment;
 
-    HTTP.post(`${settings.apiUrl}/comment/delete`, { id }, () => {
-      const comments = this.state.comments.filter((comment) => {
-        return comment.id !== id;
-      });
+    API.comment.delete(id, (err) => {
+      if (err) {
+        // TODO: Display message
+        return;
+      }
 
       this.setState({
-        comments,
-        showModal: null,
         activeComment: null,
+        comments: this.state.comments.filter(comment => comment.id !== id),
+        showModal: null,
       });
     });
   }
 
   insertComment(value) {
-    const url = `${settings.apiUrl}/comment/insert`;
-    const data = {
-      comment: value,
-      member: this.props.member,
-    };
-
-    HTTP.post(url, data, (err, res) => {
+    API.comment.insert(this.props.member, value, (err, res) => {
       if (err) {
         // TODO: display error message
         return;
@@ -105,13 +99,7 @@ export default class MemberCommentContainer extends Component {
   }
 
   updateComment(value) {
-    const url = `${settings.apiUrl}/comment/update`;
-    const data = {
-      comment: value,
-      id: this.state.activeComment.id,
-    };
-
-    HTTP.post(url, data, (err) => {
+    API.comment.update(this.state.activeComment.id, value, (err) => {
       if (err) {
         // TODO: display error message
         return;
@@ -119,6 +107,7 @@ export default class MemberCommentContainer extends Component {
 
       const comments = this.state.comments;
       const currentComment = comments.find(comment => comment.id === this.state.activeComment.id);
+
       currentComment.comment = value;
       currentComment.updatedAt = new Date();
 

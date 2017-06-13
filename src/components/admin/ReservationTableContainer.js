@@ -3,10 +3,9 @@ import { Glyphicon, Label } from 'react-bootstrap';
 import { Link } from 'react-router';
 import moment from 'moment';
 
+import API from '../../lib/API';
 import { ConfirmModal } from '../general/modals';
-import HTTP from '../../lib/HTTP';
 import Reservation from '../../lib/models/Reservation';
-import settings from '../../settings';
 import TableLayout from '../general/TableLayout';
 
 const link = (href, label) => (<Link to={{ pathname: href }}>{label}</Link>);
@@ -72,7 +71,7 @@ export default class ReservationTableContainer extends Component {
   }
 
   componentWillMount() {
-    HTTP.post(`${settings.apiUrl}/reservation/select`, {}, (err, res) => {
+    API.reservation.select((err, res) => {
       if (err) {
         // TODO: Display erorr message
         return;
@@ -84,7 +83,7 @@ export default class ReservationTableContainer extends Component {
   }
 
   deleteReservations() {
-    HTTP.post(`${settings.apiUrl}/reservation/deleteAll`, {}, (err) => {
+    API.reservation.clear((err) => {
       if (err) {
         // TODO: Display erorr message
         return;
