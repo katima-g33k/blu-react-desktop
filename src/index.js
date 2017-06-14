@@ -1,3 +1,5 @@
+'use babel';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
@@ -9,7 +11,7 @@ moment.semester = () => {
   const session = moment().get('month') < 7 ? 'hiver' : 'automne';
   return `Session ${session} ${moment().get('y')}`;
 };
-console.log('test');
+
 ReactDOM.render(
   <App />,
   document.getElementById('app')

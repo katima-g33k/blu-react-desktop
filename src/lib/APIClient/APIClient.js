@@ -7,18 +7,14 @@ export default class APIClient {
 
     HTTP.setAPIKey(key);
     HTTP.setAPIurl(url);
-  }
 
-  get category() {
-    return {
+    this.category = {
       select: (callback) => {
         HTTP.post(`${this.url}/category/select`, {}, callback);
       },
     };
-  }
 
-  get comment() {
-    return {
+    this.comment = {
       delete: (id, callback) => {
         HTTP.post(`${this.url}/comment/delete`, { id }, callback);
       },
@@ -29,10 +25,8 @@ export default class APIClient {
         HTTP.post(`${this.url}/comment/update`, { id, comment }, callback);
       },
     };
-  }
 
-  get copy() {
-    return {
+    this.copy = {
       delete: (id, callback) => {
         HTTP.post(`${this.url}/copy/delete`, { id }, callback);
       },
@@ -43,10 +37,8 @@ export default class APIClient {
         HTTP.post(`${this.url}/copy/update`, { id, price }, callback);
       },
     };
-  }
 
-  get item() {
-    return {
+    this.item = {
       exists: (ean13, callback) => {
         HTTP.post(`${this.url}/item/exists`, { ean13 }, callback);
       },
@@ -70,10 +62,8 @@ export default class APIClient {
         HTTP.post(`${this.url}/item/update_storage`, { id, storage }, callback);
       },
     };
-  }
 
-  get member() {
-    return {
+    this.member = {
       exists: (no, callback) => {
         HTTP.post(`${this.url}/member/exists`, { no }, callback);
       },
@@ -99,10 +89,8 @@ export default class APIClient {
         HTTP.post(`${this.url}/member/update`, { no, member }, callback);
       },
     };
-  }
 
-  get reservation() {
-    return {
+    this.reservation = {
       clear: (callback) => {
         HTTP.post(`${this.url}/reservation/deleteAll`, {}, callback);
       },
@@ -116,18 +104,14 @@ export default class APIClient {
         HTTP.post(`${this.url}/reservation/select`, {}, callback);
       },
     };
-  }
 
-  get state() {
-    return {
+    this.state = {
       select: (callback) => {
         HTTP.post(`${this.url}/state/select`, {}, callback);
       },
     };
-  }
 
-  get storage() {
-    return {
+    this.storage = {
       clear: (callback) => {
         HTTP.post(`${this.url}/storage/delete`, {}, callback);
       },
@@ -135,10 +119,8 @@ export default class APIClient {
         HTTP.post(`${this.url}/storage/select`, {}, callback);
       },
     };
-  }
 
-  get transaction() {
-    return {
+    this.transaction = {
       delete: (copy, type, callback) => {
         HTTP.post(`${this.url}/transaction/delete`, { copy, type }, callback);
       },

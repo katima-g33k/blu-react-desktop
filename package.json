@@ -12,12 +12,18 @@
     "url": "https://github.com/katima-g33k/blu-react-desktop/issues"
   },
   "devDependencies": {
-    "electron": "^1.6.6",
+    "electron": "^1.7.3",
     "electron-builder": "^18.6.2",
     "eslint": "^3.9.1",
     "react-scripts": "0.8.4"
   },
   "dependencies": {
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-plugin-transform-svg": "^0.0.5",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.24.1",
     "halogen": "^0.2.0",
     "moment": "^2.17.1",
     "react": "^15.4.1",
@@ -33,7 +39,8 @@
   "scripts": {
     "build": "react-scripts build",
     "dist": "yarn run build && build",
-    "electron": "electron .",
+    "dist:win": "yarn run build && build --win --x64",
+    "electron": "electron -r babel-register .",
     "pack": "build --dir",
     "start": "react-scripts start"
   },
