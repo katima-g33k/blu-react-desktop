@@ -1,8 +1,7 @@
 import request from 'request';
-import settings from '../settings.json';
 
-const API_BASE_URL = settings.apiUrl;
-const API_KEY = settings.apiKey;
+let API_BASE_URL;
+let API_KEY;
 
 const HTTP = {
   call: (method, url, data, callback = () => {}) => {
@@ -50,6 +49,14 @@ const HTTP = {
     HTTP.call('POST', url, data, (err, res) => {
       callback(err, res);
     });
+  },
+
+  setAPIKey(apiKey) {
+    API_KEY = apiKey;
+  },
+
+  setAPIurl(url) {
+    API_BASE_URL = url;
   },
 };
 

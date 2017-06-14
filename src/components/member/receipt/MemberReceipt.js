@@ -3,9 +3,8 @@ import { Col, Row } from 'react-bootstrap';
 import moment from 'moment';
 
 import AlignedData from '../../general/AlignedData';
-import HTTP from '../../../lib/HTTP';
+import API from '../../../lib/API';
 import Member from '../../../lib/models/Member';
-import settings from '../../../settings.json';
 import Spinner from '../../general/Spinner';
 import Table from '../../general/Table';
 
@@ -94,9 +93,7 @@ export default class MemberReceipt extends Component {
   }
 
   componentWillMount() {
-    const { no } = this.props.params;
-
-    HTTP.post(`${settings.apiUrl}/member/select`, { no }, (err, res) => {
+    API.member.select(this.props.params.no, (err, res) => {
       if (err) {
         // TODO: Display error message
         return;

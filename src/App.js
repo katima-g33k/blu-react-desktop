@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 
+import API from './lib/API';
 import Header from './components/general/Header';
-import HTTP from './lib/HTTP';
 import { InformationModal } from './components/general/modals';
 import Routes from './routes/Routes';
 import scanner from './lib/Scanner';
-import settings from './settings.json';
 import Sidebar from './components/general/Sidebar';
 
 export default class App extends Component {
@@ -36,7 +35,7 @@ export default class App extends Component {
 
   onMemberScan(no) {
     if (this.canChangeLocation()) {
-      HTTP.post(`${settings.apiUrl}/member/exists`, { no }, (err, res) => {
+      API.member.exists(no, (err, res) => {
         if (err) {
           // TODO: Display message
           return;
@@ -50,7 +49,7 @@ export default class App extends Component {
 
   onItemScan(ean13) {
     if (this.canChangeLocation()) {
-      HTTP.post(`${settings.apiUrl}/item/exists`, { ean13 }, (err, res) => {
+      API.item.exists(ean13, (err, res) => {
         if (err) {
           // TODO: Display message
           return;

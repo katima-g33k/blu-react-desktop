@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 
-import HTTP from '../../../lib/HTTP';
+import API from '../../../lib/API';
 import { ConfirmModal, InputModal, SearchModal } from '../../general/modals';
 import Member from '../../../lib/models/Member';
 import Item from '../../../lib/models/Item';
 import ItemView from './ItemView';
-import settings from '../../../settings';
 import Spinner from '../../general/Spinner';
 
 const status = {
@@ -44,14 +43,13 @@ export default class ItemViewContainer extends Component {
   }
 
   componentWillMount() {
-    const data = {
-      id: this.props.params.id,
-    };
-
-    HTTP.post(`${settings.apiUrl}/item/select`, data, (err, res) => {
-      if (res) {
-        this.setState({ item: new Item(res) });
+    API.item.select(this.props.params.id, {}, (err, res) => {
+      if (err) {
+        // TODO: Display message
+        return;
       }
+
+      this.setState({ item: new Item(res) });
     });
   }
 
@@ -78,17 +76,13 @@ export default class ItemViewContainer extends Component {
   }
 
   renewParentAccount(no) {
-    HTTP.post(`${settings.apiUrl}/member/renew`, { no });
+    API.member.renew(no);
   }
 
   reserve(parent) {
-    const item = this.state.item;
-    const data = {
-      member: parent.no,
-      item: item.id,
-    };
+    const { item } = this.state;
 
-    HTTP.post(`${settings.apiUrl}/reservation/insert`, data, (err, res) => {
+    API.reservation.insert(parent.no, item.id, (err, res) => {
       if (err) {
         // TODO: Display error message
         return;
@@ -107,18 +101,13 @@ export default class ItemViewContainer extends Component {
   }
 
   updateStatus(newStatus) {
-    const data = {
-      id: this.props.params.id,
-      status: newStatus,
-    };
-
-    HTTP.post(`${settings.apiUrl}/item/updateStatus`, data, (err) => {
+    API.item.updateStatus(this.props.params.id, newStatus, (err) => {
       if (err) {
         // TODO: Display erorr message
         return;
       }
 
-      const item = this.state.item;
+      const { item } = this.state;
       item.updateStatus(newStatus);
       this.setState({ item });
     });
@@ -126,18 +115,14 @@ export default class ItemViewContainer extends Component {
 
   updateStorage(event, value) {
     const storage = value.replace(/\D+/g, ' ').split(/\D/).sort((a, b) => a - b);
-    const data = {
-      id: this.props.params.id,
-      storage,
-    };
 
-    HTTP.post(`${settings.apiUrl}/item/update_storage`, data, (err) => {
+    API.item.updateStorage(this.props.params.id, storage, (err) => {
       if (err) {
         // TODO: Display erorr message
         return;
       }
 
-      const item = this.state.item;
+      const { item } = this.state;
       item.storage = storage;
       this.setState({ item, showModal: null });
     });

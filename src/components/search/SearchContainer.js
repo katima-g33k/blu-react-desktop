@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 
-import HTTP from '../../lib/HTTP';
+import API from '../../lib/API';
 import I18n from '../../lib/i18n/i18n';
+import Item from '../../lib/models/Item';
+import Member from '../../lib/models/Member';
 import Search from './Search';
 import { SearchColumns } from '../../lib/TableColumns';
-import settings from '../../settings.json';
-import Member from '../../lib/models/Member';
-import Item from '../../lib/models/Item';
 
 export default class SearchContainer extends Component {
   constructor(props) {
@@ -43,21 +42,27 @@ export default class SearchContainer extends Component {
   search(event) {
     event.preventDefault();
     this.setState({ isLoading: true });
-    const data = {
-      search: this.state.search,
-      is_parent: this.state.type === 'parent',
-    };
+    const { archives, search, type } = this.state;
+    const searchType = type === 'item' ? 'item' : 'member';
+    const options = {};
 
-    const searchType = this.state.type === 'item' ? 'item' : 'member';
-    data[searchType === 'item' ? 'outdated' : 'deactivated'] = this.state.archives;
+    if (searchType === 'member') {
+      options.is_parent = type === 'parent';
+      options.deactivated = archives;
+    } else {
+      options.outdated = archives;
+    }
 
-    HTTP.post(`${settings.apiUrl}/${searchType}/search`, data, (err, res) => {
-      if (res) {
-        this.setState({
-          data: res.map(row => searchType === 'item' ? new Item(row) : new Member(row)),
-          isLoading: false,
-        });
+    API[searchType].search(search, options, (err, res) => {
+      if (err) {
+        // TODO: Display message
+        return;
       }
+
+      this.setState({
+        data: res.map(row => searchType === 'item' ? new Item(row) : new Member(row)),
+        isLoading: false,
+      });
     });
   }
 

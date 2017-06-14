@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 
+import API from '../../lib/API';
 import { ConfirmModal } from '../general/modals';
-import HTTP from '../../lib/HTTP';
 import Storage from '../../lib/models/Storage';
-import settings from '../../settings';
 import TableLayout from '../general/TableLayout';
 
 const actions = [
@@ -60,13 +59,13 @@ export default class StorageTableContainer extends Component {
   }
 
   componentWillMount() {
-    HTTP.post(`${settings.apiUrl}/storage/select`, {}, (err, res) => {
+    API.storage.select((err, res) => {
       if (err) {
         // TODO: Display erorr message
         return;
       }
 
-      const storage = Object.keys(res).map(key => {
+      const storage = Object.keys(res).map((key) => {
         const item = res[key].sort((a, b) => a.name < b.name ? -1 : 1);
         return new Storage({ no: key, item });
       });
@@ -75,7 +74,7 @@ export default class StorageTableContainer extends Component {
   }
 
   deleteStorage() {
-    HTTP.post(`${settings.apiUrl}/storage/delete`, {}, (err) => {
+    API.storage.clear((err) => {
       if (err) {
         // TODO: Display erorr message
         return;
