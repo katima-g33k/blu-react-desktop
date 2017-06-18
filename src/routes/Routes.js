@@ -54,6 +54,10 @@ export default class Routes extends Component {
   constructor() {
     super();
     this.getRoutes = this.getRoutes.bind(this);
+
+    if (window.location.pathname.includes('index.html')) {
+      browserHistory.push('/');
+    }
   }
 
   getRoutes() {

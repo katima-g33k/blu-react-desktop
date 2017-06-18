@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { browserHistory } from 'react-router';
 
 import API from '../../lib/API';
 import I18n from '../../lib/i18n/i18n';
@@ -28,7 +29,7 @@ export default class SearchContainer extends Component {
         if (this.props.onRowClick) {
           this.props.onRowClick(data);
         } else {
-          location.href = data.no ? `member/view/${data.no}` : `item/view/${data.id}`;
+          browserHistory.push(data.no ? `member/view/${data.no}` : `item/view/${data.id}`);
         }
       },
       noDataText: I18n.t('Search.results.none'),
