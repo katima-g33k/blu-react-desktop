@@ -122,6 +122,7 @@ export default class APIClient {
 
     this.transaction = {
       delete: (copy, type, callback) => {
+        console.log(copy, type);
         HTTP.post(`${this.url}/transaction/delete`, { copy, type }, callback);
       },
       insert: (member, copies, type, callback) => {

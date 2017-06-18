@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
+
 import { Translate } from '../../lib/i18n/i18n';
 
 const links = [
@@ -29,11 +30,15 @@ export default class Sidebar extends Component {
       location: '/',
     };
 
+    this.isCurrentLocation = this.isCurrentLocation.bind(this);
+  }
+
+  componentDidMount() {
+    this.setState({ location: browserHistory.getCurrentLocation().pathname });
+
     browserHistory.listen(({ pathname }) => {
       this.setState({ location: pathname });
     });
-
-    this.isCurrentLocation = this.isCurrentLocation.bind(this);
   }
 
   isCurrentLocation(key) {

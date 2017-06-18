@@ -32,7 +32,7 @@ const HTTP = {
     };
     request[method.toLowerCase()](options, (err, res, body) => {
       try {
-        callback(err, err ? null : JSON.parse(body).data);
+        callback(err, !err && JSON.parse(body).data);
       } catch (e) {
         callback({ code: 500, message: body });
       }
@@ -47,6 +47,7 @@ const HTTP = {
 
   post: (url, data, callback = () => {}) => {
     HTTP.call('POST', url, data, (err, res) => {
+      console.log(err, res);
       callback(err, res);
     });
   },

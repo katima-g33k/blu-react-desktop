@@ -53,7 +53,7 @@ export default class MemberView extends Component {
           value={formatDate(account.lastActivity)}
         />
         <AlignedData
-          label={<Translate value="MemberView.account.registration" />}
+          label={<Translate value="MemberView.account.deactivation" />}
           value={formatDate(account.deactivationDate)}
         />
       </section>
