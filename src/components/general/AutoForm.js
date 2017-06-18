@@ -301,7 +301,7 @@ export default class AutoForm extends Component {
   renderFields(fields) {
     return fields.map((field) => {
       const key = field.key || field.inline[0].key;
-      const validationState = (field.invalid || field.inline && field.inline[0].invalid) && 'error';
+      const validationState = (field.invalid || (field.inline && field.inline[0].invalid)) && 'error';
 
       return (
         <FormGroup
