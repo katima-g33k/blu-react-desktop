@@ -842,12 +842,6 @@ babel-plugin-transform-strict-mode@^6.24.1:
     babel-runtime "^6.22.0"
     babel-types "^6.24.1"
 
-babel-plugin-transform-svg@^0.0.5:
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-svg/-/babel-plugin-transform-svg-0.0.5.tgz#4be06dfb6411f41ce63230624a62f16788f3d6ca"
-  dependencies:
-    xml-parser "^1.2.1"
-
 babel-preset-env@1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/babel-preset-env/-/babel-preset-env-1.2.1.tgz#659178f54df74a74765f796be4d290b5beeb3f5f"
@@ -6450,12 +6444,6 @@ xml-char-classes@^1.0.0:
 xml-name-validator@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/xml-name-validator/-/xml-name-validator-2.0.1.tgz#4d8b8f1eccd3419aa362061becef515e1e559635"
-
-xml-parser@^1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/xml-parser/-/xml-parser-1.2.1.tgz#c31f4c34f2975db82ad013222120592736156fcd"
-  dependencies:
-    debug "^2.2.0"
 
 xmlbuilder@8.2.2:
   version "8.2.2"
