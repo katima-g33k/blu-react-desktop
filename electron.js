@@ -1,19 +1,27 @@
 require('babel-register');
-const electron = require('electron');
 
+const electron = require('electron');
 const { app, BrowserWindow } = electron;
+
+const options = {
+  // show: false,
+};
 
 let mainWindow;
 
-function createWindow() {
-  mainWindow = new BrowserWindow({ width: 800, height: 600 });
+function resetMainWindow() {
+  mainWindow = null;
+}
 
-  // mainWindow.loadURL('http://localhost:3000');
+function createWindow() {
+  mainWindow = new BrowserWindow(options);
   mainWindow.loadURL(`file://${__dirname}/src/index.html`);
-  mainWindow.webContents.openDevTools();
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-  });
+  mainWindow.maximize();
+
+  // mainWindow.once('ready-to-show', mainWindow.maximize);
+  mainWindow.on('closed', resetMainWindow);
+
+  // mainWindow.webContents.openDevTools();
 }
 
 app.on('ready', createWindow);
