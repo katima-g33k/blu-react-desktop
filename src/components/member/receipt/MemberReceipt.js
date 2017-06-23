@@ -3,9 +3,6 @@ import { Col, Row } from 'react-bootstrap';
 import moment from 'moment';
 
 import AlignedData from '../../general/AlignedData';
-import API from '../../../lib/API';
-import Member from '../../../lib/models/Member';
-import Spinner from '../../general/Spinner';
 import Table from '../../general/Table';
 
 const formatDate = date => date ? moment(date).format('YYYY-MM-DD') : '';
@@ -80,9 +77,6 @@ const columns = [
 export default class MemberReceipt extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      member: null,
-    };
 
     this.renderAccount = this.renderAccount.bind(this);
     this.renderAutorisation = this.renderAutorisation.bind(this);
@@ -92,24 +86,16 @@ export default class MemberReceipt extends Component {
     this.renderNote = this.renderNote.bind(this);
   }
 
-  componentWillMount() {
-    API.member.select(this.props.params.no, (err, res) => {
-      if (err) {
-        // TODO: Display error message
-        return;
-      }
-
-      this.setState({ member: new Member(res) });
-      print();
-      close();
-    });
+  componentDidMount() {
+    print();
+    return this.props.onAfterPrint && this.props.onAfterPrint();
   }
 
   renderCopies() {
     return (
       <Table
         columns={columns}
-        data={this.state.member.account.copies}
+        data={this.props.member.account.copies}
         options={{
           defaultSortName: columns.find(column => column.defaultSort).dataField,
           defaultSortOrder: 'asc',
@@ -120,7 +106,7 @@ export default class MemberReceipt extends Component {
   }
 
   renderPhone() {
-    const phones = this.state.member.phone;
+    const phones = this.props.member.phone;
 
     return phones.map((phone, index) => {
       return (
@@ -135,7 +121,7 @@ export default class MemberReceipt extends Component {
   }
 
   renderAccount() {
-    const member = this.state.member;
+    const member = this.props.member;
     const fields = [
       { key: 'name', label: 'Nom' },
       { key: 'no', label: 'Numéro de DA' },
@@ -162,11 +148,11 @@ export default class MemberReceipt extends Component {
   }
 
   renderAutorisation() {
-    const { amount } = this.props.params;
-    const { name } = this.state.member;
+    const { amount } = this.props;
+    const { name } = this.props.member;
     const date = moment().format('LL');
     // eslint-disable-next-line
-    const message = `Je, ${name}, atteste que les informations précitées sont valides et que l\'Association Étudiante du Cégep de Sherbrooke (AÉCS) m\'a remis le montant de ${amount} $ en date du ${date}.`;
+    const message = `Je, ${name}, atteste que les informations précisées sont valides et que l\'Association Étudiante du Cégep de Sherbrooke (AÉCS) m\'a remis le montant de ${amount} $ en date du ${date}.`;
     return (
       <Row className="autorisation">
         <Row>
@@ -204,8 +190,8 @@ export default class MemberReceipt extends Component {
   }
 
   render() {
-    return this.state.member ? (
-      <div>
+    return (
+      <div id="receipt">
         <h2>{'Banque de livres usagés'}</h2>
         <p className="semester">{moment.semester()}</p>
         <Row>
@@ -223,10 +209,12 @@ export default class MemberReceipt extends Component {
         {this.renderAutorisation()}
         {this.renderConditions()}
       </div>
-    ) : <Spinner/>;
+    );
   }
 }
 
 MemberReceipt.propTypes = {
-  params: PropTypes.shape(),
+  amount: PropTypes.number.isRequired,
+  member: PropTypes.shape().isRequired,
+  onAfterPrint: PropTypes.func,
 };

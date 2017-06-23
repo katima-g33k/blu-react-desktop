@@ -13,13 +13,13 @@ export default class MemberViewContainer extends Component {
     this.state = {
       amount: 0,
       member: null,
+      printReceipt: false,
       showModal: null,
     };
 
     this.getActions = this.getActions.bind(this);
     this.getModal = this.getModal.bind(this);
     this.pay = this.pay.bind(this);
-    this.printReceipt = this.printReceipt.bind(this);
     this.renewAccount = this.renewAccount.bind(this);
     this.transferAccount = this.transferAccount.bind(this);
   }
@@ -33,13 +33,6 @@ export default class MemberViewContainer extends Component {
 
       this.setState({ member: new Member(res) });
     });
-  }
-
-  printReceipt() {
-    const { no } = this.props.params;
-    const { amount } = this.state;
-
-    window.open(`/member/receipt/${no}/${amount}`, '_blank').focus();
   }
 
   getActions() {
@@ -76,7 +69,7 @@ export default class MemberViewContainer extends Component {
         style: 'primary',
         onClick: event => {
           event.preventDefault();
-          this.printReceipt();
+          this.setState({ printReceipt: true });
         },
       },
     ];
@@ -171,7 +164,7 @@ export default class MemberViewContainer extends Component {
               {
                 label: 'Imprimer un reçu',
                 onClick: () => {
-                  this.pay(this.printReceipt);
+                  this.pay(() => this.setState({ printReceipt: true }));
                 },
               },
               {
@@ -233,11 +226,16 @@ export default class MemberViewContainer extends Component {
   }
 
   render() {
-    return this.state.member ? (
+    const { amount, member, printReceipt } = this.state;
+
+    return member ? (
       <MemberView
         actions={this.getActions()}
-        member={this.state.member}
+        amount={amount}
+        member={member}
         modal={this.getModal()}
+        printReceipt={printReceipt}
+        onAfterPrint={() => this.setState({ amount: 0, printReceipt: false })}
       />
     ) : (<Spinner/>);
   }

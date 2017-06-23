@@ -8,6 +8,7 @@ import ActionPanel from '../../general/ActionPanel';
 import AlignedData from '../../general/AlignedData';
 import CopyTableContainer from '../../copy/table/CopyTableContainer';
 import MemberCommentsContainer from './MemberCommentsContainer';
+import MemberReceipt from '../receipt/MemberReceipt';
 import ProfileStats from '../../general/ProfileStats';
 
 const formatDate = (date) => {
@@ -122,17 +123,18 @@ export default class MemberView extends Component {
   }
 
   render() {
+    const { actions, amount, member, modal, printReceipt, onAfterPrint } = this.props;
+    const { account, name, no } = member;
+
     return (
       <Row>
         <Col md={10}>
           <Panel
             header={I18n.t('MemberView.title')}
-            bsStyle={this.props.member.account.isActive ? 'default' : 'danger'}
+            bsStyle={account.isActive ? 'default' : 'danger'}
           >
             {this.renderAlert()}
-            <h3>
-              {this.props.member.name}
-            </h3>
+            <h3>{name}</h3>
             <Row>
               <Col sm={12} md={6} style={border}>{this.renderGeneralInformation()}</Col>
               <Col sm={12} md={6}>{this.renderAccountState()}</Col>
@@ -142,8 +144,8 @@ export default class MemberView extends Component {
               <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
               <Col sm={12} md={6}>
                 <MemberCommentsContainer
-                  member={this.props.member.no}
-                  comments={this.props.member.account.comment}
+                  member={no}
+                  comments={account.comment}
                 />
               </Col>
             </Row>
@@ -151,17 +153,24 @@ export default class MemberView extends Component {
             <Row>
               <Col md={12}>
                 <CopyTableContainer
-                  member={this.props.member.no}
-                  copies={this.props.member.account.copies.filter(copy => !copy.isDonated)}
+                  member={no}
+                  copies={account.copies.filter(copy => !copy.isDonated)}
                 />
               </Col>
             </Row>
           </Panel>
         </Col>
         <Col md={2}>
-          <ActionPanel actions={this.props.actions} />
+          <ActionPanel actions={actions} />
         </Col>
-        {this.props.modal}
+        {modal}
+        {printReceipt && (
+          <MemberReceipt
+            amount={amount}
+            member={member}
+            onAfterPrint={onAfterPrint}
+          />
+        )}
       </Row>
     );
   }
@@ -169,6 +178,9 @@ export default class MemberView extends Component {
 
 MemberView.propTypes = {
   actions: React.PropTypes.array,
+  amount: React.PropTypes.number,
   member: React.PropTypes.shape(),
   modal: React.PropTypes.shape(),
+  printReceipt: React.PropTypes.bool.isRequired,
+  onAfterPrint: React.PropTypes.func,
 };
