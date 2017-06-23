@@ -10,15 +10,9 @@ import MemberViewContainer from '../components/member/view/MemberViewContainer';
 import SearchContainer from '../components/search/SearchContainer';
 
 export default class Routes extends Component {
-  constructor(props) {
-    super(props);
-
-    console.log(/index\.html/.test(
-      browserHistory.getCurrentLocation().pathname),
-      browserHistory.getCurrentLocation().pathname
-    );
+  componentDidMount() {
     if (/index\.html/.test(browserHistory.getCurrentLocation().pathname)) {
-      browserHistory.push('/');
+      browserHistory.push('/search');
     }
   }
 
