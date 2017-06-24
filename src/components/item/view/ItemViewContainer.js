@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import moment from 'moment';
 
 import API from '../../../lib/API';
-import { ConfirmModal, InputModal, SearchModal } from '../../general/modals';
+import { ConfirmModal, InformationModal, InputModal, SearchModal } from '../../general/modals';
 import Member from '../../../lib/models/Member';
 import Item from '../../../lib/models/Item';
 import ItemView from './ItemView';
@@ -27,6 +27,7 @@ export default class ItemViewContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       item: null,
       showModal: null,
     };
@@ -43,9 +44,9 @@ export default class ItemViewContainer extends Component {
   }
 
   componentWillMount() {
-    API.item.select(this.props.params.id, {}, (err, res) => {
-      if (err) {
-        // TODO: Display message
+    API.item.select(this.props.params.id, {}, (error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -82,9 +83,9 @@ export default class ItemViewContainer extends Component {
   reserve(parent) {
     const { item } = this.state;
 
-    API.reservation.insert(parent.no, item.id, (err, res) => {
-      if (err) {
-        // TODO: Display error message
+    API.reservation.insert(parent.no, item.id, (error, res) => {
+      if (error) {
+        this.setState({ error, showModal: null });
         return;
       }
 
@@ -101,9 +102,9 @@ export default class ItemViewContainer extends Component {
   }
 
   updateStatus(newStatus) {
-    API.item.updateStatus(this.props.params.id, newStatus, (err) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.item.updateStatus(this.props.params.id, newStatus, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -116,9 +117,9 @@ export default class ItemViewContainer extends Component {
   updateStorage(event, value) {
     const storage = value.replace(/\D+/g, ' ').split(/\D/).sort((a, b) => a - b);
 
-    API.item.updateStorage(this.props.params.id, storage, (err) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.item.updateStorage(this.props.params.id, storage, (error) => {
+      if (error) {
+        this.setState({ error, showModal: null });
         return;
       }
 
@@ -170,7 +171,19 @@ export default class ItemViewContainer extends Component {
   }
 
   getModal() {
-    switch (this.state.showModal) {
+    const { error, item, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
       case 'reserve':
         return (
           <SearchModal
@@ -196,7 +209,7 @@ export default class ItemViewContainer extends Component {
             onCancel={() => this.setState({ showModal: null })}
             onSave={this.updateStorage}
             title={'Modifier les caisses de rangements'}
-            value={this.state.item.storage.join('; ')}
+            value={item.storage.join('; ')}
           />
         );
       default:

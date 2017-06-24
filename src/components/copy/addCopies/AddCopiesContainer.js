@@ -5,7 +5,7 @@ import AddCopies from './AddCopies';
 import addCopiesColums from './addCopiesColumns';
 import API from '../../../lib/API';
 import Copy from '../../../lib/models/Copy';
-import InputModal from '../../general/modals/InputModal';
+import { InformationModal, InputModal } from '../../general/modals';
 import Item from '../../../lib/models/Item';
 import Member from '../../../lib/models/Member';
 import scanner from '../../../lib/Scanner';
@@ -17,6 +17,7 @@ export default class AddCopiesContainer extends Component {
     this.state = {
       copies: [],
       ean13: null,
+      error: null,
       isSearch: true,
       member: new Member({ no: props.params.no }),
       showModal: false,
@@ -57,9 +58,9 @@ export default class AddCopiesContainer extends Component {
 
     scanner.addListener('onItemScan', this.onItemScan);
 
-    API.member.getName(no, (err, res) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.member.getName(no, (error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -72,9 +73,9 @@ export default class AddCopiesContainer extends Component {
   }
 
   deleteCopy(id) {
-    API.copy.delete(id, (err) => {
-      if (err) {
-        // TODO: Display error message
+    API.copy.delete(id, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -96,24 +97,34 @@ export default class AddCopiesContainer extends Component {
   }
 
   getModal() {
-    const isCopy = this.state.copy;
+    const { copy, error, item, showModal } = this.state;
 
-    return this.state.showModal ? (
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    return showModal ? (
       <InputModal
         message={'Entrer le montant souhaité'}
         onCancel={this.closeModal}
-        onSave={isCopy ? this.updatePrice : this.save}
-        title={isCopy ? this.state.copy.item.name : this.state.item.name}
+        onSave={copy ? this.updatePrice : this.save}
+        title={copy ? copy.item.name : item.name}
         type="number"
-        value={isCopy && this.state.copy.price}
+        value={copy && this.state.copy.price}
       />
     ) : null;
   }
 
   onItemScan(ean13) {
-    API.item.select(ean13, { forCopy: true }, (err, res) => {
-      if (err) {
-        // TODO: Display message
+    API.item.select(ean13, { forCopy: true }, (error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -134,10 +145,9 @@ export default class AddCopiesContainer extends Component {
     const memberNo = this.props.params.no;
     const itemId = this.state.item.id;
 
-    API.copy.insert(memberNo, itemId, price, (err, res) => {
-      if (err) {
-        this.closeModal();
-        // TODO: Display error message
+    API.copy.insert(memberNo, itemId, price, (error, res) => {
+      if (error) {
+        this.closeModal({ error });
         return;
       }
 
@@ -166,10 +176,9 @@ export default class AddCopiesContainer extends Component {
     const price = parseInt(value, 10);
     const { id } = this.state.copy.currentCopy;
 
-    API.copy.update(id, price, (err) => {
-      if (err) {
-        this.closeModal();
-        // TODO: Display error message
+    API.copy.update(id, price, (error) => {
+      if (error) {
+        this.closeModal({ error });
         return;
       }
 

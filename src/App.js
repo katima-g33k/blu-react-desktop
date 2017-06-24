@@ -13,6 +13,7 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       showModal: null,
     };
 
@@ -35,9 +36,9 @@ export default class App extends Component {
 
   onMemberScan(no) {
     if (this.canChangeLocation()) {
-      API.member.exists(no, (err, res) => {
-        if (err) {
-          // TODO: Display message
+      API.member.exists(no, (error, res) => {
+        if (error) {
+          this.setState({ error });
           return;
         }
 
@@ -49,9 +50,9 @@ export default class App extends Component {
 
   onItemScan(ean13) {
     if (this.canChangeLocation()) {
-      API.item.exists(ean13, (err, res) => {
-        if (err) {
-          // TODO: Display message
+      API.item.exists(ean13, (error, res) => {
+        if (error) {
+          this.setState({ error });
           return;
         }
 
@@ -66,7 +67,19 @@ export default class App extends Component {
   }
 
   renderModal() {
-    switch (this.state.showModal) {
+    const { error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Error ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
       case 'invalidCode':
         return (
           <InformationModal

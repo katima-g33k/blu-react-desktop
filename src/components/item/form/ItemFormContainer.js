@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 
 import API from '../../../lib/API';
 import Author from '../../../lib/models/Author';
+import { InformationModal } from '../../general/modals';
 import Item from '../../../lib/models/Item';
 import ItemForm from './ItemForm';
 import schema from './schema';
@@ -10,10 +11,12 @@ export default class ItemFormContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       item: new Item({ isBook: true, author: [new Author()] }),
       categories: [],
     };
 
+    this.getModal = this.getModal.bind(this);
     this.handleAuthors = this.handleAuthors.bind(this);
     this.handleEan13 = this.handleEan13.bind(this);
     this.handleIsBook = this.handleIsBook.bind(this);
@@ -32,9 +35,9 @@ export default class ItemFormContainer extends Component {
   componentWillMount() {
     const { ean13, location, params } = this.props;
 
-    API.category.select((err, res) => {
-      if (err) {
-        // TODO: display error
+    API.category.select((error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -42,9 +45,9 @@ export default class ItemFormContainer extends Component {
     });
 
     if (params && params.id) {
-      API.item.select(params.id, {}, (err, res) => {
-        if (err) {
-          // TODO: display error
+      API.item.select(params.id, {}, (error, res) => {
+        if (error) {
+          this.setState({ error });
           return;
         }
 
@@ -128,9 +131,9 @@ export default class ItemFormContainer extends Component {
   }
 
   insert(item) {
-    API.item.insert(item, (err, { id }) => {
-      if (err) {
-        // TODO: Display message
+    API.item.insert(item, (error, { id }) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -180,9 +183,9 @@ export default class ItemFormContainer extends Component {
   update(item) {
     const { id } = this.props.params;
 
-    API.item.update(id, item, (err) => {
-      if (err) {
-        // TODO: Display message
+    API.item.update(id, item, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -193,6 +196,18 @@ export default class ItemFormContainer extends Component {
         this.props.router.push(`/item/view/${id}`);
       }
     });
+  }
+
+  getModal() {
+    const { error } = this.state;
+
+    return error && (
+      <InformationModal
+        message={error.message}
+        onClick={() => this.setState({ error: null })}
+        title={`Erreur ${error.code}`}
+      />
+    );
   }
 
   render() {
@@ -209,6 +224,7 @@ export default class ItemFormContainer extends Component {
         data={item}
         onCancel={this.props.onCancel || this.onCancel}
         onSave={this.onSave}
+        modal={this.getModal()}
         schema={this.schema[item.isBook ? 'book' : 'item']}
       />
     );

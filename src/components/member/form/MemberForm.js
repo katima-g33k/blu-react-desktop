@@ -16,6 +16,7 @@ export default class MemberForm extends Component {
             onSave={this.props.onSave}
           />
         </Col>
+        {this.props.modal}
       </Panel>
     );
   }
@@ -23,6 +24,7 @@ export default class MemberForm extends Component {
 
 MemberForm.propTypes = {
   member: React.PropTypes.shape(),
+  modal: React.PropTypes.shape(),
   onCancel: React.PropTypes.func.isRequired,
   onSave: React.PropTypes.func.isRequired,
   schema: React.PropTypes.shape().isRequired,

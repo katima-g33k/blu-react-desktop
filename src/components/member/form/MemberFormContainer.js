@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import { browserHistory } from 'react-router';
 
 import API from '../../../lib/API';
+import { InformationModal } from '../../general/modals';
 import Member from '../../../lib/models/Member';
 import MemberForm from './MemberForm';
 import memberFormSchema from './memberFormSchema';
@@ -30,11 +32,13 @@ export default class MemberFormContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       states: [],
       member: new Member(),
     };
 
     this.cancel = this.cancel.bind(this);
+    this.getModal = this.getModal.bind(this);
     this.handleNo = this.handleNo.bind(this);
     this.insert = this.insert.bind(this);
     this.save = this.save.bind(this);
@@ -46,9 +50,9 @@ export default class MemberFormContainer extends Component {
   }
 
   componentWillMount() {
-    API.state.select((err, res) => {
-      if (err) {
-        // TODO: Displau message
+    API.state.select((error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -59,9 +63,9 @@ export default class MemberFormContainer extends Component {
     });
 
     if (this.props.params.no) {
-      API.member.select(this.props.params.no, (err, res) => {
-        if (err) {
-          // TODO: Display message
+      API.member.select(this.props.params.no, (error, res) => {
+        if (error) {
+          this.setState({ error });
           return;
         }
 
@@ -75,20 +79,19 @@ export default class MemberFormContainer extends Component {
 
   cancel(event) {
     event.preventDefault();
-    const no = this.props.params.no;
-    this.props.router.push(no ? `/member/view/${no}` : '/search');
+    const { no } = this.props.params;
+    browserHistory.push(no ? `/member/view/${no}` : '/search');
   }
 
   insert(data) {
-    API.member.insert(data, (err, res) => {
-      if (err) {
-        // TODO: Display error message
+    API.member.insert(data, (error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
-      const { router } = this.props;
       const no = res.no || data.no;
-      router.push({ pathname: `/member/view/${no}` });
+      browserHistory.push(`/member/view/${no}`);
     });
   }
 
@@ -112,27 +115,33 @@ export default class MemberFormContainer extends Component {
   }
 
   save(member) {
-    const no = this.props.params.no;
+    const { no } = this.props.params;
     const data = removeEmptyPropperties({ ...member });
 
-    if (no) {
-      this.update(no, data);
-    } else {
-      this.insert(data);
-    }
+    return no ? this.update(no, data) : this.insert(data);
   }
 
   update(no, data) {
-    API.member.update(no, data, (err) => {
-      if (err) {
-        // TODO: Display error message
+    API.member.update(no, data, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
-      this.props.router.push({
-        pathname: `/member/view/${data.no}`,
-      });
+      browserHistory.push(`/member/view/${data.no}`);
     });
+  }
+
+  getModal() {
+    const { error } = this.state;
+
+    return error && (
+      <InformationModal
+        message={error.message}
+        onClick={() => this.setState({ error: null })}
+        title={`Erreur ${error.code}`}
+      />
+    );
   }
 
   render() {
@@ -142,6 +151,7 @@ export default class MemberFormContainer extends Component {
     return (
       <MemberForm
         member={member}
+        modal={this.getModal()}
         onCancel={this.cancel}
         onSave={this.save}
         schema={this.schema}
