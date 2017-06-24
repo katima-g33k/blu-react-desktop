@@ -132,7 +132,7 @@ export default class CopyTableContainer extends Component {
   }
 
   refund(id) {
-    API.transaction.delete(id, Transaction.TYPES.SEL, (err) => {
+    API.transaction.delete(id, Transaction.TYPES.SELL, (err) => {
       if (err) {
         // TODO: Display error message
         return;

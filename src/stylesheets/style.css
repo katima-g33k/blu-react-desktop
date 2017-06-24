@@ -35,7 +35,15 @@ h4 {
   font-weight: bold;
 }
 
+#receipt {
+  display: none;
+}
+
 @media print {
+  #receipt {
+    display: block;
+  }
+
   * {
     font-size: 9px;
   }
@@ -50,7 +58,7 @@ h4 {
     margin: 15px 0 10px 0;
   }
 
-  aside, header, nav {
+  aside, header, nav, .modal, .modal-dialog, .modal-content, .panel {
     display: none;
   }
 
