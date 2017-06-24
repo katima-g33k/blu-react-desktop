@@ -3,15 +3,16 @@ import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 
 import API from '../../../lib/API';
 import CommentColumns from './CommentColumns';
-import { ConfirmModal, InputModal } from '../../general/modals';
+import { ConfirmModal, InformationModal, InputModal } from '../../general/modals';
 import MemberComments from './MemberComments';
 
 export default class MemberCommentContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      comments: props.comments || [],
       activeComment: null,
+      comments: props.comments || [],
+      error: null,
       showModal: null,
     };
 
@@ -55,9 +56,9 @@ export default class MemberCommentContainer extends Component {
     event.preventDefault();
     const { id } = this.state.activeComment;
 
-    API.comment.delete(id, (err) => {
-      if (err) {
-        // TODO: Display message
+    API.comment.delete(id, (error) => {
+      if (error) {
+        this.setState({ error, activeComment: null, showModal: null });
         return;
       }
 
@@ -70,9 +71,9 @@ export default class MemberCommentContainer extends Component {
   }
 
   insertComment(value) {
-    API.comment.insert(this.props.member, value, (err, res) => {
-      if (err) {
-        // TODO: display error message
+    API.comment.insert(this.props.member, value, (error, res) => {
+      if (error) {
+        this.setState({ error, activeComment: null, showModal: null });
         return;
       }
 
@@ -87,7 +88,7 @@ export default class MemberCommentContainer extends Component {
       this.setState({
         comments,
         activeComment: null,
-        showModal: false,
+        showModal: null,
       });
     });
   }
@@ -99,9 +100,9 @@ export default class MemberCommentContainer extends Component {
   }
 
   updateComment(value) {
-    API.comment.update(this.state.activeComment.id, value, (err) => {
-      if (err) {
-        // TODO: display error message
+    API.comment.update(this.state.activeComment.id, value, (error) => {
+      if (error) {
+        this.setState({ error, activeComment: null, showModal: null });
         return;
       }
 
@@ -114,20 +115,32 @@ export default class MemberCommentContainer extends Component {
       this.setState({
         comments,
         activeComment: null,
-        showModal: false,
+        showModal: null,
       });
     });
   }
 
   getModal() {
-    switch (this.state.showModal) {
+    const { activeComment, error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
       case 'input':
         return (
           <InputModal
             message="Entrer le commentaire"
-            title={this.state.activeComment ? 'Modifier un commentaire' : 'Ajouter un commentaire'}
+            title={activeComment ? 'Modifier un commentaire' : 'Ajouter un commentaire'}
             textarea
-            value={this.state.activeComment ? this.state.activeComment.comment : ''}
+            value={activeComment ? activeComment.comment : ''}
             onSave={this.saveComment}
             onCancel={() => this.setState({ activeComment: null, showModal: null })}
           />
@@ -135,7 +148,7 @@ export default class MemberCommentContainer extends Component {
       case 'confirm':
         return (
           <ConfirmModal
-            message={`Souhaitez-vous vraiment supprimer ce commentaire : "${this.state.activeComment.comment}"`}
+            message={`Souhaitez-vous vraiment supprimer ce commentaire : "${activeComment.comment}"`}
             title="Supprimer un commentaire"
             onConfirm={this.deleteComment}
             onCancel={() => this.setState({ activeComment: null, showModal: null })}

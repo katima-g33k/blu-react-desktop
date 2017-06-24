@@ -12,6 +12,7 @@ export default class MemberViewContainer extends Component {
     super(props);
     this.state = {
       amount: 0,
+      error: null,
       member: null,
       printReceipt: false,
       showModal: null,
@@ -25,9 +26,9 @@ export default class MemberViewContainer extends Component {
   }
 
   componentWillMount() {
-    API.member.select(this.props.params.no, (err, res) => {
-      if (err) {
-        // TODO: Display message
+    API.member.select(this.props.params.no, (error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -100,9 +101,9 @@ export default class MemberViewContainer extends Component {
     let amount = 0;
     const { member } = this.state;
 
-    API.member.pay(member.no, (err) => {
-      if (err) {
-        // TODO: display error message
+    API.member.pay(member.no, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -122,9 +123,9 @@ export default class MemberViewContainer extends Component {
   renewAccount() {
     const { member } = this.state;
 
-    API.member.renew(member.no, (err) => {
-      if (err) {
-        // TODO: display error message
+    API.member.renew(member.no, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -140,9 +141,9 @@ export default class MemberViewContainer extends Component {
 
     const copyIDs = copies.map(copy => copy.id);
 
-    API.transaction.insert(member.no, copyIDs, Transaction.TYPES.DONATE, (err) => {
-      if (err) {
-        // TODO: display error message
+    API.transaction.insert(member.no, copyIDs, Transaction.TYPES.DONATE, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -152,7 +153,19 @@ export default class MemberViewContainer extends Component {
   }
 
   getModal() {
-    switch (this.state.showModal) {
+    const { error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
       case 'pay':
         return (
           <ConfirmModal

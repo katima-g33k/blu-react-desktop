@@ -4,7 +4,7 @@ import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 import API from '../../../lib/API';
 import CopyTable from './CopyTable';
 import CopyColumns from './columns';
-import { ConfirmModal, InputModal, SearchModal } from '../../general/modals';
+import { ConfirmModal, InformationModal, InputModal, SearchModal } from '../../general/modals';
 import Transaction from '../../../lib/models/Transaction';
 
 export default class CopyTableContainer extends Component {
@@ -12,6 +12,7 @@ export default class CopyTableContainer extends Component {
     super(props);
     this.state = {
       copies: props.copies,
+      error: null,
       showModal: null,
     };
 
@@ -102,9 +103,9 @@ export default class CopyTableContainer extends Component {
   cancelReservation() {
     const { id } = this.state.activeCopy;
 
-    API.transaction.delete(id, Transaction.TYPES.RESERVE, (err) => {
-      if (err) {
-        // TODO: Display error message
+    API.transaction.delete(id, Transaction.TYPES.RESERVE, (error) => {
+      if (error) {
+        this.setState({ error, showModal: null, activeCopy: null });
         return;
       }
 
@@ -117,9 +118,9 @@ export default class CopyTableContainer extends Component {
   delete() {
     const { id } = this.state.activeCopy;
 
-    API.copy.delete(id, (err) => {
-      if (err) {
-        // TODO: Display error message
+    API.copy.delete(id, (error) => {
+      if (error) {
+        this.setState({ error, showModal: null, activeCopy: null });
         return;
       }
 
@@ -132,9 +133,9 @@ export default class CopyTableContainer extends Component {
   }
 
   refund(id) {
-    API.transaction.delete(id, Transaction.TYPES.SELL, (err) => {
-      if (err) {
-        // TODO: Display error message
+    API.transaction.delete(id, Transaction.TYPES.SELL, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -151,9 +152,9 @@ export default class CopyTableContainer extends Component {
   reserve(parent) {
     const { id } = this.state.activeCopy;
 
-    API.transaction.insert(parent.no, [id], Transaction.TYPES.RESERVE, (err) => {
-      if (err) {
-        // TODO: Display error message
+    API.transaction.insert(parent.no, [id], Transaction.TYPES.RESERVE, (error) => {
+      if (error) {
+        this.setState({ error, showModal: null, activeCopy: null });
         return;
       }
 
@@ -169,9 +170,9 @@ export default class CopyTableContainer extends Component {
     const member = this.props.member || copy.member.no;
     const transactionType = Transaction.TYPES[halfPrice ? 'SELL_PARENT' : 'SELL'];
 
-    API.transaction.insert(member, [copy.id], transactionType, (err) => {
-      if (err) {
-        // TODO: Display error message
+    API.transaction.insert(member, [copy.id], transactionType, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -191,9 +192,9 @@ export default class CopyTableContainer extends Component {
     const { id } = this.state.activeCopy;
     const price = parseInt(value, 10);
 
-    API.copy.update(id, price, (err) => {
-      if (err) {
-        // TODO: Display error message
+    API.copy.update(id, price, (error) => {
+      if (error) {
+        this.setState({ error, showModal: null, activeCopy: null });
         return;
       }
 
@@ -204,7 +205,19 @@ export default class CopyTableContainer extends Component {
   }
 
   getModal() {
-    switch (this.state.showModal) {
+    const { error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
       case 'delete':
         return (
           <ConfirmModal

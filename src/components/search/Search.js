@@ -97,26 +97,28 @@ export default class Search extends Component {
             )}
           </Col>
         </Row>
+        {this.props.modal}
       </Panel>
     );
   }
 }
 
 Search.propTypes = {
-  disableArchive: React.PropTypes.bool,
-  noHeader: React.PropTypes.bool,
-  onRowClick: React.PropTypes.func,
-  onAddButton: React.PropTypes.func,
-  disableTypeSelection: React.PropTypes.bool,
   archives: React.PropTypes.bool,
-  handleInput: React.PropTypes.func,
-  handleType: React.PropTypes.func,
-  handleArchive: React.PropTypes.func,
-  type: React.PropTypes.string,
-  isLoading: React.PropTypes.bool,
-  handleSearch: React.PropTypes.func,
   columns: React.PropTypes.array,
   data: React.PropTypes.array,
+  disableArchive: React.PropTypes.bool,
+  disableTypeSelection: React.PropTypes.bool,
+  handleArchive: React.PropTypes.func,
+  handleInput: React.PropTypes.func,
+  handleSearch: React.PropTypes.func,
+  handleType: React.PropTypes.func,
+  isLoading: React.PropTypes.bool,
+  modal: React.PropTypes.shape,
+  noHeader: React.PropTypes.bool,
+  onAddButton: React.PropTypes.func,
+  onRowClick: React.PropTypes.func,
   search: React.PropTypes.string,
   tableOptions: React.PropTypes.shape(),
+  type: React.PropTypes.string,
 };

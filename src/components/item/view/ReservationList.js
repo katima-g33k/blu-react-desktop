@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import moment from 'moment';
 
 import API from '../../../lib/API';
-import { ConfirmModal } from '../../general/modals';
+import { ConfirmModal, InformationModal } from '../../general/modals';
 import TableLayout from '../../general/TableLayout';
 import Transaction from '../../../lib/models/Transaction';
 
@@ -50,6 +50,7 @@ export default class ReservationList extends Component {
     super(props);
     this.state = {
       activeReservation: null,
+      error: null,
       showModal: null,
     };
 
@@ -76,9 +77,9 @@ export default class ReservationList extends Component {
   deleteReservation() {
     const reservation = this.state.activeReservation;
     const { copy, item, parent } = reservation;
-    const onDelete = (err) => {
-      if (err) {
-        // TODO: Display error message
+    const onDelete = (error) => {
+      if (error) {
+        this.setState({ error, activeReservation: null, showModal: null });
         return;
       }
 
@@ -97,9 +98,21 @@ export default class ReservationList extends Component {
   }
 
   getModal() {
-    switch (this.state.showModal) {
+    const { activeReservation, error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
       case 'delete':
-        const { name } = this.state.activeReservation.parent;
+        const { name } = activeReservation.parent;
 
         return (
           <ConfirmModal

@@ -5,22 +5,27 @@ import AutoForm from '../../general/AutoForm';
 
 export default class ItemForm extends Component {
   render() {
+    const { data, modal, onCancel, onSave, schema } = this.props;
+
     return (
       <Panel header={I18n.t('ItemForm.title')}>
         <Col md={8}>
           <AutoForm
-            schema={this.props.schema}
-            data={this.props.data}
-            onCancel={this.props.onCancel}
-            onSave={this.props.onSave}
+            schema={schema}
+            data={data}
+            onCancel={onCancel}
+            onSave={onSave}
           />
         </Col>
-      </Panel>);
+        {modal}
+      </Panel>
+    );
   }
 }
 
 ItemForm.propTypes = {
   data: React.PropTypes.shape(),
+  modal: React.PropTypes.shape(),
   onCancel: React.PropTypes.func.isRequired,
   onSave: React.PropTypes.func.isRequired,
   schema: React.PropTypes.shape().isRequired,

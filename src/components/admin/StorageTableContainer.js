@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router';
 
 import API from '../../lib/API';
-import { ConfirmModal } from '../general/modals';
+import { ConfirmModal, InformationModal } from '../general/modals';
 import Storage from '../../lib/models/Storage';
 import TableLayout from '../general/TableLayout';
 
@@ -45,6 +45,7 @@ export default class StorageTableContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       storage: [],
       showModal: false,
     };
@@ -59,9 +60,9 @@ export default class StorageTableContainer extends Component {
   }
 
   componentWillMount() {
-    API.storage.select((err, res) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.storage.select((error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -74,9 +75,9 @@ export default class StorageTableContainer extends Component {
   }
 
   deleteStorage() {
-    API.storage.clear((err) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.storage.clear((error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -85,7 +86,19 @@ export default class StorageTableContainer extends Component {
   }
 
   getModal() {
-    return this.state.showModal ? (
+    const { error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    return showModal ? (
       <ConfirmModal
         message={'Êtes-vous certains de vouloir vider les caisses de rangement ?'}
         onCancel={() => this.setState({ showModal: false })}

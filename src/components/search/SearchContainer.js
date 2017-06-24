@@ -3,6 +3,7 @@ import { browserHistory } from 'react-router';
 
 import API from '../../lib/API';
 import I18n from '../../lib/i18n/i18n';
+import { InformationModal } from '../general/modals';
 import Item from '../../lib/models/Item';
 import Member from '../../lib/models/Member';
 import Search from './Search';
@@ -12,13 +13,15 @@ export default class SearchContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      archives: false,
+      data: [],
+      error: null,
       isLoading: false,
       search: '',
-      data: [],
       type: props.type || 'member',
-      archives: false,
     };
 
+    this.getModal = this.getModal.bind(this);
     this.handleArchive = this.handleArchive.bind(this);
     this.handleInput = this.handleInput.bind(this);
     this.handleType = this.handleType.bind(this);
@@ -34,6 +37,18 @@ export default class SearchContainer extends Component {
       },
       noDataText: I18n.t('Search.results.none'),
     };
+  }
+
+  getModal() {
+    const { error } = this.state;
+
+    return error && (
+      <InformationModal
+        message={error.message}
+        onClick={() => this.setState({ error: null })}
+        title={`Erreur ${error.code}`}
+      />
+    );
   }
 
   handleInput(event) {
@@ -54,14 +69,16 @@ export default class SearchContainer extends Component {
       options.outdated = archives;
     }
 
-    API[searchType].search(search, options, (err, res) => {
-      if (err) {
-        // TODO: Display message
+    API[searchType].search(search, options, (error, res) => {
+      if (error) {
+        this.setState({ error, isLoading: false });
         return;
       }
 
+      const Instance = searchType === 'item' ? Item : Member;
+
       this.setState({
-        data: res.map(row => searchType === 'item' ? new Item(row) : new Member(row)),
+        data: res.map(row => new Instance(row)),
         isLoading: false,
       });
     });
@@ -85,17 +102,18 @@ export default class SearchContainer extends Component {
       <Search
         {...this.props}
         archives={this.state.archives}
-        disableTypeSelection={!!this.props.type}
-        handleInput={this.handleInput}
-        handleType={this.handleType}
-        handleArchive={this.handleArchive}
-        type={type}
-        isLoading={this.state.isLoading}
-        handleSearch={this.search}
         columns={SearchColumns[type]}
         data={this.state.data || []}
+        disableTypeSelection={!!this.props.type}
+        handleArchive={this.handleArchive}
+        handleInput={this.handleInput}
+        handleSearch={this.search}
+        handleType={this.handleType}
+        isLoading={this.state.isLoading}
+        modal={this.getModal()}
         search={this.state.search}
         tableOptions={this.tableOptions}
+        type={type}
       />
     );
   }
@@ -104,7 +122,7 @@ export default class SearchContainer extends Component {
 SearchContainer.propTypes = {
   disableArchive: React.PropTypes.bool,
   noHeader: React.PropTypes.bool,
-  type: React.PropTypes.string,
-  onRowClick: React.PropTypes.func,
   onAddButton: React.PropTypes.func,
+  onRowClick: React.PropTypes.func,
+  type: React.PropTypes.string,
 };
