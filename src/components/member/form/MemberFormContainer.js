@@ -8,8 +8,8 @@ import MemberForm from './MemberForm';
 import memberFormSchema from './memberFormSchema';
 
 const removeEmptyPropperties = (data) => {
-  Object.keys(data).forEach(key => {
-    if (data[key] === null || typeof data[key] === 'boolean') {
+  Object.keys(data).forEach((key) => {
+    if (data[key] === null || (typeof data[key] === 'boolean' && key !== 'is_parent')) {
       delete data[key];
     } else if (typeof data[key] === 'string' && data[key] === '') {
       delete data[key];
