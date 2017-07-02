@@ -118,6 +118,10 @@ export default class MemberFormContainer extends Component {
     const { no } = this.props.params;
     const data = removeEmptyPropperties({ ...member });
 
+    if (data.zip) {
+      data.zip = data.zip.replace(/\s/g, '').toUpperCase();
+    }
+
     return no ? this.update(no, data) : this.insert(data);
   }
 
