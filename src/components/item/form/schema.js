@@ -15,6 +15,7 @@ const subject = {
   label: 'Sujet',
   key: 'subject',
   type: 'select',
+  value: ({ id }) => id,
 };
 const ean13 = {
   key: 'ean13',
