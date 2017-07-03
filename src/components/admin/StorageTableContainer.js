@@ -20,7 +20,7 @@ const columns = [
     dataField: 'no',
     isKey: true,
     label: 'Numéro de caisse',
-    width: '150',
+    width: '150px',
   },
   {
     dataField: 'content',

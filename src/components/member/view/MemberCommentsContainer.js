@@ -30,7 +30,7 @@ export default class MemberCommentContainer extends Component {
         dataField: 'action',
         label: 'Actions',
         dataAlign: 'center',
-        width: '100',
+        width: '100px',
         dataFormat: (cell, row) => {
           return (
             <ButtonGroup>
