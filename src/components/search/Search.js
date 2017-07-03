@@ -114,7 +114,7 @@ Search.propTypes = {
   handleSearch: React.PropTypes.func,
   handleType: React.PropTypes.func,
   isLoading: React.PropTypes.bool,
-  modal: React.PropTypes.shape,
+  modal: React.PropTypes.shape(),
   noHeader: React.PropTypes.bool,
   onAddButton: React.PropTypes.func,
   onRowClick: React.PropTypes.func,
