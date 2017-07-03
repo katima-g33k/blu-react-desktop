@@ -248,7 +248,7 @@ export default class MemberViewContainer extends Component {
         member={member}
         modal={this.getModal()}
         printReceipt={printReceipt}
-        onAfterPrint={() => this.setState({ amount: 0, printReceipt: false })}
+        onAfterPrint={() => this.setState({ printReceipt: false })}
       />
     ) : (<Spinner/>);
   }
