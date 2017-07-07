@@ -57,12 +57,11 @@ export default class Search extends Component {
                 </Checkbox>
               ) : null}
               <Button
-                bsStyle="primary"
+                bsStyle={this.props.isLoading ? 'danger' : 'primary'}
                 type="submit"
-                disabled={this.props.isLoading}
-                onClick={!this.props.isLoading ? this.props.handleSearch : null}
+                onClick={!this.props.isLoading ? this.props.handleSearch : this.props.cancelSearch}
               >
-                <Translate value={this.props.isLoading ? 'Search.loading' : 'Search.title'} />
+                <Translate value={this.props.isLoading ? 'Search.cancel' : 'Search.title'} />
               </Button>
             </form>
           </Col>
@@ -105,6 +104,7 @@ export default class Search extends Component {
 
 Search.propTypes = {
   archives: React.PropTypes.bool,
+  cancelSearch: React.PropTypes.func,
   columns: React.PropTypes.array,
   data: React.PropTypes.array,
   disableArchive: React.PropTypes.bool,

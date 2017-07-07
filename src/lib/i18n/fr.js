@@ -86,7 +86,7 @@ const fr = {
         parent: 'Désactivés',
       },
     },
-    loading: 'Chargement...',
+    cancel: 'Annuler',
     results: {
       title: 'Résultats',
       none: 'Aucun résultat',
