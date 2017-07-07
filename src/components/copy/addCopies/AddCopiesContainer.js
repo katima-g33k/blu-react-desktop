@@ -116,7 +116,7 @@ export default class AddCopiesContainer extends Component {
         onSave={copy ? this.updatePrice : this.save}
         title={copy ? copy.item.name : item.name}
         type="number"
-        value={copy && this.state.copy.price}
+        value={copy && `${this.state.copy.price}`}
       />
     ) : null;
   }
@@ -174,7 +174,7 @@ export default class AddCopiesContainer extends Component {
 
   updatePrice(event, value) {
     const price = parseInt(value, 10);
-    const { id } = this.state.copy.currentCopy;
+    const { id } = this.state.copy;
 
     API.copy.update(id, price, (error) => {
       if (error) {
