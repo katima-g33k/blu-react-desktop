@@ -8,6 +8,7 @@ import Copy from '../../../lib/models/Copy';
 import { InformationModal, InputModal } from '../../general/modals';
 import Item from '../../../lib/models/Item';
 import Member from '../../../lib/models/Member';
+import Reservation from '../../../lib/models/Reservation';
 import scanner from '../../../lib/Scanner';
 import Transaction from '../../../lib/models/Transaction';
 
@@ -20,7 +21,8 @@ export default class AddCopiesContainer extends Component {
       error: null,
       isSearch: true,
       member: new Member({ no: props.params.no }),
-      showModal: false,
+      reservation: null,
+      showModal: null,
     };
 
     this.deleteCopy = this.deleteCopy.bind(this);
@@ -28,7 +30,7 @@ export default class AddCopiesContainer extends Component {
     this.getActions = this.getActions.bind(this);
     this.getModal = this.getModal.bind(this);
     this.onItemScan = this.onItemScan.bind(this);
-    this.openModal = this.openModal.bind(this);
+    this.openInputModal = this.openInputModal.bind(this);
     this.save = this.save.bind(this);
     this.updatePrice = this.updatePrice.bind(this);
 
@@ -38,7 +40,7 @@ export default class AddCopiesContainer extends Component {
         <div>
           <Button
             bsStyle="default"
-            onClick={() => this.openModal({ copy })}
+            onClick={() => this.setState({ copy, showModal: 'input', isSearch: true })}
           >
             <Glyphicon glyph="pencil" />
           </Button>
@@ -85,7 +87,7 @@ export default class AddCopiesContainer extends Component {
   }
 
   closeModal(state = {}) {
-    this.setState({ ...state, item: null, copy: null, showModal: false });
+    this.setState({ ...state, item: null, copy: null, reservation: null, showModal: null });
   }
 
   getActions() {
@@ -97,7 +99,7 @@ export default class AddCopiesContainer extends Component {
   }
 
   getModal() {
-    const { copy, error, item, showModal } = this.state;
+    const { copy, error, item, reservation, showModal } = this.state;
 
     if (error) {
       return (
@@ -109,16 +111,33 @@ export default class AddCopiesContainer extends Component {
       );
     }
 
-    return showModal ? (
-      <InputModal
-        message={'Entrer le montant souhaité'}
-        onCancel={this.closeModal}
-        onSave={copy ? this.updatePrice : this.save}
-        title={copy ? copy.item.name : item.name}
-        type="number"
-        value={copy && `${this.state.copy.price}`}
-      />
-    ) : null;
+    switch (showModal) {
+      case 'input':
+        return (
+          <InputModal
+            message={'Entrer le montant souhaité'}
+            onCancel={this.closeModal}
+            onSave={copy ? this.updatePrice : this.save}
+            title={copy ? copy.item.name : item.name}
+            type="number"
+            value={copy && `${this.state.copy.price}`}
+          />
+        );
+      case 'reservation':
+        return (
+          <InformationModal
+            message={`Cet ouvrage est réservé par ${reservation.parent.name} veuillez le mettre de côté`}
+            onClick={this.closeModal}
+            title={'Ouvrage réservé'}
+          />
+        );
+      default:
+        return null;
+    }
+  }
+
+  openInputModal(data = {}) {
+    this.setState({ ...data, showModal: 'input', isSearch: true });
   }
 
   onItemScan(ean13) {
@@ -129,15 +148,11 @@ export default class AddCopiesContainer extends Component {
       }
 
       if (res.id) {
-        this.openModal({ item: new Item(res) });
+        this.setState({ item: new Item(res), showModal: 'input', isSearch: true });
       } else {
         this.setState({ ean13, isSearch: false });
       }
     });
-  }
-
-  openModal(data = {}) {
-    this.setState({ ...data, showModal: true, isSearch: true });
   }
 
   save(event, value) {
@@ -151,10 +166,11 @@ export default class AddCopiesContainer extends Component {
         return;
       }
 
-      const copies = this.state.copies;
+      const { id, reservation } = res;
+      const { copies, item } = this.state;
       const copy = new Copy({
-        id: res.id,
-        item: this.state.item,
+        id,
+        item,
         price,
         transaction: [{
           code: Transaction.TYPES.ADD,
@@ -162,13 +178,17 @@ export default class AddCopiesContainer extends Component {
         }],
       });
 
-      if (res.reservation) {
-        copy.reserve(res.reservation.member);
+      if (reservation) {
+        copy.reserve(reservation.member);
       }
 
       copies.push(copy);
 
       this.closeModal({ copies });
+
+      if (reservation) {
+        this.setState({ showModal: 'reservation', reservation: new Reservation({ parent: reservation }) });
+      }
     });
   }
 
@@ -189,7 +209,7 @@ export default class AddCopiesContainer extends Component {
   }
 
   render() {
-    const { columns, getActions, getModal, openModal, props } = this;
+    const { columns, getActions, getModal, props } = this;
     const { copies, ean13, isSearch, member } = this.state;
 
     return (
@@ -203,8 +223,8 @@ export default class AddCopiesContainer extends Component {
         member={member}
         modal={getModal()}
         onAddButton={() => this.setState({ isSearch: false })}
-        openModal={openModal}
-        onFormSave={openModal}
+        openModal={this.openInputModal}
+        onFormSave={this.openInputModal}
         onFormCancel={() => this.setState({ isSearch: true })}
       />
     );
