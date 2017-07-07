@@ -94,8 +94,8 @@ const fr = {
   },
   Sidebar: {
     search: 'Recherche',
-    member: 'Nouveau Membre',
-    item: 'Nouvel Ouvrage',
+    member: 'Membre',
+    item: 'Ouvrage',
     admin: 'Administration',
   },
   TableColumns: {
