@@ -53,7 +53,7 @@ export default class Search extends Component {
                   onChange={this.props.handleArchive}
                   checked={this.props.archives}
                 >
-                  <Translate value="Search.filters.archives" />
+                  <Translate value={`Search.filters.archive.${this.props.type}`} />
                 </Checkbox>
               ) : null}
               <Button

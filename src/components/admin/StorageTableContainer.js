@@ -87,6 +87,8 @@ export default class StorageTableContainer extends Component {
 
   getModal() {
     const { error, showModal } = this.state;
+    // eslint-disable-next-line max-len
+    const message = 'Êtes-vous certains de vouloir vider les caisses de rangement ? Ceci est IRRÉVERSIBLE. Ne le faîtes pas à moins d\'être certain de ne plus avoir besoin des caisses présentement enregistrées.';
 
     if (error) {
       return (
@@ -100,7 +102,7 @@ export default class StorageTableContainer extends Component {
 
     return showModal ? (
       <ConfirmModal
-        message={'Êtes-vous certains de vouloir vider les caisses de rangement ?'}
+        message={message}
         onCancel={() => this.setState({ showModal: false })}
         onConfirm={this.deleteStorage}
         title={'Vider les caisses de rangement'}

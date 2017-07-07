@@ -96,6 +96,8 @@ export default class ReservationTableContainer extends Component {
 
   getModal() {
     const { error, showModal } = this.state;
+    // eslint-disable-next-line max-len
+    const message = 'Êtes-vous certains de vouloir supprimer TOUTES les réservations ? Ceci est IRRÉVERSIBLE. Ne le faîtes pas à moins d\'être certain de ne pas avoir de réservation pour la session en cours.';
 
     if (error) {
       return (
@@ -109,7 +111,7 @@ export default class ReservationTableContainer extends Component {
 
     return showModal ? (
       <ConfirmModal
-        message={'Êtes-vous certains de vouloir supprimer toutes les réservations ?'}
+        message={message}
         onCancel={() => this.setState({ showModal: false })}
         onConfirm={this.deleteReservations}
         title={'Suppression des réservations'}

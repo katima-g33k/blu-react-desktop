@@ -78,9 +78,13 @@ const fr = {
   Search: {
     title: 'Recherche',
     filters: {
-      member: 'Member',
+      member: 'Membre',
       item: 'Ouvrage',
-      archive: 'Chercher dans les archives',
+      archive: {
+        item: 'Désuets/Retirés',
+        member: 'Désactivés',
+        parent: 'Désactivés',
+      },
     },
     loading: 'Chargement...',
     results: {
@@ -90,8 +94,8 @@ const fr = {
   },
   Sidebar: {
     search: 'Recherche',
-    member: 'Membre',
-    item: 'Ouvrage',
+    member: 'Nouveau Membre',
+    item: 'Nouvel Ouvrage',
     admin: 'Administration',
   },
   TableColumns: {
