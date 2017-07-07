@@ -25,6 +25,7 @@ export default class Search extends Component {
               <FormControl
                 type="search"
                 onChange={this.props.handleInput}
+                value={this.props.value}
               />
               {this.props.disableTypeSelection ? null : (
                 <FormGroup>
@@ -123,4 +124,5 @@ Search.propTypes = {
   search: React.PropTypes.string,
   tableOptions: React.PropTypes.shape(),
   type: React.PropTypes.string,
+  value: React.PropTypes.string,
 };

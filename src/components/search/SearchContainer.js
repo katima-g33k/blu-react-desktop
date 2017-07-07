@@ -63,7 +63,7 @@ export default class SearchContainer extends Component {
 
   search(event) {
     event.preventDefault();
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, search: this.state.search.trim() });
     const { archives, search, type } = this.state;
     const searchType = type === 'item' ? 'item' : 'member';
     const options = {};
@@ -126,6 +126,7 @@ export default class SearchContainer extends Component {
         search={this.state.search}
         tableOptions={this.tableOptions}
         type={type}
+        value={this.state.search}
       />
     );
   }
