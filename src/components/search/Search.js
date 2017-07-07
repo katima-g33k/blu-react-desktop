@@ -90,8 +90,10 @@ export default class Search extends Component {
                 columns={this.props.columns}
                 data={this.props.data}
                 highlight={this.props.search}
+                placeholder={'Aucune donnée'}
                 options={this.props.tableOptions}
                 striped
+                rowClass={() => 'search-result'}
               />
             )}
           </Col>

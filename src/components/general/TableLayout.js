@@ -27,7 +27,7 @@ export default class TableLayout extends Component {
         <Table
           columns={this.props.columns}
           data={this.props.data}
-          placeholder={this.props.placeholder || 'No Data'}
+          placeholder={this.props.placeholder || 'Aucune donnée'}
           striped
         />
         {this.props.modal}
