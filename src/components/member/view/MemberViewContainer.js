@@ -19,6 +19,7 @@ export default class MemberViewContainer extends Component {
     };
 
     this.getActions = this.getActions.bind(this);
+    this.getMember = this.getMember.bind(this);
     this.getModal = this.getModal.bind(this);
     this.pay = this.pay.bind(this);
     this.renewAccount = this.renewAccount.bind(this);
@@ -26,7 +27,15 @@ export default class MemberViewContainer extends Component {
   }
 
   componentWillMount() {
-    API.member.select(this.props.params.no, (error, res) => {
+    this.getMember(this.props.params.no);
+  }
+
+  componentWillReceiveProps(props) {
+    this.getMember(props.params.no);
+  }
+
+  getMember(no) {
+    API.member.select(no, (error, res) => {
       if (error) {
         this.setState({ error });
         return;
@@ -248,7 +257,7 @@ export default class MemberViewContainer extends Component {
         member={member}
         modal={this.getModal()}
         printReceipt={printReceipt}
-        onAfterPrint={() => this.setState({ amount: 0, printReceipt: false })}
+        onAfterPrint={() => this.setState({ printReceipt: false })}
       />
     ) : (<Spinner/>);
   }

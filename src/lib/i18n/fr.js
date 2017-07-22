@@ -78,11 +78,15 @@ const fr = {
   Search: {
     title: 'Recherche',
     filters: {
-      member: 'Member',
+      member: 'Membre',
       item: 'Ouvrage',
-      archive: 'Chercher dans les archives',
+      archive: {
+        item: 'Désuets/Retirés',
+        member: 'Désactivés',
+        parent: 'Désactivés',
+      },
     },
-    loading: 'Chargement...',
+    cancel: 'Annuler',
     results: {
       title: 'Résultats',
       none: 'Aucun résultat',

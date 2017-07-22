@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Alert, Col, Label, Panel, Row } from 'react-bootstrap';
+import { Alert, Col, Image, Label, Panel, Row } from 'react-bootstrap';
 import { I18n, Translate } from 'react-i18nify';
 
 import moment from 'moment';
@@ -11,6 +11,7 @@ import MemberCommentsContainer from './MemberCommentsContainer';
 import MemberReceipt from '../receipt/MemberReceipt';
 import ProfileStats from '../../general/ProfileStats';
 
+const dir = __dirname;
 const formatDate = (date) => {
   return date ? moment(new Date(date)).format('LL') : '';
 };
@@ -124,7 +125,7 @@ export default class MemberView extends Component {
 
   render() {
     const { actions, amount, member, modal, printReceipt, onAfterPrint } = this.props;
-    const { account, name, no } = member;
+    const { account, name, no, isParent } = member;
 
     return (
       <Row>
@@ -134,7 +135,15 @@ export default class MemberView extends Component {
             bsStyle={account.isActive ? 'default' : 'danger'}
           >
             {this.renderAlert()}
-            <h3>{name}</h3>
+            <h3>
+              {name}
+              {isParent && (
+                <Image
+                  src={`${dir === '/' ? '' : `${dir}/`}../../assets/images/logo_parents_etudiants.png`}
+                  style={{ height: '30px', border: 'none', marginLeft: '10px', marginBottom: '5px' }}
+                />
+              )}
+            </h3>
             <Row>
               <Col sm={12} md={6} style={border}>{this.renderGeneralInformation()}</Col>
               <Col sm={12} md={6}>{this.renderAccountState()}</Col>

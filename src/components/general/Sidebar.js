@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 
+import settings from '../../settings.json';
 import { Translate } from '../../lib/i18n/i18n';
 
 const links = [
@@ -17,11 +18,14 @@ const links = [
     key: 'member',
     href: '/member/add',
   },
-  {
+];
+
+if (settings.isAdmin) {
+  links.push({
     key: 'admin',
     href: '/admin',
-  },
-];
+  });
+}
 
 export default class Sidebar extends Component {
   constructor(props) {

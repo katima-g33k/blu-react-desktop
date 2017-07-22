@@ -21,6 +21,7 @@ export default class SearchContainer extends Component {
       type: props.type || 'member',
     };
 
+    this.cancelSearch = this.cancelSearch.bind(this);
     this.getModal = this.getModal.bind(this);
     this.handleArchive = this.handleArchive.bind(this);
     this.handleInput = this.handleInput.bind(this);
@@ -37,6 +38,11 @@ export default class SearchContainer extends Component {
       },
       noDataText: I18n.t('Search.results.none'),
     };
+  }
+
+  cancelSearch(event) {
+    event.preventDefault();
+    this.setState({ isLoading: false, data: [] });
   }
 
   getModal() {
@@ -57,7 +63,7 @@ export default class SearchContainer extends Component {
 
   search(event) {
     event.preventDefault();
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, search: this.state.search.trim() });
     const { archives, search, type } = this.state;
     const searchType = type === 'item' ? 'item' : 'member';
     const options = {};
@@ -70,6 +76,11 @@ export default class SearchContainer extends Component {
     }
 
     API[searchType].search(search, options, (error, res) => {
+      // If search was stopped by user
+      if (!this.state.isLoading) {
+        return;
+      }
+
       if (error) {
         this.setState({ error, isLoading: false });
         return;
@@ -102,6 +113,7 @@ export default class SearchContainer extends Component {
       <Search
         {...this.props}
         archives={this.state.archives}
+        cancelSearch={this.cancelSearch}
         columns={SearchColumns[type]}
         data={this.state.data || []}
         disableTypeSelection={!!this.props.type}
@@ -114,6 +126,7 @@ export default class SearchContainer extends Component {
         search={this.state.search}
         tableOptions={this.tableOptions}
         type={type}
+        value={this.state.search}
       />
     );
   }

@@ -4,5 +4,6 @@
   "barcode": {
     "firstChar": "à",
     "lastChar": "À"
-  }
+  },
+  "isAdmin": true
 }
