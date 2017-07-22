@@ -8,8 +8,8 @@ import MemberForm from './MemberForm';
 import memberFormSchema from './memberFormSchema';
 
 const removeEmptyPropperties = (data) => {
-  Object.keys(data).forEach(key => {
-    if (data[key] === null || typeof data[key] === 'boolean') {
+  Object.keys(data).forEach((key) => {
+    if (data[key] === null || (typeof data[key] === 'boolean' && key !== 'is_parent')) {
       delete data[key];
     } else if (typeof data[key] === 'string' && data[key] === '') {
       delete data[key];
@@ -117,6 +117,10 @@ export default class MemberFormContainer extends Component {
   save(member) {
     const { no } = this.props.params;
     const data = removeEmptyPropperties({ ...member });
+
+    if (data.zip) {
+      data.zip = data.zip.replace(/\s/g, '').toUpperCase();
+    }
 
     return no ? this.update(no, data) : this.insert(data);
   }

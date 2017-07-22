@@ -25,6 +25,7 @@ export default class Search extends Component {
               <FormControl
                 type="search"
                 onChange={this.props.handleInput}
+                value={this.props.value}
               />
               {this.props.disableTypeSelection ? null : (
                 <FormGroup>
@@ -53,16 +54,15 @@ export default class Search extends Component {
                   onChange={this.props.handleArchive}
                   checked={this.props.archives}
                 >
-                  <Translate value="Search.filters.archives" />
+                  <Translate value={`Search.filters.archive.${this.props.type}`} />
                 </Checkbox>
               ) : null}
               <Button
-                bsStyle="primary"
+                bsStyle={this.props.isLoading ? 'danger' : 'primary'}
                 type="submit"
-                disabled={this.props.isLoading}
-                onClick={!this.props.isLoading ? this.props.handleSearch : null}
+                onClick={!this.props.isLoading ? this.props.handleSearch : this.props.cancelSearch}
               >
-                <Translate value={this.props.isLoading ? 'Search.loading' : 'Search.title'} />
+                <Translate value={this.props.isLoading ? 'Search.cancel' : 'Search.title'} />
               </Button>
             </form>
           </Col>
@@ -91,8 +91,10 @@ export default class Search extends Component {
                 columns={this.props.columns}
                 data={this.props.data}
                 highlight={this.props.search}
+                placeholder={'Aucune donnée'}
                 options={this.props.tableOptions}
                 striped
+                rowClass={() => 'search-result'}
               />
             )}
           </Col>
@@ -105,6 +107,7 @@ export default class Search extends Component {
 
 Search.propTypes = {
   archives: React.PropTypes.bool,
+  cancelSearch: React.PropTypes.func,
   columns: React.PropTypes.array,
   data: React.PropTypes.array,
   disableArchive: React.PropTypes.bool,
@@ -114,11 +117,12 @@ Search.propTypes = {
   handleSearch: React.PropTypes.func,
   handleType: React.PropTypes.func,
   isLoading: React.PropTypes.bool,
-  modal: React.PropTypes.shape,
+  modal: React.PropTypes.shape(),
   noHeader: React.PropTypes.bool,
   onAddButton: React.PropTypes.func,
   onRowClick: React.PropTypes.func,
   search: React.PropTypes.string,
   tableOptions: React.PropTypes.shape(),
   type: React.PropTypes.string,
+  value: React.PropTypes.string,
 };

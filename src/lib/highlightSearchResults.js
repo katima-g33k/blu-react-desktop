@@ -4,7 +4,7 @@ const highlightSearchResults = (string, highlight) => {
     return string;
   }
 
-  const regex = new RegExp(`(${highlight})`, 'i');
+  const regex = new RegExp(`(${highlight}|${highlight.replace(/\s/, '|')})`, 'i');
   return string.split(regex).map(str => formatString(str, regex.test(str))).join('');
 };
 

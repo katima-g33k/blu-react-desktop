@@ -32,6 +32,7 @@ export default class ItemViewContainer extends Component {
       showModal: null,
     };
 
+    this.getItem = this.getItem.bind(this);
     this.decreaseStatus = this.decreaseStatus.bind(this);
     this.increaseStatus = this.increaseStatus.bind(this);
     this.reserve = this.reserve.bind(this);
@@ -44,7 +45,15 @@ export default class ItemViewContainer extends Component {
   }
 
   componentWillMount() {
-    API.item.select(this.props.params.id, {}, (error, res) => {
+    this.getItem(this.props.params.id);
+  }
+
+  componentWillReceiveProps(props) {
+    this.getItem(props.params.id);
+  }
+
+  getItem(id) {
+    API.item.select(id, {}, (error, res) => {
       if (error) {
         this.setState({ error });
         return;

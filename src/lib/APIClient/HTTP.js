@@ -47,7 +47,6 @@ const HTTP = {
 
   post: (url, data, callback = () => {}) => {
     HTTP.call('POST', url, data, (err, res) => {
-      console.log(err, res);
       callback(err, res);
     });
   },
