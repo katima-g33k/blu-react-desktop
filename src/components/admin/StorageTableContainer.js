@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 
-import { ConfirmModal } from '../general/modals';
-import HTTP from '../../lib/HTTP';
+import API from '../../lib/API';
+import { ConfirmModal, InformationModal } from '../general/modals';
 import Storage from '../../lib/models/Storage';
-import settings from '../../settings';
 import TableLayout from '../general/TableLayout';
 
 const actions = [
@@ -46,6 +45,7 @@ export default class StorageTableContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       storage: [],
       showModal: false,
     };
@@ -60,13 +60,13 @@ export default class StorageTableContainer extends Component {
   }
 
   componentWillMount() {
-    HTTP.post(`${settings.apiUrl}/storage/select`, {}, (err, res) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.storage.select((error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
-      const storage = Object.keys(res).map(key => {
+      const storage = Object.keys(res).map((key) => {
         const item = res[key].sort((a, b) => a.name < b.name ? -1 : 1);
         return new Storage({ no: key, item });
       });
@@ -75,9 +75,9 @@ export default class StorageTableContainer extends Component {
   }
 
   deleteStorage() {
-    HTTP.post(`${settings.apiUrl}/storage/delete`, {}, (err) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.storage.clear((error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -86,7 +86,19 @@ export default class StorageTableContainer extends Component {
   }
 
   getModal() {
-    return this.state.showModal ? (
+    const { error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    return showModal ? (
       <ConfirmModal
         message={'Êtes-vous certains de vouloir vider les caisses de rangement ?'}
         onCancel={() => this.setState({ showModal: false })}

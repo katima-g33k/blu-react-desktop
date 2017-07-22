@@ -19,14 +19,16 @@ For more information on the BLU, please refer to the [Student Council (AÉCS) we
 ### Setup development machine
 1. `git clone git@github.com:katima-g33k/blu-react-desktop.git`
 2. `cd blu-react-desktop`
-5. `meteor npm install`
-6. `meteor npm start`
+5. `yarn init-blu`
+6. `yarn start`
 
 ## Usage
 * Start app
-  * `npm start`
+  * `yarn start`
 * Build app
-  * `npm run build`
+  * `yarn run build`
+* Package app
+  * `electron-packager .`
 
 ## Documentation
 No documentation is available at the moment.

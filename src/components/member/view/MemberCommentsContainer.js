@@ -1,18 +1,18 @@
 import React, { Component } from 'react';
 import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
 
+import API from '../../../lib/API';
 import CommentColumns from './CommentColumns';
-import { ConfirmModal, InputModal } from '../../general/modals';
+import { ConfirmModal, InformationModal, InputModal } from '../../general/modals';
 import MemberComments from './MemberComments';
-import HTTP from '../../../lib/HTTP';
-import settings from '../../../settings.json';
 
 export default class MemberCommentContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      comments: props.comments || [],
       activeComment: null,
+      comments: props.comments || [],
+      error: null,
       showModal: null,
     };
 
@@ -54,31 +54,26 @@ export default class MemberCommentContainer extends Component {
 
   deleteComment(event) {
     event.preventDefault();
-    const id = this.state.activeComment.id;
+    const { id } = this.state.activeComment;
 
-    HTTP.post(`${settings.apiUrl}/comment/delete`, { id }, () => {
-      const comments = this.state.comments.filter((comment) => {
-        return comment.id !== id;
-      });
+    API.comment.delete(id, (error) => {
+      if (error) {
+        this.setState({ error, activeComment: null, showModal: null });
+        return;
+      }
 
       this.setState({
-        comments,
-        showModal: null,
         activeComment: null,
+        comments: this.state.comments.filter(comment => comment.id !== id),
+        showModal: null,
       });
     });
   }
 
   insertComment(value) {
-    const url = `${settings.apiUrl}/comment/insert`;
-    const data = {
-      comment: value,
-      member: this.props.member,
-    };
-
-    HTTP.post(url, data, (err, res) => {
-      if (err) {
-        // TODO: display error message
+    API.comment.insert(this.props.member, value, (error, res) => {
+      if (error) {
+        this.setState({ error, activeComment: null, showModal: null });
         return;
       }
 
@@ -93,7 +88,7 @@ export default class MemberCommentContainer extends Component {
       this.setState({
         comments,
         activeComment: null,
-        showModal: false,
+        showModal: null,
       });
     });
   }
@@ -105,40 +100,47 @@ export default class MemberCommentContainer extends Component {
   }
 
   updateComment(value) {
-    const url = `${settings.apiUrl}/comment/update`;
-    const data = {
-      comment: value,
-      id: this.state.activeComment.id,
-    };
-
-    HTTP.post(url, data, (err) => {
-      if (err) {
-        // TODO: display error message
+    API.comment.update(this.state.activeComment.id, value, (error) => {
+      if (error) {
+        this.setState({ error, activeComment: null, showModal: null });
         return;
       }
 
       const comments = this.state.comments;
       const currentComment = comments.find(comment => comment.id === this.state.activeComment.id);
+
       currentComment.comment = value;
       currentComment.updatedAt = new Date();
 
       this.setState({
         comments,
         activeComment: null,
-        showModal: false,
+        showModal: null,
       });
     });
   }
 
   getModal() {
-    switch (this.state.showModal) {
+    const { activeComment, error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
       case 'input':
         return (
           <InputModal
             message="Entrer le commentaire"
-            title={this.state.activeComment ? 'Modifier un commentaire' : 'Ajouter un commentaire'}
+            title={activeComment ? 'Modifier un commentaire' : 'Ajouter un commentaire'}
             textarea
-            value={this.state.activeComment ? this.state.activeComment.comment : ''}
+            value={activeComment ? activeComment.comment : ''}
             onSave={this.saveComment}
             onCancel={() => this.setState({ activeComment: null, showModal: null })}
           />
@@ -146,7 +148,7 @@ export default class MemberCommentContainer extends Component {
       case 'confirm':
         return (
           <ConfirmModal
-            message={`Souhaitez-vous vraiment supprimer ce commentaire : "${this.state.activeComment.comment}"`}
+            message={`Souhaitez-vous vraiment supprimer ce commentaire : "${activeComment.comment}"`}
             title="Supprimer un commentaire"
             onConfirm={this.deleteComment}
             onCancel={() => this.setState({ activeComment: null, showModal: null })}

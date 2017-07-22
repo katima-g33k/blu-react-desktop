@@ -3,10 +3,9 @@ import { Glyphicon, Label } from 'react-bootstrap';
 import { Link } from 'react-router';
 import moment from 'moment';
 
-import { ConfirmModal } from '../general/modals';
-import HTTP from '../../lib/HTTP';
+import API from '../../lib/API';
+import { ConfirmModal, InformationModal } from '../general/modals';
 import Reservation from '../../lib/models/Reservation';
-import settings from '../../settings';
 import TableLayout from '../general/TableLayout';
 
 const link = (href, label) => (<Link to={{ pathname: href }}>{label}</Link>);
@@ -58,6 +57,7 @@ export default class ReservationTableContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       reservations: [],
       showModal: false,
     };
@@ -72,9 +72,9 @@ export default class ReservationTableContainer extends Component {
   }
 
   componentWillMount() {
-    HTTP.post(`${settings.apiUrl}/reservation/select`, {}, (err, res) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.reservation.select((error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -84,9 +84,9 @@ export default class ReservationTableContainer extends Component {
   }
 
   deleteReservations() {
-    HTTP.post(`${settings.apiUrl}/reservation/deleteAll`, {}, (err) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.reservation.clear((error) => {
+      if (error) {
+        this.setState({ error, showModal: false });
         return;
       }
 
@@ -95,7 +95,19 @@ export default class ReservationTableContainer extends Component {
   }
 
   getModal() {
-    return this.state.showModal ? (
+    const { error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    return showModal ? (
       <ConfirmModal
         message={'Êtes-vous certains de vouloir supprimer toutes les réservations ?'}
         onCancel={() => this.setState({ showModal: false })}

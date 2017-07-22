@@ -3,27 +3,31 @@ import { Button, Glyphicon } from 'react-bootstrap';
 
 import AddCopies from './AddCopies';
 import addCopiesColums from './addCopiesColumns';
+import API from '../../../lib/API';
 import Copy from '../../../lib/models/Copy';
-import HTTP from '../../../lib/HTTP';
-import InputModal from '../../general/modals/InputModal';
-import settings from '../../../settings.json';
-import Transaction from '../../../lib/models/Transaction';
+import { InformationModal, InputModal } from '../../general/modals';
+import Item from '../../../lib/models/Item';
 import Member from '../../../lib/models/Member';
+import scanner from '../../../lib/Scanner';
+import Transaction from '../../../lib/models/Transaction';
 
 export default class AddCopiesContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
       copies: [],
+      ean13: null,
+      error: null,
       isSearch: true,
+      member: new Member({ no: props.params.no }),
       showModal: false,
-      member: new Member({ no: this.props.params.no }),
     };
 
     this.deleteCopy = this.deleteCopy.bind(this);
     this.closeModal = this.closeModal.bind(this);
     this.getActions = this.getActions.bind(this);
     this.getModal = this.getModal.bind(this);
+    this.onItemScan = this.onItemScan.bind(this);
     this.openModal = this.openModal.bind(this);
     this.save = this.save.bind(this);
     this.updatePrice = this.updatePrice.bind(this);
@@ -50,21 +54,28 @@ export default class AddCopiesContainer extends Component {
   }
 
   componentWillMount() {
-    const no = this.props.params.no;
-    HTTP.post(`${settings.apiUrl}/member/getName`, { no }, (err, res) => {
-      if (err) {
-        // TODO: Display erorr message
+    const { no } = this.props.params;
+
+    scanner.addListener('onItemScan', this.onItemScan);
+
+    API.member.getName(no, (error, res) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
-      this.setState({ member: new Member({ no, ...res }) });
+      this.setState({ member: new Member({ ...res, no }) });
     });
   }
 
+  componentWillUnmount() {
+    scanner.removeListener('onItemScan', this.onItemScan);
+  }
+
   deleteCopy(id) {
-    HTTP.post(`${settings.apiUrl}/copy/delete`, { id }, (err) => {
-      if (err) {
-        // TODO: Display error message
+    API.copy.delete(id, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -86,18 +97,43 @@ export default class AddCopiesContainer extends Component {
   }
 
   getModal() {
-    const isCopy = this.state.copy;
+    const { copy, error, item, showModal } = this.state;
 
-    return this.state.showModal && (
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    return showModal ? (
       <InputModal
         message={'Entrer le montant souhaité'}
         onCancel={this.closeModal}
-        onSave={isCopy ? this.updatePrice : this.save}
-        title={isCopy ? this.state.copy.item.name : this.state.item.name}
+        onSave={copy ? this.updatePrice : this.save}
+        title={copy ? copy.item.name : item.name}
         type="number"
-        value={isCopy && this.state.copy.price}
+        value={copy && this.state.copy.price}
       />
-    );
+    ) : null;
+  }
+
+  onItemScan(ean13) {
+    API.item.select(ean13, { forCopy: true }, (error, res) => {
+      if (error) {
+        this.setState({ error });
+        return;
+      }
+
+      if (res.id) {
+        this.openModal({ item: new Item(res) });
+      } else {
+        this.setState({ ean13, isSearch: false });
+      }
+    });
   }
 
   openModal(data = {}) {
@@ -106,16 +142,12 @@ export default class AddCopiesContainer extends Component {
 
   save(event, value) {
     const price = parseInt(value, 10);
-    const data = {
-      member_no: this.props.params.no,
-      item_id: this.state.item.id,
-      price,
-    };
+    const memberNo = this.props.params.no;
+    const itemId = this.state.item.id;
 
-    HTTP.post(`${settings.apiUrl}/copy/insert`, data, (err, res) => {
-      if (err) {
-        this.closeModal();
-        // TODO: Display error message
+    API.copy.insert(memberNo, itemId, price, (error, res) => {
+      if (error) {
+        this.closeModal({ error });
         return;
       }
 
@@ -142,38 +174,37 @@ export default class AddCopiesContainer extends Component {
 
   updatePrice(event, value) {
     const price = parseInt(value, 10);
-    const currentCopy = this.state.copy;
-    const data = {
-      id: currentCopy.id,
-      price,
-    };
+    const { id } = this.state.copy.currentCopy;
 
-    HTTP.post(`${settings.apiUrl}/copy/update`, data, (err) => {
-      if (err) {
-        this.closeModal();
-        // TODO: Display error message
+    API.copy.update(id, price, (error) => {
+      if (error) {
+        this.closeModal({ error });
         return;
       }
 
-      const copies = this.state.copies;
-      copies.find(copy => copy.id === currentCopy.id).price = price;
+      const { copies } = this.state;
+      copies.find(copy => copy.id === id).price = price;
       this.closeModal({ copies });
     });
   }
 
   render() {
+    const { columns, getActions, getModal, openModal, props } = this;
+    const { copies, ean13, isSearch, member } = this.state;
+
     return (
       <AddCopies
-        {...this.props}
-        actions={this.getActions()}
-        columns={this.columns}
-        data={this.state.copies}
-        isSearch={this.state.isSearch}
-        member={this.state.member}
-        modal={this.getModal()}
+        {...props}
+        actions={getActions()}
+        columns={columns}
+        data={copies}
+        ean13={ean13}
+        isSearch={isSearch}
+        member={member}
+        modal={getModal()}
         onAddButton={() => this.setState({ isSearch: false })}
-        openModal={this.openModal}
-        onFormSave={this.openModal}
+        openModal={openModal}
+        onFormSave={openModal}
         onFormCancel={() => this.setState({ isSearch: true })}
       />
     );

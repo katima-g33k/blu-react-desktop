@@ -8,6 +8,7 @@ export default class Account {
     this.last_activity = account.last_activity;
     this.comment = account.comment ? account.comment.map(comment => new Comment(comment)) : [];
     this.copies = account.copies ? account.copies.map(copy => new Copy(copy)) : [];
+    this.transfers = account.transfers || [];
   }
 
   get deactivationDate() {

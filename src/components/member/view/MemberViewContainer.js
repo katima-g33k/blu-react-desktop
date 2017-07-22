@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 
+import API from '../../../lib/API';
 import { ConfirmModal, InformationModal } from '../../general/modals';
-import HTTP from '../../../lib/HTTP';
 import Member from '../../../lib/models/Member';
 import MemberView from './MemberView';
-import settings from '../../../settings.json';
 import Spinner from '../../general/Spinner';
 import Transaction from '../../../lib/models/Transaction';
 
@@ -12,33 +11,29 @@ export default class MemberViewContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      amount: 0,
+      error: null,
       member: null,
+      printReceipt: false,
       showModal: null,
     };
 
     this.getActions = this.getActions.bind(this);
     this.getModal = this.getModal.bind(this);
     this.pay = this.pay.bind(this);
-    this.printReceipt = this.printReceipt.bind(this);
     this.renewAccount = this.renewAccount.bind(this);
     this.transferAccount = this.transferAccount.bind(this);
   }
 
   componentWillMount() {
-    const url = `${settings.apiUrl}/member/select`;
-    const data = {
-      no: this.props.params.no,
-    };
-
-    HTTP.post(url, data, (err, res) => {
-      if (res) {
-        this.setState({ member: new Member(res) });
+    API.member.select(this.props.params.no, (error, res) => {
+      if (error) {
+        this.setState({ error });
+        return;
       }
-    });
-  }
 
-  printReceipt() {
-    window.open(`/member/receipt/${this.props.params.no}`, '_blank').focus();
+      this.setState({ member: new Member(res) });
+    });
   }
 
   getActions() {
@@ -75,7 +70,7 @@ export default class MemberViewContainer extends Component {
         style: 'primary',
         onClick: event => {
           event.preventDefault();
-          this.printReceipt();
+          this.setState({ printReceipt: true });
         },
       },
     ];
@@ -102,29 +97,35 @@ export default class MemberViewContainer extends Component {
     return generalActions.concat(this.state.member.account.isActive ? activeActions : inactiveActions);
   }
 
-  pay() {
-    const member = this.state.member;
-    const data = { no: member.no };
+  pay(callback = () => {}) {
+    let amount = 0;
+    const { member } = this.state;
 
-    HTTP.post(`${settings.apiUrl}/member/pay`, data, (err) => {
-      if (err) {
-        // TODO: display error message
+    API.member.pay(member.no, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
       this.renewAccount();
-      member.account.copies.forEach(copy => copy.isSold && copy.pay());
-      this.setState({ member, showModal: 'paySuccessfull' });
+      member.account.copies.forEach((copy) => {
+        if (copy.isSold) {
+          amount += +copy.price;
+          copy.pay();
+        }
+      });
+
+      this.setState({ amount, member, showModal: 'paySuccessfull' });
+      callback();
     });
   }
 
   renewAccount() {
-    const member = this.state.member;
-    const data = { no: member.no };
+    const { member } = this.state;
 
-    HTTP.post(`${settings.apiUrl}/member/renew`, data, (err) => {
-      if (err) {
-        // TODO: display error message
+    API.member.renew(member.no, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -137,15 +138,12 @@ export default class MemberViewContainer extends Component {
     const member = this.state.member;
     const copies = member.account.getAddedCopies();
     copies.push(...member.account.getSoldCopies());
-    const data = {
-      copies: copies.map(copy => copy.id),
-      member: member.no,
-      type: Transaction.TYPES.DONATE,
-    };
 
-    HTTP.post(`${settings.apiUrl}/transaction/insert`, data, (err) => {
-      if (err) {
-        // TODO: display error message
+    const copyIDs = copies.map(copy => copy.id);
+
+    API.transaction.insert(member.no, copyIDs, Transaction.TYPES.DONATE, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
@@ -155,7 +153,19 @@ export default class MemberViewContainer extends Component {
   }
 
   getModal() {
-    switch (this.state.showModal) {
+    const { error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
       case 'pay':
         return (
           <ConfirmModal
@@ -167,8 +177,7 @@ export default class MemberViewContainer extends Component {
               {
                 label: 'Imprimer un reçu',
                 onClick: () => {
-                  this.pay();
-                  this.printReceipt();
+                  this.pay(() => this.setState({ printReceipt: true }));
                 },
               },
               {
@@ -181,10 +190,11 @@ export default class MemberViewContainer extends Component {
           />
         );
       case 'paySuccessfull':
+        const { amount } = this.state;
         return (
           <InformationModal
-            message="L'argent a été remis avec succès"
-            onClick={() => this.setState({ showModal: null })}
+            message={`Le montant de ${amount} $  a été remis avec succès`}
+            onClick={() => this.setState({ amount: 0, showModal: null })}
             title="Argent remis"
           />
         );
@@ -229,11 +239,16 @@ export default class MemberViewContainer extends Component {
   }
 
   render() {
-    return this.state.member ? (
+    const { amount, member, printReceipt } = this.state;
+
+    return member ? (
       <MemberView
         actions={this.getActions()}
-        member={this.state.member}
+        amount={amount}
+        member={member}
         modal={this.getModal()}
+        printReceipt={printReceipt}
+        onAfterPrint={() => this.setState({ amount: 0, printReceipt: false })}
       />
     ) : (<Spinner/>);
   }
