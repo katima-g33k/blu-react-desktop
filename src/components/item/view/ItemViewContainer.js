@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import moment from 'moment';
 
-import HTTP from '../../../lib/HTTP';
-import { ConfirmModal, InputModal, SearchModal } from '../../general/modals';
+import API from '../../../lib/API';
+import { ConfirmModal, InformationModal, InputModal, SearchModal } from '../../general/modals';
 import Member from '../../../lib/models/Member';
 import Item from '../../../lib/models/Item';
 import ItemView from './ItemView';
-import settings from '../../../settings';
 import Spinner from '../../general/Spinner';
 
 const status = {
@@ -28,6 +27,7 @@ export default class ItemViewContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      error: null,
       item: null,
       showModal: null,
     };
@@ -44,14 +44,13 @@ export default class ItemViewContainer extends Component {
   }
 
   componentWillMount() {
-    const data = {
-      id: this.props.params.id,
-    };
-
-    HTTP.post(`${settings.apiUrl}/item/select`, data, (err, res) => {
-      if (res) {
-        this.setState({ item: new Item(res) });
+    API.item.select(this.props.params.id, {}, (error, res) => {
+      if (error) {
+        this.setState({ error });
+        return;
       }
+
+      this.setState({ item: new Item(res) });
     });
   }
 
@@ -78,19 +77,15 @@ export default class ItemViewContainer extends Component {
   }
 
   renewParentAccount(no) {
-    HTTP.post(`${settings.apiUrl}/member/renew`, { no });
+    API.member.renew(no);
   }
 
   reserve(parent) {
-    const item = this.state.item;
-    const data = {
-      member: parent.no,
-      item: item.id,
-    };
+    const { item } = this.state;
 
-    HTTP.post(`${settings.apiUrl}/reservation/insert`, data, (err, res) => {
-      if (err) {
-        // TODO: Display error message
+    API.reservation.insert(parent.no, item.id, (error, res) => {
+      if (error) {
+        this.setState({ error, showModal: null });
         return;
       }
 
@@ -107,18 +102,13 @@ export default class ItemViewContainer extends Component {
   }
 
   updateStatus(newStatus) {
-    const data = {
-      id: this.props.params.id,
-      status: newStatus,
-    };
-
-    HTTP.post(`${settings.apiUrl}/item/updateStatus`, data, (err) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.item.updateStatus(this.props.params.id, newStatus, (error) => {
+      if (error) {
+        this.setState({ error });
         return;
       }
 
-      const item = this.state.item;
+      const { item } = this.state;
       item.updateStatus(newStatus);
       this.setState({ item });
     });
@@ -126,18 +116,14 @@ export default class ItemViewContainer extends Component {
 
   updateStorage(event, value) {
     const storage = value.replace(/\D+/g, ' ').split(/\D/).sort((a, b) => a - b);
-    const data = {
-      id: this.props.params.id,
-      storage,
-    };
 
-    HTTP.post(`${settings.apiUrl}/item/update_storage`, data, (err) => {
-      if (err) {
-        // TODO: Display erorr message
+    API.item.updateStorage(this.props.params.id, storage, (error) => {
+      if (error) {
+        this.setState({ error, showModal: null });
         return;
       }
 
-      const item = this.state.item;
+      const { item } = this.state;
       item.storage = storage;
       this.setState({ item, showModal: null });
     });
@@ -185,7 +171,19 @@ export default class ItemViewContainer extends Component {
   }
 
   getModal() {
-    switch (this.state.showModal) {
+    const { error, item, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
       case 'reserve':
         return (
           <SearchModal
@@ -211,7 +209,7 @@ export default class ItemViewContainer extends Component {
             onCancel={() => this.setState({ showModal: null })}
             onSave={this.updateStorage}
             title={'Modifier les caisses de rangements'}
-            value={this.state.item.storage.join('; ')}
+            value={item.storage.join('; ')}
           />
         );
       default:

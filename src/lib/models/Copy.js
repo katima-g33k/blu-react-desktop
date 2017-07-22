@@ -1,13 +1,14 @@
+import Item from './Item';
 import Member from './Member';
 import Transaction from './Transaction';
 
 export default class Copy {
-  constructor(copy) {
-    this.id = copy.id || 0;
-    this.price = copy.price || 0;
-    this.transaction = copy.transaction ? copy.transaction.map(t => new Transaction(t)) : [];
-    this.item = copy.item;
-    this.member = copy.member ? new Member(copy.member) : null;
+  constructor({ id = 0, price = 0, transaction = [], item, member }) {
+    this.id = id;
+    this.price = price;
+    this.transaction = transaction.map(t => new Transaction(t));
+    this.item = item ? new Item(item) : null;
+    this.member = member ? new Member(member) : null;
   }
 
   get priceString() {

@@ -1,3 +1,7 @@
-node_modules
-.vscode
 *.log
+.vscode
+blu-react-desktop-*
+build/*
+dist/*
+node_modules
+settings.json

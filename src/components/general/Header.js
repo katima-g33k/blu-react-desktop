@@ -1,14 +1,17 @@
 import React, { Component } from 'react';
 import { Col, Image, Row } from 'react-bootstrap';
 
-import logo from '../../../public/logo_blu.svg';
+const dir = __dirname;
 
 export default class Header extends Component {
   render() {
     return (
       <Row componentClass="header">
         <Col md={1}>
-          <Image src={logo} thumbnail />
+           <Image
+            src={`${dir === '/' ? '' : `${dir}/`}../../assets/images/logo_blu.svg`}
+            thumbnail
+          />
         </Col>
       </Row>
     );

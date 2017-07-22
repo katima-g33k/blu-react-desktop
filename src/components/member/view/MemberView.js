@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Label, Panel, Row } from 'react-bootstrap';
+import { Alert, Col, Label, Panel, Row } from 'react-bootstrap';
 import { I18n, Translate } from 'react-i18nify';
 
 import moment from 'moment';
@@ -8,6 +8,7 @@ import ActionPanel from '../../general/ActionPanel';
 import AlignedData from '../../general/AlignedData';
 import CopyTableContainer from '../../copy/table/CopyTableContainer';
 import MemberCommentsContainer from './MemberCommentsContainer';
+import MemberReceipt from '../receipt/MemberReceipt';
 import ProfileStats from '../../general/ProfileStats';
 
 const formatDate = (date) => {
@@ -23,6 +24,7 @@ export default class MemberView extends Component {
     super(props);
 
     this.renderAccountState = this.renderAccountState.bind(this);
+    this.renderAlert = this.renderAlert.bind(this);
     this.renderGeneralInformation = this.renderGeneralInformation.bind(this);
     this.renderPhones = this.renderPhones.bind(this);
     this.renderStats = this.renderStats.bind(this);
@@ -52,10 +54,20 @@ export default class MemberView extends Component {
           value={formatDate(account.lastActivity)}
         />
         <AlignedData
-          label={<Translate value="MemberView.account.registration" />}
+          label={<Translate value="MemberView.account.deactivation" />}
           value={formatDate(account.deactivationDate)}
         />
       </section>
+    );
+  }
+
+  renderAlert() {
+    const transfers = this.props.member.account.transfers;
+    const dates = transfers.map(date => moment(date).format('LL')).join('');
+    return transfers.length > 0 && (
+      <Alert bsStyle="warning">
+        {`Ce compte a été transféré à la BLU ${transfers.length === 1 ? 'le' : 'les'} ${dates}`}
+      </Alert>
     );
   }
 
@@ -111,16 +123,18 @@ export default class MemberView extends Component {
   }
 
   render() {
+    const { actions, amount, member, modal, printReceipt, onAfterPrint } = this.props;
+    const { account, name, no } = member;
+
     return (
       <Row>
         <Col md={10}>
           <Panel
             header={I18n.t('MemberView.title')}
-            bsStyle={this.props.member.account.isActive ? 'default' : 'danger'}
+            bsStyle={account.isActive ? 'default' : 'danger'}
           >
-            <h3>
-              {this.props.member.name}
-            </h3>
+            {this.renderAlert()}
+            <h3>{name}</h3>
             <Row>
               <Col sm={12} md={6} style={border}>{this.renderGeneralInformation()}</Col>
               <Col sm={12} md={6}>{this.renderAccountState()}</Col>
@@ -130,8 +144,8 @@ export default class MemberView extends Component {
               <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
               <Col sm={12} md={6}>
                 <MemberCommentsContainer
-                  member={this.props.member.no}
-                  comments={this.props.member.account.comment}
+                  member={no}
+                  comments={account.comment}
                 />
               </Col>
             </Row>
@@ -139,17 +153,24 @@ export default class MemberView extends Component {
             <Row>
               <Col md={12}>
                 <CopyTableContainer
-                  member={this.props.member.no}
-                  copies={this.props.member.account.copies.filter(copy => !copy.isDonated)}
+                  member={no}
+                  copies={account.copies.filter(copy => !copy.isDonated)}
                 />
               </Col>
             </Row>
           </Panel>
         </Col>
         <Col md={2}>
-          <ActionPanel actions={this.props.actions} />
+          <ActionPanel actions={actions} />
         </Col>
-        {this.props.modal}
+        {modal}
+        {printReceipt && (
+          <MemberReceipt
+            amount={amount}
+            member={member}
+            onAfterPrint={onAfterPrint}
+          />
+        )}
       </Row>
     );
   }
@@ -157,6 +178,9 @@ export default class MemberView extends Component {
 
 MemberView.propTypes = {
   actions: React.PropTypes.array,
+  amount: React.PropTypes.number,
   member: React.PropTypes.shape(),
   modal: React.PropTypes.shape(),
+  printReceipt: React.PropTypes.bool.isRequired,
+  onAfterPrint: React.PropTypes.func,
 };

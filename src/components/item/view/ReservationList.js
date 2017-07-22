@@ -3,11 +3,10 @@ import { Button, Glyphicon, Label } from 'react-bootstrap';
 import { Link } from 'react-router';
 import moment from 'moment';
 
-import { ConfirmModal } from '../../general/modals';
-import HTTP from '../../../lib/HTTP';
-import settings from '../../../settings';
-import Transaction from '../../../lib/models/Transaction';
+import API from '../../../lib/API';
+import { ConfirmModal, InformationModal } from '../../general/modals';
 import TableLayout from '../../general/TableLayout';
+import Transaction from '../../../lib/models/Transaction';
 
 const link = (href, label) => (<Link to={{ pathname: href }}>{label}</Link>);
 
@@ -51,6 +50,7 @@ export default class ReservationList extends Component {
     super(props);
     this.state = {
       activeReservation: null,
+      error: null,
       showModal: null,
     };
 
@@ -77,18 +77,9 @@ export default class ReservationList extends Component {
   deleteReservation() {
     const reservation = this.state.activeReservation;
     const { copy, item, parent } = reservation;
-    const object = copy ? 'transaction' : 'reservation';
-    const data = copy ? {
-      copy: copy.id,
-      type: Transaction.TYPES.RESERVE,
-    } : {
-      member: parent.no,
-      item: item.id,
-    };
-
-    HTTP.post(`${settings.apiUrl}/${object}/delete`, data, (err) => {
-      if (err) {
-        // TODO: Display error message
+    const onDelete = (error) => {
+      if (error) {
+        this.setState({ error, activeReservation: null, showModal: null });
         return;
       }
 
@@ -97,13 +88,31 @@ export default class ReservationList extends Component {
       if (this.props.onReservationDeleted) {
         this.props.onReservationDeleted(reservation);
       }
-    });
+    };
+
+    if (copy) {
+      API.transaction.delete(copy.id, Transaction.TYPES.RESERVE, onDelete);
+    } else {
+      API.reservation.delete(parent.no, item.id, onDelete);
+    }
   }
 
   getModal() {
-    switch (this.state.showModal) {
+    const { activeReservation, error, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={() => this.setState({ error: null })}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
       case 'delete':
-        const { name } = this.state.activeReservation.parent;
+        const { name } = activeReservation.parent;
 
         return (
           <ConfirmModal
