@@ -43,7 +43,20 @@ const links = [
 if (settings.isAdmin) {
   links.push({
     key: 'admin',
-    href: '/admin',
+    children: [
+      {
+        key: 'admin_reservations',
+        href: '/admin/reservations',
+      },
+      {
+        key: 'admin_storage',
+        href: '/admin/storage',
+      },
+      {
+        key: 'admin_statistics',
+        href: 'admin/statistics',
+      },
+    ],
   });
 }
 
