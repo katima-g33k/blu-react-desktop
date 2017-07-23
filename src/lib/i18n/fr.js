@@ -95,7 +95,12 @@ const fr = {
   Sidebar: {
     search: 'Recherche',
     member: 'Membre',
+    member_form: 'Formulaire de membre',
+    member_view: 'Fiche de membre',
+    member_copies: 'Ajout d\'exemplaires',
     item: 'Ouvrage',
+    item_form: 'Formulaire d\'ouvrage',
+    item_view: 'Fiche d\'ouvrage',
     admin: 'Administration',
   },
   TableColumns: {

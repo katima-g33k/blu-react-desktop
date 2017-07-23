@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
+
 import { browserHistory } from 'react-router';
 
 import settings from '../../settings.json';
@@ -12,11 +13,30 @@ const links = [
   },
   {
     key: 'item',
-    href: '/item/add',
+    children: [
+      {
+        key: 'item_form',
+        href: '/item/add',
+      },
+      {
+        key: 'item_view',
+      },
+    ],
   },
   {
     key: 'member',
-    href: '/member/add',
+    children: [
+      {
+        key: 'member_form',
+        href: '/member/add',
+      },
+      {
+        key: 'member_view',
+      },
+      {
+        key: 'member_copies',
+      },
+    ],
   },
 ];
 
@@ -35,6 +55,7 @@ export default class Sidebar extends Component {
     };
 
     this.isCurrentLocation = this.isCurrentLocation.bind(this);
+    this.getList = this.getList.bind(this);
   }
 
   componentDidMount() {
@@ -45,24 +66,64 @@ export default class Sidebar extends Component {
     });
   }
 
-  isCurrentLocation(key) {
-    return (new RegExp(key)).test(this.state.location);
+  isCurrentLocation(key, href) {
+    const { location } = this.state;
+    return location.includes(href) || location.includes(key.replace(/_/g, '/'));
+  }
+
+  getList(data) {
+    return data.map(({ children, key, href }) => {
+      if (children) {
+        return (
+          <li
+            key={key}
+            style={{
+              margin: '10px 0',
+              paddingLeft: '10px',
+            }}
+          >
+            <Translate value={`Sidebar.${key}`} />
+            <ul style={{ listStyle: 'none' }}>
+              {this.getList(children)}
+            </ul>
+            <hr/>
+          </li>
+        );
+      }
+
+      const isCurrentLocation = this.isCurrentLocation(key, href);
+      const onClick = () => {
+        if (href) {
+          browserHistory.push(href);
+        }
+      };
+      return (
+        <li
+          key={key}
+          onClick={onClick}
+          style={{
+            cursor: href ? 'pointer' : 'default',
+            padding: '10px',
+            backgroundColor: isCurrentLocation ? '#F5F5F5' : '#FFF',
+            fontWeight: isCurrentLocation ? 'bold' : 'normal',
+          }}
+        >
+          <Translate value={`Sidebar.${key}`} />
+          {data === links && <hr/>}
+        </li>
+      );
+    });
   }
 
   render() {
     return (
-      <Row>
-        <Col>
-          {links.map(({ href, key }) => (
-            <Button
-              block
-              bsSize="large"
-              bsStyle={this.isCurrentLocation(key) ? 'primary' : 'default'}
-              key={`nav_${key}`}
-              onClick={() => browserHistory.push(href)}>
-                <Translate value={`Sidebar.${key}`} />
-            </Button>
-          ))}
+      <Row componentClass='nav'>
+        <Col
+          md={12}
+          componentClass='ul'
+          style={{ listStyle: 'none', fontSize: '1.1em', padding: '20px' }}
+        >
+          {this.getList(links)}
         </Col>
       </Row>
     );
