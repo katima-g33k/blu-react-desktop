@@ -4,13 +4,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 
+import 'react-datepicker/dist/react-datepicker.css';
+import './lib/semester';
+
 import App from './App';
 
 moment.locale('fr');
-moment.semester = () => {
-  const session = moment().get('month') < 7 ? 'hiver' : 'automne';
-  return `Session ${session} ${moment().get('y')}`;
-};
 
 ReactDOM.render(
   <App />,

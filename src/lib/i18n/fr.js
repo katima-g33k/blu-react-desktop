@@ -1,6 +1,9 @@
 const fr = {
   Admin: {
     title: 'Administration',
+    statistics: {
+      title: 'Statistiques',
+    },
   },
   ItemForm: {
     title: 'Formulaire de l\'ouvrage',

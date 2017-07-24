@@ -111,6 +111,12 @@ export default class APIClient {
       },
     };
 
+    this.statistics = {
+      byInterval: (startDate, endDate, callback) => {
+        HTTP.post(`${this.url}/statistics/byInterval`, { startDate, endDate }, callback);
+      },
+    };
+
     this.storage = {
       clear: (callback) => {
         HTTP.post(`${this.url}/storage/delete`, {}, callback);

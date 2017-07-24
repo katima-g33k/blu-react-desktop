@@ -54,7 +54,7 @@ if (settings.isAdmin) {
       },
       {
         key: 'admin_statistics',
-        href: 'admin/statistics',
+        href: '/admin/statistics',
       },
     ],
   });
