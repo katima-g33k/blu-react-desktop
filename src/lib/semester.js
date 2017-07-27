@@ -36,19 +36,33 @@ function getSemesterList() {
   return semesters;
 }
 
-moment.semester = (data) => {
+moment.semester = (query, data) => {
   const year = moment().get('y');
-  switch (data) {
+  switch (query) {
     case 'start':
+      if (data) {
+        const month = data.substr(0, 1) === 'H' ? '01' : '08';
+        return moment(`${data.substr(1)}-${month}`, 'YY-MM');
+      }
       return moment(`${year}-${moment().get('month') < 7 ? '01' : '08'}-01`);
     case 'end':
+      if (data) {
+        const month = data.substr(0, 1) === 'H' ? '07' : '12';
+        return moment(`${data.substr(1)}-${month}`, 'YY-MM');
+      }
       return moment(`${year}-${moment().get('month') < 7 ? '07' : '12'}-31`);
     case 'list':
       return getSemesterList();
     case 'code':
+      if (data) {
+        return `${data.get('month') < 7 ? 'H' : 'A'}${data.format('YY')}`;
+      }
       return `${moment().get('month') < 7 ? 'H' : 'A'}${moment().format('YY')}`;
     case 'name':
     default:
+      if (data) {
+        return `${data.get('month') < 7 ? 'H' : 'A'}${data.format('YY')}`;
+      }
       return `Session ${moment().get('month') < 7 ? 'hiver' : 'automne'} ${year}`;
   }
 };
