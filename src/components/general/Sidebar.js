@@ -56,6 +56,10 @@ if (settings.isAdmin) {
         key: 'admin_statistics',
         href: '/admin/statistics',
       },
+      {
+        key: 'admin_employees',
+        href: '/admin/employees',
+      },
     ],
   });
 }

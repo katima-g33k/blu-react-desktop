@@ -343,7 +343,7 @@ export default class AutoForm extends Component {
           {this.state.schema.title}
         </Col>
         {this.renderSections(sections)}
-        <ButtonToolbar>
+        <ButtonToolbar style={{ float: 'right' }}>
           <Button onClick={onCancel}>
             {'Annuler'}
           </Button>

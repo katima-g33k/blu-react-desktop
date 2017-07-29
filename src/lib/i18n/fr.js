@@ -4,6 +4,9 @@ const fr = {
     statistics: {
       title: 'Statistiques',
     },
+    employees: {
+      title: 'Gestion des employé.e.s',
+    },
   },
   ItemForm: {
     title: 'Formulaire de l\'ouvrage',
@@ -105,6 +108,7 @@ const fr = {
     item_form: 'Formulaire d\'ouvrage',
     item_view: 'Fiche d\'ouvrage',
     admin: 'Administration',
+    admin_employees: 'Employé.e.s',
     admin_reservations: 'Réservations',
     admin_storage: 'Caisses de rangement',
     admin_statistics: 'Statistiques',
