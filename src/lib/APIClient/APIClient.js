@@ -38,6 +38,21 @@ export default class APIClient {
       },
     };
 
+    this.employee = {
+      delete: (id, callback) => {
+        HTTP.post(`${this.url}/employee/delete`, { id }, callback);
+      },
+      insert: (employee, callback) => {
+        HTTP.post(`${this.url}/employee/insert`, employee, callback);
+      },
+      list: (callback) => {
+        HTTP.post(`${this.url}/employee/list`, {}, callback);
+      },
+      update: (id, employee, callback) => {
+        HTTP.post(`${this.url}/employee/update`, { id, employee }, callback);
+      },
+    };
+
     this.item = {
       exists: (ean13, callback) => {
         HTTP.post(`${this.url}/item/exists`, { ean13 }, callback);
