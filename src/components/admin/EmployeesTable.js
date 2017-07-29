@@ -35,6 +35,11 @@ const columns = [
       </Label>
     ),
   },
+  {
+    dataField: 'actions',
+    label: 'Actions',
+    width: '95px',
+  },
 ];
 
 const schema = {
@@ -75,6 +80,7 @@ const schema = {
           type: 'password',
           label: 'Mot de passe',
           required: true,
+          disabled: true,
           inputWidth: {
             md: 8,
             sm: 10,
@@ -88,6 +94,7 @@ const schema = {
           type: 'password',
           label: 'Confirmer',
           required: true,
+          disabled: true,
           inputWidth: {
             md: 8,
             sm: 10,
@@ -112,14 +119,14 @@ export default class EmployeesTable extends Component {
 
     this.delete = this.delete.bind(this);
     this.insert = this.insert.bind(this);
-    this.update = this.update.bind(this);
     this.save = this.save.bind(this);
+    this.update = this.update.bind(this);
     this.getRowActions = this.getRowActions.bind(this);
     this.getTableActions = this.getTableActions.bind(this);
     this.renderModal = this.renderModal.bind(this);
 
     this.columns = columns;
-    this.columns.push(this.getRowActions());
+    this.columns.find(column => column.dataField === 'actions').dataFormat = this.getRowActions();
 
     this.schema = schema;
     const setPassword = this.schema.sections[0].fields.find(field => field.key === 'setPassword');
@@ -193,31 +200,25 @@ export default class EmployeesTable extends Component {
   }
 
   getRowActions() {
-    return {
-      dataField: 'actions',
-      label: 'Actions',
-      dataFormat: (field, employee) => {
-        return (
-          <ButtonGroup>
-            <Button
-              bsStyle='primary'
-              onClick={() => this.setState({
-                currentEmployee: { ...employee },
-                showModal: 'update',
-              })}
-            >
-              <Glyphicon glyph="pencil" />
-            </Button>
-            <Button
-              bsStyle='danger'
-              onClick={() => this.setState({ currentEmployee: employee, showModal: 'delete' })}
-            >
-              <Glyphicon glyph="trash" />
-            </Button>
-          </ButtonGroup>
-        );
-      },
-    };
+    return (field, employee) => (
+      <ButtonGroup>
+        <Button
+          bsStyle='primary'
+          onClick={() => this.setState({
+            currentEmployee: { ...employee },
+            showModal: 'update',
+          })}
+        >
+          <Glyphicon glyph="pencil" />
+        </Button>
+        <Button
+          bsStyle='danger'
+          onClick={() => this.setState({ currentEmployee: employee, showModal: 'delete' })}
+        >
+          <Glyphicon glyph="trash" />
+        </Button>
+      </ButtonGroup>
+    );
   }
 
   getTableActions() {
@@ -264,7 +265,7 @@ export default class EmployeesTable extends Component {
             data={currentEmployee}
             onCancel={() => this.setState({ currentEmployee: null, showModal: null })}
             onSave={this.save}
-            schema={schema}
+            schema={this.schema}
             title={`${currentEmployee.id ? 'Modifier' : 'Ajouter'} un.e employé.e` }
           />
         );
