@@ -1,6 +1,9 @@
 const fr = {
   Admin: {
     title: 'Administration',
+    statistics: {
+      title: 'Statistiques',
+    },
   },
   ItemForm: {
     title: 'Formulaire de l\'ouvrage',
@@ -102,6 +105,9 @@ const fr = {
     item_form: 'Formulaire d\'ouvrage',
     item_view: 'Fiche d\'ouvrage',
     admin: 'Administration',
+    admin_reservations: 'Réservations',
+    admin_storage: 'Caisses de rangement',
+    admin_statistics: 'Statistiques',
   },
   TableColumns: {
     search: {

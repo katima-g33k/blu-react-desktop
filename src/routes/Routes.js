@@ -8,6 +8,7 @@ import ItemViewContainer from '../components/item/view/ItemViewContainer';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
 import MemberViewContainer from '../components/member/view/MemberViewContainer';
 import SearchContainer from '../components/search/SearchContainer';
+import Statistics from '../components/admin/Statistics';
 
 export default class Routes extends Component {
   componentDidMount() {
@@ -40,7 +41,11 @@ export default class Routes extends Component {
           <Route name="ItemAdd" path="add" component={ItemFormContainer} />
           <Route name="ItemEdit" path="edit/:id" component={ItemFormContainer} />
         </Route>
-        <Route name="Admin" path="/admin" component={Admin} />
+        <Route name="Admin" path="/admin">
+          <Route name="reservations" path="reservations" component={Admin} />
+          <Route name="storage" path="storage" component={Admin} />
+          <Route name="statistics" path="statistics" component={Statistics} />
+        </Route>
       </Router>
     );
   }
