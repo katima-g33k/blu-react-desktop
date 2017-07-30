@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
-
 import { browserHistory } from 'react-router';
 
-import settings from '../../settings.json';
 import { Translate } from '../../lib/i18n/i18n';
 
-const links = [
+const menuItems = [
   {
     key: 'search',
     href: '/search',
@@ -40,29 +38,27 @@ const links = [
   },
 ];
 
-if (settings.isAdmin) {
-  links.push({
-    key: 'admin',
-    children: [
-      {
-        key: 'admin_reservations',
-        href: '/admin/reservations',
-      },
-      {
-        key: 'admin_storage',
-        href: '/admin/storage',
-      },
-      {
-        key: 'admin_statistics',
-        href: '/admin/statistics',
-      },
-      {
-        key: 'admin_employees',
-        href: '/admin/employees',
-      },
-    ],
-  });
-}
+const adminMenuItems = {
+  key: 'admin',
+  children: [
+    {
+      key: 'admin_reservations',
+      href: '/admin/reservations',
+    },
+    {
+      key: 'admin_storage',
+      href: '/admin/storage',
+    },
+    {
+      key: 'admin_statistics',
+      href: '/admin/statistics',
+    },
+    {
+      key: 'admin_employees',
+      href: '/admin/employees',
+    },
+  ],
+};
 
 export default class Sidebar extends Component {
   constructor(props) {
@@ -72,7 +68,8 @@ export default class Sidebar extends Component {
     };
 
     this.isCurrentLocation = this.isCurrentLocation.bind(this);
-    this.getList = this.getList.bind(this);
+    this.getMenuItems = this.getMenuItems.bind(this);
+    this.renderMenu = this.renderMenu.bind(this);
   }
 
   componentDidMount() {
@@ -88,7 +85,18 @@ export default class Sidebar extends Component {
     return location.includes(href) || location.includes(key.replace(/_/g, '/'));
   }
 
-  getList(data) {
+  getMenuItems() {
+    const user = sessionStorage.getItem('user');
+    const data = [...menuItems];
+
+    if (user && JSON.parse(user).isAdmin) {
+      data.push(adminMenuItems);
+    }
+
+    return data;
+  }
+
+  renderMenu(data, isChild) {
     return data.map(({ children, key, href }) => {
       if (children) {
         return (
@@ -101,7 +109,7 @@ export default class Sidebar extends Component {
           >
             <Translate value={`Sidebar.${key}`} />
             <ul style={{ listStyle: 'none' }}>
-              {this.getList(children)}
+              {this.renderMenu(children, true)}
             </ul>
             <hr/>
           </li>
@@ -126,7 +134,7 @@ export default class Sidebar extends Component {
           }}
         >
           <Translate value={`Sidebar.${key}`} />
-          {data === links && <hr/>}
+          {!isChild && <hr/>}
         </li>
       );
     });
@@ -140,7 +148,7 @@ export default class Sidebar extends Component {
           componentClass='ul'
           style={{ listStyle: 'none', fontSize: '1.1em', padding: '20px' }}
         >
-          {this.getList(links)}
+          {this.renderMenu(this.getMenuItems())}
         </Col>
       </Row>
     );

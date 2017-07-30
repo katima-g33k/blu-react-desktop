@@ -4,6 +4,7 @@ import { Button, ButtonGroup, Col, Glyphicon, Label, Panel, Row } from 'react-bo
 import API from '../../lib/API';
 import { ConfirmModal, FormModal, InformationModal } from '../general/modals';
 import Employee from '../../lib/models/Employee';
+import { encrypt } from '../../lib/cipher';
 import I18n from '../../lib/i18n/i18n';
 import TableLayout from '../general/TableLayout';
 
@@ -181,6 +182,12 @@ export default class EmployeesTable extends Component {
   }
 
   save(employee) {
+    if (employee.setPassword) {
+      delete employee.setPassword;
+      delete employee.confirmPassword;
+      employee.password = encrypt(employee.password);
+    }
+
     return employee.id ? this.update(employee) : this.insert(employee);
   }
 

@@ -32,7 +32,13 @@ const HTTP = {
     };
     request[method.toLowerCase()](options, (err, res, body) => {
       try {
-        callback(err, !err && JSON.parse(body).data);
+        const response = !err && JSON.parse(body).data;
+
+        if (response.code && response.code !== 200) {
+          callback(response);
+        } else {
+          callback(err, response);
+        }
       } catch (e) {
         callback({ code: 500, message: body });
       }

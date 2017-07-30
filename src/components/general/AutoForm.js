@@ -335,7 +335,7 @@ export default class AutoForm extends Component {
 
   render() {
     const { options, sections, titleClass } = this.state.schema;
-    const { onCancel } = this.props;
+    const { confirmButtonText, onCancel } = this.props;
 
     return (
       <Form {...options}>
@@ -344,14 +344,16 @@ export default class AutoForm extends Component {
         </Col>
         {this.renderSections(sections)}
         <ButtonToolbar style={{ float: 'right' }}>
-          <Button onClick={onCancel}>
-            {'Annuler'}
-          </Button>
+          {onCancel && (
+            <Button onClick={onCancel}>
+              {'Annuler'}
+            </Button>
+          )}
           <Button
             bsStyle="primary"
             onClick={this.onSave}
           >
-            {'Sauvegarder'}
+            {confirmButtonText || 'Sauvegarder'}
           </Button>
         </ButtonToolbar>
       </Form>
@@ -360,8 +362,9 @@ export default class AutoForm extends Component {
 }
 
 AutoForm.propTypes = {
+  confirmButtonText: React.PropTypes.string,
   data: React.PropTypes.shape().isRequired,
   schema: React.PropTypes.shape().isRequired,
-  onCancel: React.PropTypes.func.isRequired,
+  onCancel: React.PropTypes.func,
   onSave: React.PropTypes.func.isRequired,
 };

@@ -48,6 +48,9 @@ export default class APIClient {
       list: (callback) => {
         HTTP.post(`${this.url}/employee/list`, {}, callback);
       },
+      login: (username, password, callback) => {
+        HTTP.post(`${this.url}/employee/login`, { username, password }, callback);
+      },
       update: (id, employee, callback) => {
         HTTP.post(`${this.url}/employee/update`, { id, employee }, callback);
       },
