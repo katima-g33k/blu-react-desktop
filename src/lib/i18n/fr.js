@@ -40,6 +40,9 @@ const fr = {
       none: 'Aucun exemplaire',
     },
   },
+  Login: {
+    title: 'Connexion',
+  },
   MemberForm: {
     title: 'Formulaire du membre',
   },

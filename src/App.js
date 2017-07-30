@@ -5,6 +5,7 @@ import { browserHistory } from 'react-router';
 import API from './lib/API';
 import Header from './components/general/Header';
 import { InformationModal } from './components/general/modals';
+import Login from './components/login/Login';
 import Routes from './routes/Routes';
 import scanner from './lib/Scanner';
 import Sidebar from './components/general/Sidebar';
@@ -14,6 +15,7 @@ export default class App extends Component {
     super(props);
     this.state = {
       error: null,
+      user: null,
       showModal: null,
     };
 
@@ -25,9 +27,15 @@ export default class App extends Component {
   }
 
   componentWillMount() {
+    const user = sessionStorage.getItem('user');
+
     scanner.addListener('onInvalidScan', this.onInvalidScan);
     scanner.addListener('onItemScan', this.onItemScan);
     scanner.addListener('onMemberScan', this.onMemberScan);
+
+    if (user) {
+      this.setState({ user: JSON.parse(user) });
+    }
   }
 
   canChangeLocation() {
@@ -97,15 +105,21 @@ export default class App extends Component {
     return (
       <div>
         <Header />
-        <main>
-          <Col componentClass="aside" md={2}>
-            <Sidebar />
-          </Col>
-          <Col sm={12} md={10}>
-            <Routes />
-          </Col>
-          {this.renderModal()}
-        </main>
+        {this.state.user ? (
+          <main>
+            <Col componentClass="aside" md={2}>
+              <Sidebar />
+            </Col>
+            <Col sm={12} md={10}>
+              <Routes />
+            </Col>
+            {this.renderModal()}
+          </main>
+        ) : (
+          <main>
+            <Login onConnected={user => this.setState({ user })} />
+          </main>
+        )}
       </div>
     );
   }
