@@ -1,8 +1,7 @@
-import fs from 'fs';
-import settings from '../settings.json';
+import settings from './Settings';
 
-const SCAN_FIRST_CHAR = settings.barcode.firstChar;
-const SCAN_LAST_CHAR = settings.barcode.lastChar;
+const SCAN_FIRST_CHAR = settings.barcodeFirstChar;
+const SCAN_LAST_CHAR = settings.barcodeLastChar;
 
 class Scanner {
   constructor() {
@@ -24,21 +23,9 @@ class Scanner {
   }
 
   calibrate = (code) => {
-    const firstChar = code.charAt();
-    const lastChar = code.charAt(code.length - 1);
-
-    const newSettings = {
-      ...settings,
-      barcode: { firstChar, lastChar },
-    };
-
-    fs.writeFile('../settings.json', JSON.stringify(newSettings), (err) => {
-      if (err) {
-        // TODO: Display message
-        return;
-      }
-
-      // TODO: Display message
+    settings.set({
+      barcodeFirstChar: code.charAt(),
+      barcodeLastChar: code.charAt(code.length - 1),
     });
   }
 

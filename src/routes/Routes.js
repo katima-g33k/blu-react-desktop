@@ -9,6 +9,7 @@ import ItemViewContainer from '../components/item/view/ItemViewContainer';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
 import MemberViewContainer from '../components/member/view/MemberViewContainer';
 import SearchContainer from '../components/search/SearchContainer';
+import SettingsView from '../components/general/SettingsView';
 import Statistics from '../components/admin/Statistics';
 
 export default class Routes extends Component {
@@ -48,6 +49,7 @@ export default class Routes extends Component {
           <Route name="statistics" path="statistics" component={Statistics} />
           <Route name="storage" path="storage" component={Admin} />
         </Route>
+        <Route name="settings" path="/settings" component={SettingsView} />
       </Router>
     );
   }
