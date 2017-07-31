@@ -42,6 +42,20 @@ export default class AutoForm extends Component {
     });
   }
 
+  componentDidMount() {
+    const formElements = document.getElementsByTagName('form')[0].elements;
+    const focusable = ['number', 'text', 'textarea'];
+
+    for (let i = 0; i < formElements.length; i++) {
+      const element = formElements[i];
+
+      if (focusable.includes(element.type)) {
+        element.focus();
+        break;
+      }
+    }
+  }
+
   canSave() {
     let canSave = true;
     const { data, schema } = this.state;
@@ -351,6 +365,7 @@ export default class AutoForm extends Component {
           )}
           <Button
             bsStyle="primary"
+            type="submit"
             onClick={this.onSave}
           >
             {confirmButtonText || 'Sauvegarder'}
