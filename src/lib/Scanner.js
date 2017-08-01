@@ -1,7 +1,7 @@
 import settings from './Settings';
 
-const SCAN_FIRST_CHAR = settings.barcodeFirstChar;
-const SCAN_LAST_CHAR = settings.barcodeLastChar;
+let SCAN_FIRST_CHAR = settings.barcodeFirstChar;
+let SCAN_LAST_CHAR = settings.barcodeLastChar;
 
 class Scanner {
   constructor() {
@@ -9,6 +9,7 @@ class Scanner {
     this.listeners = {
       onScan: [],
       onMemberScan: [],
+      onInput: [],
       onItemScan: [],
       onInvalidScan: [],
     };
@@ -23,9 +24,12 @@ class Scanner {
   }
 
   calibrate = (code) => {
+    SCAN_FIRST_CHAR = code.charAt();
+    SCAN_LAST_CHAR = code.charAt(code.length - 1);
+
     settings.set({
-      barcodeFirstChar: code.charAt(),
-      barcodeLastChar: code.charAt(code.length - 1),
+      barcodeFirstChar: SCAN_FIRST_CHAR,
+      barcodeLastChar: SCAN_LAST_CHAR,
     });
   }
 
@@ -35,6 +39,8 @@ class Scanner {
 
   initScanner = () => {
     document.onkeydown = (event) => {
+      this.dispatch('onInput', event.key);
+
       if (event.key === SCAN_FIRST_CHAR) {
         this.barcode = event.key;
       } else if (this.barcode.slice(0, 1) === SCAN_FIRST_CHAR) {

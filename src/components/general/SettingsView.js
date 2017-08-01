@@ -4,6 +4,7 @@ import { browserHistory } from 'react-router';
 
 import AutoForm from './AutoForm';
 import I18n from '../../lib/i18n/i18n';
+import { ScannerCalibrationModal } from './modals';
 import Settings from '../../lib/Settings';
 
 const schema = {
@@ -57,6 +58,12 @@ export default class SettingsView extends Component {
   renderModal() {
     switch (this.state.showModal) {
       case 'calibrate':
+        return (
+          <ScannerCalibrationModal
+            onCancel={() => this.setState({ showModal: null })}
+            onSave={() => this.setState({ showModal: null })}
+          />
+        );
       default:
         return null;
     }
