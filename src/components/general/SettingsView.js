@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Panel } from 'react-bootstrap';
+import { Button, Panel, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 
 import AutoForm from './AutoForm';
@@ -14,31 +14,33 @@ const schema = {
   },
   sections: [
     {
-      fields: [
-        {
-          key: 'apiUrl',
-          type: 'texte',
-          label: 'URL de l\'API',
-          inputWidth: {
-            md: 8,
-            sm: 10,
-          },
-        },
-        {
-          key: 'apiKey',
-          type: 'texte',
-          label: 'Clé d\'API',
-          inputWidth: {
-            md: 8,
-            sm: 10,
-          },
-        },
-      ],
+      fields: [],
     },
   ],
 };
 
-export default class SettingsView extends Component {
+const adminFields = [
+  {
+    key: 'apiUrl',
+    type: 'texte',
+    label: 'URL de l\'API',
+    inputWidth: {
+      md: 8,
+      sm: 10,
+    },
+  },
+  {
+    key: 'apiKey',
+    type: 'texte',
+    label: 'Clé d\'API',
+    inputWidth: {
+      md: 8,
+      sm: 10,
+    },
+  },
+];
+
+class CustomButton extends Component {
   constructor(props) {
     super(props);
 
@@ -46,13 +48,7 @@ export default class SettingsView extends Component {
       showModal: null,
     };
 
-    this.onSave = this.onSave.bind(this);
-    this.schema = schema;
-  }
-
-  onSave(settings) {
-    Settings.set(settings);
-    browserHistory.goBack();
+    this.renderModal = this.renderModal.bind(this);
   }
 
   renderModal() {
@@ -71,19 +67,59 @@ export default class SettingsView extends Component {
 
   render() {
     return (
-      <Panel header={I18n.t('SettingsView.title')}>
+      <Row style={{ textAlign: 'center' }}>
         <Button
           onClick={() => this.setState({ showModal: 'calibrate' })}
         >
           {'Calibrer le scanneur'}
         </Button>
+        {this.renderModal()}
+      </Row>
+    );
+  }
+}
+
+export default class SettingsView extends Component {
+  constructor(props) {
+    super(props);
+
+    this.onSave = this.onSave.bind(this);
+    this.getSchema = this.getSchema.bind(this);
+
+    this.schema = this.getSchema();
+  }
+
+  onSave(settings) {
+    Settings.set(settings);
+    browserHistory.goBack();
+  }
+
+  getSchema() {
+    const user = JSON.parse(sessionStorage.getItem('user'));
+
+    if (user.isAdmin) {
+      schema.sections[0].fields.push(...adminFields);
+    }
+
+    schema.sections[0].fields.push({
+      label: 'Calibrer le scanneur',
+      key: 'calibrate',
+      type: 'custom',
+      component: CustomButton,
+    });
+
+    return schema;
+  }
+
+  render() {
+    return (
+      <Panel header={I18n.t('SettingsView.title')}>
         <AutoForm
           data={Settings.get()}
           schema={this.schema}
           onCancel={browserHistory.goBack}
           onSave={this.onSave}
         />
-        {this.renderModal()}
       </Panel>
     );
   }
