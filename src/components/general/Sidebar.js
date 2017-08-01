@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Glyphicon, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 
 import { Translate } from '../../lib/i18n/i18n';
@@ -74,6 +74,7 @@ export default class Sidebar extends Component {
 
     this.isCurrentLocation = this.isCurrentLocation.bind(this);
     this.getMenuItems = this.getMenuItems.bind(this);
+    this.renderBackButton = this.renderBackButton.bind(this);
     this.renderMenu = this.renderMenu.bind(this);
   }
 
@@ -100,6 +101,14 @@ export default class Sidebar extends Component {
 
     data.push(settingsMenuItem);
     return data;
+  }
+
+  renderBackButton() {
+    return (
+      <p id="backButton" onClick={browserHistory.goBack}>
+        <Glyphicon glyph="arrow-left" /> {'Page précédente'}
+      </p>
+    );
   }
 
   renderMenu(data, isChild) {
@@ -149,13 +158,20 @@ export default class Sidebar extends Component {
   render() {
     return (
       <Row componentClass='nav'>
-        <Col
-          md={12}
-          componentClass='ul'
-          style={{ listStyle: 'none', fontSize: '1.1em', padding: '20px' }}
-        >
-          {this.renderMenu(this.getMenuItems())}
-        </Col>
+        <Row>
+          <Col md={12}>
+            {this.renderBackButton()}
+          </Col>
+        </Row>
+        <Row>
+          <Col
+            md={12}
+            componentClass='ul'
+            style={{ listStyle: 'none', fontSize: '1.1em', padding: '20px' }}
+          >
+            {this.renderMenu(this.getMenuItems())}
+          </Col>
+        </Row>
       </Row>
     );
   }
