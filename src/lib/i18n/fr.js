@@ -101,6 +101,9 @@ const fr = {
       none: 'Aucun résultat',
     },
   },
+  SettingsView: {
+    title: 'Paramètres',
+  },
   Sidebar: {
     search: 'Recherche',
     member: 'Membre',
@@ -115,6 +118,7 @@ const fr = {
     admin_reservations: 'Réservations',
     admin_storage: 'Caisses de rangement',
     admin_statistics: 'Statistiques',
+    settings: 'Paramètres',
   },
   TableColumns: {
     search: {

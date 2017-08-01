@@ -60,6 +60,11 @@ const adminMenuItems = {
   ],
 };
 
+const settingsMenuItem = {
+  key: 'settings',
+  href: '/settings',
+};
+
 export default class Sidebar extends Component {
   constructor(props) {
     super(props);
@@ -93,6 +98,7 @@ export default class Sidebar extends Component {
       data.push(adminMenuItems);
     }
 
+    data.push(settingsMenuItem);
     return data;
   }
 
