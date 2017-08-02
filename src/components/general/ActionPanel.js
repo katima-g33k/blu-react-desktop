@@ -22,7 +22,7 @@ export default class ActionPanel extends Component {
     };
 
     return (
-      <Panel header='actions'>
+      <Panel header='actions' style={{ position: 'fixed' }}>
         {this.props.actions.map((action, index) => {
           return action.custom ? (
             <CustomButton key={`action${index}`} {...action} />
