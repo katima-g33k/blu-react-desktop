@@ -57,6 +57,10 @@ const adminMenuItems = {
       key: 'admin_employees',
       href: '/admin/employees',
     },
+    {
+      key: 'admin_itemList',
+      href: '/admin/item/list',
+    },
   ],
 };
 

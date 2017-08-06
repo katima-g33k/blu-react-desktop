@@ -8,6 +8,9 @@ html, body {
   font-family: sans-serif;
 }
 
+.glyphicon {
+  overflow: hidden;
+}
 
 .table {
   margin-bottom: 0;

@@ -5,6 +5,7 @@ import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer'
 import Admin from '../components/admin/Admin';
 import EmployeesTable from '../components/admin/EmployeesTable';
 import ItemFormContainer from '../components/item/form/ItemFormContainer';
+import ItemList from '../components/admin/ItemList';
 import ItemViewContainer from '../components/item/view/ItemViewContainer';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
 import MemberViewContainer from '../components/member/view/MemberViewContainer';
@@ -48,6 +49,7 @@ export default class Routes extends Component {
           <Route name="reservations" path="reservations" component={Admin} />
           <Route name="statistics" path="statistics" component={Statistics} />
           <Route name="storage" path="storage" component={Admin} />
+          <Route name="itemList" path="item/list" component={ItemList} />
         </Route>
         <Route name="settings" path="/settings" component={SettingsView} />
       </Router>

@@ -7,6 +7,9 @@ const fr = {
     employees: {
       title: 'Gestion des employé.e.s',
     },
+    itemList: {
+      title: 'Liste des ouvrages',
+    },
   },
   ItemForm: {
     title: 'Formulaire de l\'ouvrage',
@@ -118,6 +121,7 @@ const fr = {
     admin_reservations: 'Réservations',
     admin_storage: 'Caisses de rangement',
     admin_statistics: 'Statistiques',
+    admin_itemList: 'Liste des ouvrages',
     settings: 'Paramètres',
   },
   TableColumns: {

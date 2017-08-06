@@ -63,6 +63,9 @@ export default class APIClient {
       insert: (item, callback) => {
         HTTP.post(`${this.url}/item/insert`, { item }, callback);
       },
+      list: (callback) => {
+        HTTP.post(`${this.url}/item/list`, {}, callback);
+      },
       search: (search, options, callback) => {
         HTTP.post(`${this.url}/item/search`, { ...options, search }, callback);
       },
