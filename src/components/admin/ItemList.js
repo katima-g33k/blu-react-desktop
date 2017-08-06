@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Col, Panel, Row } from 'react-bootstrap';
 
 import API from '../../lib/API';
-import excel from 'node-excel-export';
 import I18n from '../../lib/i18n/i18n';
 import { InformationModal } from '../general/modals';
 import Item from '../../lib/models/Item';
@@ -42,6 +41,7 @@ const columns = [
     dataField: 'author',
     label: 'Auteur.e.s',
     dataSort: true,
+    dataFormat: (field, item) => item.authorString,
   },
   {
     dataField: 'subject',
@@ -56,6 +56,7 @@ const columns = [
     width: '90px',
     dataSort: true,
     dataFormat: statusHelper.getLabel,
+    exportDataFormat: status => status,
   },
 ];
 
@@ -69,8 +70,6 @@ export default class ItemList extends Component {
     };
 
     this.columns = columns;
-
-    this.getTableActions = this.getTableActions.bind(this);
     this.renderModal = this.renderModal.bind(this);
   }
 
@@ -82,18 +81,6 @@ export default class ItemList extends Component {
         loading: false,
       })
     );
-  }
-
-  getTableActions() {
-    return [
-      {
-        bsStyle: 'primary',
-        icon: 'new-window',
-        label: 'Exporter sélection',
-        name: 'export',
-        onClick: () => {},
-      },
-    ];
   }
 
   renderModal() {
@@ -121,9 +108,9 @@ export default class ItemList extends Component {
           <Col md={12}>
             {!loading ? (
               <TableLayout
-                actions={this.getTableActions()}
                 columns={this.columns}
                 data={items}
+                exportable
                 placeholder={'Aucun ouvrage dans le système'}
                 title={`Liste des ouvrages (${items.length})`}
               />
