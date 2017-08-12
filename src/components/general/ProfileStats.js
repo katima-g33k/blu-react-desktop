@@ -1,16 +1,41 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
+import { Col, Row } from 'react-bootstrap';
+
+import Spinner from './Spinner';
 import Transaction, { Type } from '../../lib/Transaction';
 import { Translate } from '../../lib/i18n/i18n';
+
+const style = {
+  table: {
+    borderCollapse: 'collapse',
+    margin: 'auto',
+  },
+  td: {
+    textAlign: 'center',
+    padding: '15px',
+    border: '1px #000 solid',
+  },
+  title: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    padding: '15px',
+    border: '1px #000 solid',
+  },
+};
 
 export default class ProfileStats extends Component {
   constructor(props) {
     super(props);
     this.state = {
       copies: props.copies || [],
+      stats: null,
     };
+
     this.getCopies = this.getCopies.bind(this);
     this.getPrice = this.getPrice.bind(this);
     this.calculateStats = this.calculateStats.bind(this);
+    this.renderPriceStats = this.renderPriceStats.bind(this);
+    this.renderTable = this.renderTable.bind(this);
   }
 
   componentWillMount() {
@@ -18,17 +43,11 @@ export default class ProfileStats extends Component {
   }
 
   getCopies(copies, filters) {
-    return copies.filter((copy) => {
-      return copy.transaction.filter((t) => filters.indexOf(t.code) > -1).length;
-    });
+    return copies.filter(copy => copy.transaction.filter(t => filters.indexOf(t.code) > -1).length);
   }
 
   getPrice(copies) {
-    let price = 0;
-    copies.forEach((copy) => {
-      price += +copy.price;
-    });
-    return price;
+    return copies.reduce((acc, cur) => acc + +cur.price, 0);
   }
 
   calculateStats(copies) {
@@ -64,26 +83,89 @@ export default class ProfileStats extends Component {
     return stats;
   }
 
-  render() {
-    const style = {
-      table: {
-        borderCollapse: 'collapse',
-        margin: 'auto',
+  renderPriceStats() {
+    let numInStock = 0;
+
+    const { copies } = this.state;
+    const priceStats = {
+      max: {
+        all: 0,
+        inStock: 0,
       },
-      td: {
-        textAlign: 'center',
-        padding: '15px',
-        border: '1px #000 solid',
+      min: {
+        all: null,
+        inStock: null,
       },
-      title: {
-        fontWeight: 'bold',
-        textAlign: 'center',
-        padding: '15px',
-        border: '1px #000 solid',
+      avg: {
+        all: 0,
+        inStock: 0,
       },
     };
 
-    return this.state.stats ? (
+    copies.forEach((copy) => {
+      priceStats.avg.all += copy.price;
+
+      if (copy.price > priceStats.max.all) {
+        priceStats.max.all = copy.price;
+      }
+
+      if ((!priceStats.min.all && priceStats.min.all !== 0) || copy.price < priceStats.min.all) {
+        priceStats.min.all = copy.price;
+      }
+
+      if (copy.isAdded) {
+        numInStock++;
+        priceStats.avg.inStock += copy.price;
+
+        if (copy.price > priceStats.max.inStock) {
+          priceStats.max.inStock = copy.price;
+        }
+
+        if ((!priceStats.min.inStock && priceStats.min.inStock !== 0) || copy.price < priceStats.min.inStock) {
+          priceStats.min.inStock = copy.price;
+        }
+      }
+    });
+
+    if (copies.length > 0) {
+      priceStats.avg.all = Math.round(priceStats.avg.all / copies.length);
+    } else {
+      priceStats.min.all = 0;
+    }
+
+    if (numInStock > 0) {
+      priceStats.avg.inStock = Math.round(priceStats.avg.inStock / numInStock);
+    } else {
+      priceStats.min.inStock = 0;
+    }
+
+    return (
+      <Row>
+        <Col md={12}>
+          <Row style={{ marginTop: '15px' }}>
+            <Col md={12}>
+              {`Prix maximum: ${priceStats.max.all}$ (${priceStats.max.inStock}$ en stock)`}
+            </Col>
+          </Row>
+          <Row style={{ marginTop: '15px' }}>
+            <Col md={12}>
+              {`Prix moyen: ${priceStats.avg.all}$ (${priceStats.avg.inStock}$ en stock)`}
+            </Col>
+          </Row>
+          <Row style={{ marginTop: '15px' }}>
+            <Col md={12}>
+              {`Prix minimum: ${priceStats.min.all}$ (${priceStats.min.inStock}$ en stock)`}
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+    );
+  }
+
+  renderTable() {
+    const { added, sold, toSell, toPay, paid } = this.state.stats;
+
+    return (
       <table style={style.table}>
         <tbody>
           <tr>
@@ -93,9 +175,9 @@ export default class ProfileStats extends Component {
           </tr>
           <tr>
             <td colSpan={3} style={style.td}>
-              {this.state.stats.added.count} <Translate value="ProfileStats.books" />
+              {added.count} <Translate value="ProfileStats.books" />
               <br/>
-              ({this.state.stats.added.price} $)
+              ({added.price} $)
             </td>
           </tr>
           <tr>
@@ -108,14 +190,14 @@ export default class ProfileStats extends Component {
           </tr>
           <tr>
             <td colSpan={2} style={style.td}>
-              {this.state.stats.sold.count} <Translate value="ProfileStats.books" />
+              {sold.count} <Translate value="ProfileStats.books" />
               <br/>
-              ({this.state.stats.sold.price} $)
+              ({sold.price} $)
             </td>
             <td rowSpan={3} style={style.td}>
-              {this.state.stats.toSell.count} <Translate value="ProfileStats.books" />
+              {toSell.count} <Translate value="ProfileStats.books" />
               <br/>
-              ({this.state.stats.toSell.price} $)
+              ({toSell.price} $)
             </td>
           </tr>
           <tr>
@@ -128,22 +210,41 @@ export default class ProfileStats extends Component {
           </tr>
           <tr>
             <td style={style.td}>
-              {this.state.stats.toPay.count} <Translate value="ProfileStats.books" />
+              {toPay.count} <Translate value="ProfileStats.books" />
               <br/>
-              ({this.state.stats.toPay.price} $)
+              ({toPay.price} $)
             </td>
             <td style={style.td}>
-              {this.state.stats.paid.count} <Translate value="ProfileStats.books" />
+              {paid.count} <Translate value="ProfileStats.books" />
               <br/>
-              ({this.state.stats.paid.price} $)
+              ({paid.price} $)
             </td>
           </tr>
         </tbody>
       </table>
-    ) : null;
+    );
+  }
+
+  render() {
+    const { stats } = this.state;
+    const { priceStats } = this.props;
+
+    return stats ? (
+      <Row>
+        {priceStats ? (
+          <Col md={5}>
+            {this.renderPriceStats()}
+          </Col>
+        ) : null}
+        <Col md={priceStats ? 7 : 12}>
+          {this.renderTable()}
+        </Col>
+      </Row>
+    ) : (<Spinner />);
   }
 }
 
 ProfileStats.propTypes = {
-  copies: React.PropTypes.array,
+  copies: PropTypes.array,
+  priceStats: PropTypes.bool,
 };

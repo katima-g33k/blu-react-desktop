@@ -5,7 +5,7 @@ import Transaction from './Transaction';
 export default class Copy {
   constructor({ id = 0, price = 0, transaction = [], item, member }) {
     this.id = id;
-    this.price = price;
+    this.price = +price;
     this.transaction = transaction.map(t => new Transaction(t));
     this.item = item ? new Item(item) : null;
     this.member = member ? new Member(member) : null;
