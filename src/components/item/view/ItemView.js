@@ -99,7 +99,7 @@ export default class ItemView extends Component {
                 <h4>
                   <Translate value="ItemView.stats.title" />
                 </h4>
-                <ProfileStats copies={data.copies}/>
+                <ProfileStats copies={data.copies} priceStats />
               </Col>
             </Row>
             {data.reservation.length > 0 && (
