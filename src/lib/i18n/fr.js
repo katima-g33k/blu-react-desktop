@@ -1,14 +1,19 @@
 const fr = {
   Admin: {
-    title: 'Administration',
     statistics: {
-      title: 'Statistiques',
+      title: 'Adminnistraton - Statistiques',
     },
     employees: {
-      title: 'Gestion des employé.e.s',
+      title: 'Adminnistraton - Gestion des employé.e.s',
     },
     itemList: {
-      title: 'Liste des ouvrages',
+      title: 'Adminnistraton - Gestion des ouvrages',
+    },
+    reservation: {
+      title: 'Adminnistraton - Geston des réservations',
+    },
+    storage: {
+      title: 'Adminnistraton - Gestion des caisses de rangement',
     },
   },
   ItemForm: {
