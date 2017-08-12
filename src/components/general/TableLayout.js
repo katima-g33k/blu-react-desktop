@@ -95,30 +95,34 @@ export default class TableLayout extends Component {
       switch (filter.type) {
         case 'checkbox':
           return (
-            <Checkbox
-              key={filter.key}
-              onChange={filter.onChange}
-              checked={filter.checked}
-            >
-              {filter.label}
-            </Checkbox>
+            <Col md={1}>
+              <Checkbox
+                key={filter.key}
+                onChange={filter.onChange}
+                checked={filter.checked}
+              >
+                {filter.label}
+              </Checkbox>
+            </Col>
           );
         case 'select':
           return (
-            <div key={`select${filter.key}`}>
-              <Col componentClass={ControlLabel} md={3}>
-                {filter.label}
-              </Col>
-              <Col md={9}>
-                <FormControl
-                  componentClass='select'
-                  value={filter.value}
-                  onChange={filter.onChange}
-                >
-                  {filter.optgroups ? renderOptgroups(filter.optgroups) : renderOptions(filter.options || [])}
-                </FormControl>
-              </Col>
-            </div>
+            <Col md={2} key={`select${filter.key}`}>
+              <Row>
+                <Col componentClass={ControlLabel} md={3} style={{ marginTop: '6px' }}>
+                  {filter.label}
+                </Col>
+                <Col md={9}>
+                  <FormControl
+                    componentClass='select'
+                    value={filter.value}
+                    onChange={filter.onChange}
+                  >
+                    {filter.optgroups ? renderOptgroups(filter.optgroups) : renderOptions(filter.options || [])}
+                  </FormControl>
+                </Col>
+              </Row>
+            </Col>
           );
         default:
           return null;
@@ -139,12 +143,14 @@ export default class TableLayout extends Component {
                   <h4>{title}</h4>
                 </Col>
               </Row>
-              <Row>
-                <Col md={3}>
+              <Row style={{ marginBottom: '10px' }}>
+                <Col md={12}>
                   {exportable && this.renderExportButton()}
                   {this.renderActions()}
                 </Col>
-                <Col md={9}>
+              </Row>
+              <Row>
+                <Col md={12}>
                   {this.renderFilters()}
                 </Col>
               </Row>
@@ -158,10 +164,10 @@ export default class TableLayout extends Component {
                 placeholder={placeholder || 'Aucune donnée'}
                 striped
               />
-              {modal}
             </Col>
           </Row>
         </Col>
+        {modal}
       </Row>
     );
   }
