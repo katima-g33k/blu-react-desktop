@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
 import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
-import Admin from '../components/admin/Admin';
+import ReservationTableView from '../components/admin/ReservationTableView';
 import EmployeesTable from '../components/admin/EmployeesTable';
 import ItemFormContainer from '../components/item/form/ItemFormContainer';
 import ItemList from '../components/admin/ItemList';
@@ -12,6 +12,7 @@ import MemberViewContainer from '../components/member/view/MemberViewContainer';
 import SearchContainer from '../components/search/SearchContainer';
 import SettingsView from '../components/general/SettingsView';
 import Statistics from '../components/admin/Statistics';
+import StorageTableView from '../components/admin/StorageTableView';
 
 export default class Routes extends Component {
   componentDidMount() {
@@ -46,9 +47,9 @@ export default class Routes extends Component {
         </Route>
         <Route name="Admin" path="/admin">
           <Route name="employees" path="employees" component={EmployeesTable} />
-          <Route name="reservations" path="reservations" component={Admin} />
+          <Route name="reservations" path="reservations" component={ReservationTableView} />
           <Route name="statistics" path="statistics" component={Statistics} />
-          <Route name="storage" path="storage" component={Admin} />
+          <Route name="storage" path="storage" component={StorageTableView} />
           <Route name="itemList" path="item/list" component={ItemList} />
         </Route>
         <Route name="settings" path="/settings" component={SettingsView} />
