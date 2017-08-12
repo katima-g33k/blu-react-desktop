@@ -32,6 +32,16 @@ export default class Item {
     return Item.STATUS.VALID;
   }
 
+  getStatusString() {
+    const status = {
+      OUTDATED: 'Désuet',
+      REMOVED: 'Retiré',
+      VALID: 'Valide',
+    };
+
+    return status[this.getStatus()];
+  }
+
   updateStatus(status) {
     switch (status) {
       case Item.STATUS.VALID:

@@ -3,10 +3,10 @@ import { Label } from 'react-bootstrap';
 import Item from './models/Item';
 
 const statusHelper = {
-  getLabel: (status) => {
+  getLabel: (item) => {
     let style;
 
-    switch (status) {
+    switch (item.getStatus()) {
       case Item.STATUS.VALID:
         style = 'success';
         break;
@@ -23,7 +23,7 @@ const statusHelper = {
 
     return (
       <Label bsStyle={style}>
-        {status}
+        {item.getStatusString()}
       </Label>
     );
   },

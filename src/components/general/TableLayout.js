@@ -1,8 +1,30 @@
-import React, { Component } from 'react';
-import { Button, Col, Glyphicon, Row } from 'react-bootstrap';
+import React, { Component, PropTypes } from 'react';
+import { Button, Checkbox, Col, ControlLabel, FormControl, Glyphicon, Row } from 'react-bootstrap';
 import FileSaver from 'file-saver';
 
 import Table from './Table';
+
+const renderOptions = (options) => {
+  return options.map((option) => (
+    <option
+      key={`option${option.value}`}
+      value={option.value}
+    >
+      {option.label}
+    </option>
+  ));
+};
+
+const renderOptgroups = (optgroups) => {
+  return optgroups.map((optgroup, index) => (
+    <optgroup
+      key={`optgroup${index}`}
+      label={optgroup.label}
+    >
+      {renderOptions(optgroup.options)}
+    </optgroup>
+  ));
+};
 
 export default class TableLayout extends Component {
   constructor(props) {
@@ -66,6 +88,44 @@ export default class TableLayout extends Component {
     ));
   }
 
+  renderFilters() {
+    const { filters = [] } = this.props;
+
+    return filters.map((filter) => {
+      switch (filter.type) {
+        case 'checkbox':
+          return (
+            <Checkbox
+              key={filter.key}
+              onChange={filter.onChange}
+              checked={filter.checked}
+            >
+              {filter.label}
+            </Checkbox>
+          );
+        case 'select':
+          return (
+            <div key={`select${filter.key}`}>
+              <Col componentClass={ControlLabel} md={3}>
+                {filter.label}
+              </Col>
+              <Col md={9}>
+                <FormControl
+                  componentClass='select'
+                  value={filter.value}
+                  onChange={filter.onChange}
+                >
+                  {filter.optgroups ? renderOptgroups(filter.optgroups) : renderOptions(filter.options || [])}
+                </FormControl>
+              </Col>
+            </div>
+          );
+        default:
+          return null;
+      }
+    });
+  }
+
   render() {
     const { columns, data, exportable, modal, placeholder, title } = this.props;
 
@@ -74,9 +134,20 @@ export default class TableLayout extends Component {
         <Col md={12}>
           <Row>
             <Col md={12}>
-              <h4>{title}</h4>
-              {exportable && this.renderExportButton()}
-              {this.renderActions()}
+              <Row>
+                <Col md={12}>
+                  <h4>{title}</h4>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={3}>
+                  {exportable && this.renderExportButton()}
+                  {this.renderActions()}
+                </Col>
+                <Col md={9}>
+                  {this.renderFilters()}
+                </Col>
+              </Row>
             </Col>
           </Row>
           <Row>
@@ -97,12 +168,13 @@ export default class TableLayout extends Component {
 }
 
 TableLayout.propTypes = {
-  actions: React.PropTypes.array,
-  columns: React.PropTypes.array.isRequired,
-  data: React.PropTypes.array.isRequired,
-  exportable: React.PropTypes.bool,
-  exportTitle: React.PropTypes.string,
-  modal: React.PropTypes.shape(),
-  placeholder: React.PropTypes.string,
-  title: React.PropTypes.string.isRequired,
+  actions: PropTypes.array,
+  columns: PropTypes.array.isRequired,
+  data: PropTypes.array.isRequired,
+  filters: PropTypes.arrayOf(PropTypes.shape()),
+  exportable: PropTypes.bool,
+  exportTitle: PropTypes.string,
+  modal: PropTypes.shape(),
+  placeholder: PropTypes.string,
+  title: PropTypes.string.isRequired,
 };

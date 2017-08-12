@@ -55,8 +55,8 @@ const columns = [
     label: 'Status',
     width: '90px',
     dataSort: true,
-    dataFormat: statusHelper.getLabel,
-    exportDataFormat: status => status,
+    dataFormat: (field, item) => statusHelper.getLabel(item),
+    exportDataFormat: (field, item) => item.getStatusString(),
   },
 ];
 
@@ -64,16 +64,36 @@ export default class ItemList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: true,
+      categories: [],
       error: null,
+      filters: {
+        valid: true,
+        outdated: true,
+        removed: true,
+        subject: null,
+      },
       items: [],
+      loading: true,
     };
 
     this.columns = columns;
+    this.updateFilters = this.updateFilters.bind(this);
+    this.getFilteredData = this.getFilteredData.bind(this);
+    this.getFilters = this.getFilters.bind(this);
     this.renderModal = this.renderModal.bind(this);
   }
 
   componentWillMount() {
+    API.category.select((error, res) => {
+      this.setState({
+        error,
+        categories: error ? [] : res.map(data => ({
+          label: data.name,
+          options: data.subject.map(({ id, name }) => ({ label: name, value: id })),
+        })),
+      });
+    });
+
     API.item.list((error, res) =>
       this.setState({
         error,
@@ -83,24 +103,75 @@ export default class ItemList extends Component {
     );
   }
 
+  getFilteredData() {
+    const { items } = this.state;
+    const { outdated, removed, subject, valid } = this.state.filters;
+
+    return items.filter((item) => {
+      const { isRemoved, isOutdated, isValid } = item;
+      const status = (removed && isRemoved) || (outdated && isOutdated) || (valid && isValid);
+
+      return subject ? status && subject === item.subject.id : status;
+    });
+  }
+
+  updateFilters(key, value) {
+    const { filters } = this.state;
+    filters[key] = value;
+    this.setState({ filters });
+  }
+
+  getFilters() {
+    const { outdated, removed, subject, valid } = this.state.filters;
+
+    return [
+      {
+        key: 'subject',
+        label: 'Matière',
+        type: 'select',
+        optgroups: this.state.categories,
+        value: subject || '',
+        onChange: event => this.updateFilters('subject', +event.target.value),
+      },
+      {
+        key: 'valid',
+        label: 'Valide',
+        type: 'checkbox',
+        checked: valid,
+        onChange: event => this.updateFilters('valid', event.target.checked),
+      },
+      {
+        key: 'outdated',
+        label: 'Désuet',
+        type: 'checkbox',
+        checked: outdated,
+        onChange: event => this.updateFilters('outdated', event.target.checked),
+      },
+      {
+        key: 'removed',
+        label: 'Retiré',
+        type: 'checkbox',
+        checked: removed,
+        onChange: event => this.updateFilters('removed', event.target.checked),
+      },
+    ];
+  }
+
   renderModal() {
     const { error } = this.state;
 
-    if (error) {
-      return (
-        <InformationModal
-          message={error.message}
-          onClick={() => this.setState({ error: null })}
-          title={`Erreur ${error.code}`}
-        />
-      );
-    }
-
-    return null;
+    return error && (
+      <InformationModal
+        message={error.message}
+        onClick={() => this.setState({ error: null })}
+        title={`Erreur ${error.code}`}
+      />
+    );
   }
 
   render() {
-    const { items, loading } = this.state;
+    const { loading } = this.state;
+    const items = this.getFilteredData();
 
     return (
       <Panel header={I18n.t('Admin.itemList.title')}>
@@ -110,6 +181,7 @@ export default class ItemList extends Component {
               <TableLayout
                 columns={this.columns}
                 data={items}
+                filters={this.getFilters()}
                 exportable
                 placeholder={'Aucun ouvrage dans le système'}
                 title={`Liste des ouvrages (${items.length})`}
