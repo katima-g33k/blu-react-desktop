@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Col } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
+import moment from 'moment';
 
 import API from './lib/API';
 import Header from './components/general/Header';
@@ -8,6 +9,8 @@ import { InformationModal } from './components/general/modals';
 import Login from './components/login/Login';
 import Routes from './routes/Routes';
 import scanner from './lib/Scanner';
+import settings from './lib/Settings';
+import SettingsView from './components/general/SettingsView';
 import Sidebar from './components/general/Sidebar';
 
 export default class App extends Component {
@@ -16,6 +19,7 @@ export default class App extends Component {
     this.state = {
       error: null,
       user: null,
+      settingsUpdatedAt: null,
       showModal: null,
     };
 
@@ -23,6 +27,7 @@ export default class App extends Component {
     this.onInvalidScan = this.onInvalidScan.bind(this);
     this.onItemScan = this.onItemScan.bind(this);
     this.onMemberScan = this.onMemberScan.bind(this);
+    this.renderMain = this.renderMain.bind(this);
     this.renderModal = this.renderModal.bind(this);
   }
 
@@ -74,6 +79,43 @@ export default class App extends Component {
     this.setState({ showModal: 'invalidCode' });
   }
 
+  renderMain() {
+    const { apiKey, apiUrl, secretKey } = settings;
+
+    if (!apiKey || !apiUrl || !secretKey) {
+      return (
+        <main>
+          <Col md={6} mdOffset={3}>
+            <SettingsView
+              firstSetup
+              onSave={() => this.setState({ settingsUpdatedAt: moment() })}
+            />
+          </Col>
+        </main>
+      );
+    }
+
+    if (!this.state.user) {
+      return (
+        <main>
+          <Login onConnected={user => this.setState({ user })} />
+        </main>
+      );
+    }
+
+    return (
+      <main>
+        <Col componentClass="aside" md={2}>
+          <Sidebar />
+        </Col>
+        <Col sm={12} md={10}>
+          <Routes />
+        </Col>
+        {this.renderModal()}
+      </main>
+    );
+  }
+
   renderModal() {
     const { error, showModal } = this.state;
 
@@ -105,21 +147,7 @@ export default class App extends Component {
     return (
       <div>
         <Header />
-        {this.state.user ? (
-          <main>
-            <Col componentClass="aside" md={2}>
-              <Sidebar />
-            </Col>
-            <Col sm={12} md={10}>
-              <Routes />
-            </Col>
-            {this.renderModal()}
-          </main>
-        ) : (
-          <main>
-            <Login onConnected={user => this.setState({ user })} />
-          </main>
-        )}
+        {this.renderMain()}
       </div>
     );
   }
