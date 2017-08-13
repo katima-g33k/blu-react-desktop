@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Button, Panel, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 
@@ -33,6 +33,15 @@ const adminFields = [
     key: 'apiKey',
     type: 'texte',
     label: 'Clé d\'API',
+    inputWidth: {
+      md: 8,
+      sm: 10,
+    },
+  },
+  {
+    key: 'secretKey',
+    type: 'texte',
+    label: 'Clé d\'encryption',
     inputWidth: {
       md: 8,
       sm: 10,
@@ -91,13 +100,13 @@ export default class SettingsView extends Component {
 
   onSave(settings) {
     Settings.set(settings);
-    browserHistory.goBack();
+    return this.props.onSave ? this.props.onSave() : browserHistory.goBack();
   }
 
   getSchema() {
     const user = JSON.parse(sessionStorage.getItem('user'));
 
-    if (user.isAdmin) {
+    if (this.props.firstSetup || user.isAdmin) {
       schema.sections[0].fields.push(...adminFields);
     }
 
@@ -117,10 +126,15 @@ export default class SettingsView extends Component {
         <AutoForm
           data={Settings.get()}
           schema={this.schema}
-          onCancel={browserHistory.goBack}
+          onCancel={!this.props.firstSetup ? browserHistory.goBack : null}
           onSave={this.onSave}
         />
       </Panel>
     );
   }
 }
+
+SettingsView.propTypes = {
+  firstSetup: PropTypes.bool,
+  onSave: PropTypes.func,
+};

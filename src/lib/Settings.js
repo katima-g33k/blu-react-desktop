@@ -3,6 +3,7 @@ const PROPERTIES = [
   'apiUrl',
   'barcodeFirstChar',
   'barcodeLastChar',
+  'secretKey',
 ];
 
 class Settings {
@@ -20,6 +21,14 @@ class Settings {
 
   set apiKey(apiKey) {
     localStorage.setItem('apiKey', apiKey);
+  }
+
+  get secretKey() {
+    return localStorage.getItem('secretKey');
+  }
+
+  set secretKey(secretKey) {
+    localStorage.setItem('secretKey', secretKey);
   }
 
   get barcodeFirstChar() {
