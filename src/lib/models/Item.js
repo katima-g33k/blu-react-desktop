@@ -18,6 +18,7 @@ export default class Item {
     this.storage = item.storage || [];
     this.reservation = (item.reservation || []).map(reservation => new Reservation(reservation));
     this.comment = item.comment || '';
+    this.stats = item.stats || {};
   }
 
   getStatus() {

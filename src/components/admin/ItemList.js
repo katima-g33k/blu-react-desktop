@@ -51,6 +51,13 @@ const columns = [
     dataFormat: ({ name }) => name.replace(/\(.+\)/, '').trim(),
   },
   {
+    dataField: 'inStock',
+    label: 'En Stock',
+    dataSort: true,
+    width: '100px',
+    dataFormat: (_, item) => item.stats.inStock,
+  },
+  {
     dataField: 'status',
     label: 'Status',
     width: '90px',
@@ -94,7 +101,7 @@ export default class ItemList extends Component {
       });
     });
 
-    API.item.list((error, res) =>
+    API.item.list((error, res) => 
       this.setState({
         error,
         items: error ? [] : res.map(data => new Item(data)),
@@ -172,6 +179,7 @@ export default class ItemList extends Component {
   render() {
     const { loading } = this.state;
     const items = this.getFilteredData();
+    console.log(items);
 
     return (
       <Panel header={I18n.t('Admin.itemList.title')}>
