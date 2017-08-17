@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
+import { Button, ButtonGroup, Glyphicon, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import API from '../../../lib/API';
 import CopyTable from './CopyTable';
@@ -46,55 +46,90 @@ export default class CopyTableContainer extends Component {
 
       if (copy.isSold) {
         return (
-          <Button bsStyle='danger' onClick={() => this.refund(copy.id)}>
-            <Glyphicon glyph="ban-circle" />
-          </Button>
+          <OverlayTrigger
+            placement="bottom"
+            overlay={<Tooltip id="cancel">{'Annuler la vente'}</Tooltip>}
+          >
+            <Button bsStyle='danger' onClick={() => this.refund(copy.id)}>
+              <Glyphicon glyph="ban-circle" />
+            </Button>
+          </OverlayTrigger>
         );
       }
 
       if (copy.isReserved) {
         return (
           <ButtonGroup>
-            <Button
-              bsStyle="primary"
-              onClick={() => this.setState({ activeCopy: copy, showModal: 'cancelReservation' })}
+            <OverlayTrigger
+              placement="bottom"
+              overlay={<Tooltip id="cancel">{'Annuler la réservation'}</Tooltip>}
             >
-              <Glyphicon glyph="ban-circle" />
-            </Button>
-            <Button
-              onClick={() => this.sell(copy, true)}
+              <Button
+                bsStyle="primary"
+                onClick={() => this.setState({ activeCopy: copy, showModal: 'cancelReservation' })}
+              >
+                <Glyphicon glyph="ban-circle" />
+              </Button>
+            </OverlayTrigger>
+            <OverlayTrigger
+              placement="bottom"
+              overlay={<Tooltip id="sellParent">{'Vendre à moitié prix'}</Tooltip>}
             >
-              {'$'}
-            </Button>
+              <Button
+                onClick={() => this.sell(copy, true)}
+              >
+                {'$'}
+              </Button>
+            </OverlayTrigger>
           </ButtonGroup>
         );
       }
 
       return (
         <ButtonGroup>
-          <Button
-            bsStyle="primary"
-            onClick={() => this.setState({ activeCopy: copy, showModal: 'reserve' })}
+          <OverlayTrigger
+            placement="bottom"
+            overlay={<Tooltip id="reserve">{'Réserver'}</Tooltip>}
           >
-            <Glyphicon glyph="user" />
-          </Button>
-          <Button
-            onClick={() => this.sell(copy, true)}
+            <Button
+              bsStyle="primary"
+              onClick={() => this.setState({ activeCopy: copy, showModal: 'reserve' })}
+            >
+              <Glyphicon glyph="user" />
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+            placement="bottom"
+            overlay={<Tooltip id="sellParent">{'Vendre à moitié prix'}</Tooltip>}
           >
-            {'$'}
-          </Button>
-          <Button
-            onClick={() => this.sell(copy)}
-            bsStyle='success'
+            <Button
+              onClick={() => this.sell(copy, true)}
+            >
+              {'$'}
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+            placement="bottom"
+            overlay={<Tooltip id="sell">{'Vendre à prix régulier'}</Tooltip>}
           >
-            {'$$'}
-          </Button>
-          <Button
-            bsStyle='danger'
-            onClick={() => this.setState({ activeCopy: copy, showModal: 'delete' })}
+            <Button
+              onClick={() => this.sell(copy)}
+              bsStyle='success'
+            >
+              {'$$'}
+            </Button>
+          </OverlayTrigger>
+          <OverlayTrigger
+            placement="bottom"
+            overlay={<Tooltip id="delete">{'Supprimer de l\'inventaire'}</Tooltip>}
           >
-            <Glyphicon glyph="trash" />
-          </Button>
+            <Button
+              bsStyle='danger'
+              onClick={() => this.setState({ activeCopy: copy, showModal: 'delete' })}
+            >
+              <Glyphicon glyph="trash" />
+            </Button>
+          </OverlayTrigger>
         </ButtonGroup>
       );
     };
