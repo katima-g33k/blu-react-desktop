@@ -13,7 +13,7 @@ const HTTP = {
       'api-key': API_KEY,
     };
 
-    const apiURL = `${API_BASE_URL}/index.php?req=${JSON.stringify(req)}`;
+    const apiURL = `${API_BASE_URL}/index.php?req=${encodeURIComponent(JSON.stringify(req))}`;
     const allowedHeaders = [
       'Origin',
       'X-Authorization',
@@ -27,7 +27,7 @@ const HTTP = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': allowedHeaders.join(', '),
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json charset=utf-8',
       },
     };
     request[method.toLowerCase()](options, (err, res, body) => {

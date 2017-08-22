@@ -97,7 +97,7 @@ export default class MemberFormContainer extends Component {
 
   handleNo() {
     const { member } = this.state;
-    const isEdit = !!this.props.params.no;
+    const isEdit = !!(this.props.params && this.props.params.no);
     const inlineNo = this.schema.sections[0].fields.find(field => field.key === 'no');
 
     if (isEdit) {
@@ -115,7 +115,7 @@ export default class MemberFormContainer extends Component {
   }
 
   save(member) {
-    const { no } = this.props.params;
+    const no = this.props.params && this.props.params.no;
     const data = removeEmptyPropperties({ ...member });
 
     if (data.zip) {
