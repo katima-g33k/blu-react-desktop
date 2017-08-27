@@ -52,6 +52,15 @@ export default class MemberCommentContainer extends Component {
     }
   }
 
+  componentWillReceiveProps(props) {
+    this.setState({
+      activeComment: null,
+      comments: props.comments || [],
+      error: null,
+      showModal: null,
+    });
+  }
+
   deleteComment(event) {
     event.preventDefault();
     const { id } = this.state.activeComment;
