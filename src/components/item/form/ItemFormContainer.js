@@ -131,7 +131,7 @@ export default class ItemFormContainer extends Component {
   }
 
   insert(item) {
-    API.item.insert(item, (error, { id }) => {
+    API.item.insert(item, (error, res) => {
       if (error) {
         this.setState({ error });
         return;
@@ -139,10 +139,10 @@ export default class ItemFormContainer extends Component {
 
       if (this.props.onSave) {
         // TODO: update item with res
-        item.id = id;
+        item.id = res.id;
         this.props.onSave(item);
       } else {
-        this.props.router.push(`/item/view/${id}`);
+        this.props.router.push(`/item/view/${res.id}`);
       }
     });
   }
@@ -153,7 +153,7 @@ export default class ItemFormContainer extends Component {
   }
 
   onSave(event, data) {
-    const { id } = this.props.params;
+    const id = this.props.params ? this.props.params.id : null;
     const { item } = this.state;
 
     if (typeof item.subject === 'object') {
@@ -177,6 +177,7 @@ export default class ItemFormContainer extends Component {
 
     delete item.id;
     delete item.noEan13;
+    delete item.stats;
     return id ? this.update(item) : this.insert(item);
   }
 

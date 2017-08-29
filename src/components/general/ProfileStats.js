@@ -42,6 +42,13 @@ export default class ProfileStats extends Component {
     this.setState({ stats: this.calculateStats(this.state.copies) });
   }
 
+  componentWillReceiveProps(props) {
+    this.setState({
+      copies: props.copies || [],
+      stats: this.calculateStats(this.props.copies || []),
+    });
+  }
+
   getCopies(copies, filters) {
     return copies.filter(copy => copy.transaction.filter(t => filters.indexOf(t.code) > -1).length);
   }

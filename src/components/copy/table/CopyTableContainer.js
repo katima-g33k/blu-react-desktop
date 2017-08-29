@@ -11,6 +11,7 @@ export default class CopyTableContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      activeCopy: null,
       copies: props.copies,
       error: null,
       showModal: null,
@@ -133,6 +134,15 @@ export default class CopyTableContainer extends Component {
         </ButtonGroup>
       );
     };
+  }
+
+  componentWillReceiveProps(props) {
+    this.setState({
+      activeCopy: null,
+      copies: props.copies || [],
+      error: null,
+      showModal: null,
+    });
   }
 
   cancelReservation() {

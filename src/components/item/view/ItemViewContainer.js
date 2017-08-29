@@ -139,6 +139,8 @@ export default class ItemViewContainer extends Component {
   }
 
   getActions() {
+    const user = JSON.parse(sessionStorage.getItem('user'));
+
     return [
       {
         label: 'Modifier',
@@ -157,7 +159,7 @@ export default class ItemViewContainer extends Component {
         },
         rightButton: {
           onClick: this.increaseStatus,
-          disabled: this.state.item.isValid || this.state.item.isRemoved,
+          disabled: this.state.item.isValid || (!user.isAdmin && this.state.item.isRemoved),
         },
       },
       {
