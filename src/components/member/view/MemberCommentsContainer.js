@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-import { Button, ButtonGroup, Glyphicon } from 'react-bootstrap';
+import React, { Component, PropTypes } from 'react';
+import { ButtonGroup } from 'react-bootstrap';
 
 import API from '../../../lib/API';
+import Button from '../../general/Button';
 import CommentColumns from './CommentColumns';
 import { ConfirmModal, InformationModal, InputModal } from '../../general/modals';
 import MemberComments from './MemberComments';
@@ -11,58 +12,51 @@ export default class MemberCommentContainer extends Component {
     super(props);
     this.state = {
       activeComment: null,
-      comments: props.comments || [],
+      comments: props.comments,
       error: null,
       showModal: null,
     };
 
-    this.columns = CommentColumns;
-    this.deleteComment = this.deleteComment.bind(this);
-    this.getModal = this.getModal.bind(this);
-    this.insertComment = this.insertComment.bind(this);
-    this.saveComment = this.saveComment.bind(this);
-    this.updateComment = this.updateComment.bind(this);
+    this.columns = CommentColumns.concat([{
+      dataField: 'action',
+      label: 'Actions',
+      dataAlign: 'center',
+      width: '100px',
+      dataFormat: this.renderActionButtons,
+    }]);
   }
 
-  componentWillMount() {
-    if (this.columns[this.columns.length - 1].dataField !== 'action') {
-      this.columns.push({
-        dataField: 'action',
-        label: 'Actions',
-        dataAlign: 'center',
-        width: '100px',
-        dataFormat: (cell, row) => {
-          return (
-            <ButtonGroup>
-              <Button
-                onClick={() => this.setState({ activeComment: row, showModal: 'input' })}
-              >
-                <Glyphicon glyph="pencil" />
-              </Button>
-              <Button
-                bsStyle="danger"
-                onClick={() => this.setState({ activeComment: row, showModal: 'confirm' })}
-              >
-                <Glyphicon glyph="trash" />
-              </Button>
-            </ButtonGroup>
-          );
-        },
-      });
-    }
+  static propTypes = {
+    comments: PropTypes.array.isRequired,
+    member: PropTypes.string,
   }
 
-  componentWillReceiveProps(props) {
+  static defaultProps = {
+    comments: [],
+  }
+
+  componentWillReceiveProps = (nextProps) => {
+    this.resetState(nextProps.comments);
+  }
+
+  resetState = (comments = []) => {
     this.setState({
       activeComment: null,
-      comments: props.comments || [],
+      comments,
       error: null,
       showModal: null,
     });
   }
 
-  deleteComment(event) {
-    event.preventDefault();
+  handleButtonClick = (actionData) => {
+    this.setState(actionData);
+  }
+
+  handleNewComment = () => {
+    this.setState({ showModal: 'input' });
+  }
+
+  handleDelete = () => {
     const { id } = this.state.activeComment;
 
     API.comment.delete(id, (error) => {
@@ -79,7 +73,7 @@ export default class MemberCommentContainer extends Component {
     });
   }
 
-  insertComment(value) {
+  handleInsert = (value) => {
     API.comment.insert(this.props.member, value, (error, res) => {
       if (error) {
         this.setState({ error, activeComment: null, showModal: null });
@@ -102,13 +96,11 @@ export default class MemberCommentContainer extends Component {
     });
   }
 
-  saveComment(event, value) {
-    event.preventDefault();
-    const isUpdate = !!this.state.activeComment;
-    return isUpdate ? this.updateComment(value) : this.insertComment(value);
+  handleSave = (event, value) => {
+    return this.state.activeComment ? this.handleUpdate(value) : this.handleInsert(value);
   }
 
-  updateComment(value) {
+  handleUpdate = (value) => {
     API.comment.update(this.state.activeComment.id, value, (error) => {
       if (error) {
         this.setState({ error, activeComment: null, showModal: null });
@@ -129,14 +121,14 @@ export default class MemberCommentContainer extends Component {
     });
   }
 
-  getModal() {
+  getModal = () => {
     const { activeComment, error, showModal } = this.state;
 
     if (error) {
       return (
         <InformationModal
           message={error.message}
-          onClick={() => this.setState({ error: null })}
+          onClick={this.resetState}
           title={`Erreur ${error.code}`}
         />
       );
@@ -150,8 +142,8 @@ export default class MemberCommentContainer extends Component {
             title={activeComment ? 'Modifier un commentaire' : 'Ajouter un commentaire'}
             textarea
             value={activeComment ? activeComment.comment : ''}
-            onSave={this.saveComment}
-            onCancel={() => this.setState({ activeComment: null, showModal: null })}
+            onSave={this.handleSave}
+            onCancel={this.resetState}
           />
         );
       case 'confirm':
@@ -159,8 +151,8 @@ export default class MemberCommentContainer extends Component {
           <ConfirmModal
             message={`Souhaitez-vous vraiment supprimer ce commentaire : "${activeComment.comment}"`}
             title="Supprimer un commentaire"
-            onConfirm={this.deleteComment}
-            onCancel={() => this.setState({ activeComment: null, showModal: null })}
+            onConfirm={this.handleDelete}
+            onCancel={this.resetState}
             confirmationStyle="danger"
           />
         );
@@ -169,19 +161,32 @@ export default class MemberCommentContainer extends Component {
     }
   }
 
+  renderActionButtons = (actions, activeComment) => {
+    return (
+      <ButtonGroup>
+        <Button
+          actionData={{ activeComment, showModal: 'input' }}
+          glyph="pencil"
+          onClick={this.handleButtonClick}
+        />
+        <Button
+          actionData={{ activeComment, showModal: 'confirm' }}
+          bsStyle="danger"
+          glyph="trash"
+          onClick={this.handleButtonClick}
+        />
+      </ButtonGroup>
+    );
+  }
+
   render() {
     return (
       <MemberComments
         columns={this.columns}
-        data={this.state.comments}
+        data={this.props.comments}
         modal={this.getModal()}
-        onAddClick={() => this.setState({ showModal: 'input' })}
+        onAddClick={this.handleNewComment}
       />
     );
   }
 }
-
-MemberCommentContainer.propTypes = {
-  comments: React.PropTypes.array,
-  member: React.PropTypes.string,
-};
