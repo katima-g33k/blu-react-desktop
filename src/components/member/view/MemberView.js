@@ -7,7 +7,7 @@ import moment from 'moment';
 import ActionPanel from '../../general/ActionPanel';
 import AlignedData from '../../general/AlignedData';
 import CopyTableContainer from '../../copy/table/CopyTableContainer';
-import MemberCommentsContainer from './MemberCommentsContainer';
+import MemberComments from './MemberComments';
 import MemberReceipt from '../receipt/MemberReceipt';
 import ProfileStats from '../../general/ProfileStats';
 
@@ -152,7 +152,7 @@ export default class MemberView extends Component {
             <Row>
               <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
               <Col sm={12} md={6}>
-                <MemberCommentsContainer
+                <MemberComments
                   member={no}
                   comments={account.comment}
                 />

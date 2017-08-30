@@ -1,7 +1,14 @@
 import React, { Component, PropTypes } from 'react';
-import { Button, Checkbox, Col, ControlLabel, FormControl, Glyphicon, Row } from 'react-bootstrap';
+import {
+  Checkbox,
+  Col,
+  ControlLabel,
+  FormControl,
+  Row,
+} from 'react-bootstrap';
 import FileSaver from 'file-saver';
 
+import Button from './Button';
 import Table from './Table';
 
 const renderOptions = (options) => {
@@ -66,10 +73,9 @@ export default class TableLayout extends Component {
       <Button
         bsStyle="primary"
         onClick={this.saveFile}
-      >
-        <Glyphicon glyph="new-window" style={{ paddingRight: '10px' }} />
-        {'Exporter sélection'}
-      </Button>
+        glyph="new-window"
+        label={'Exporter sélection'}
+      />
     );
   }
 
@@ -78,13 +84,12 @@ export default class TableLayout extends Component {
 
     return actions.map(action => (
       <Button
-        key={action.name}
         bsStyle={action.bsStyle}
+        key={action.name}
+        glyph={action.icon}
+        label={action.label}
         onClick={action.onClick}
-      >
-        {action.icon ? (<Glyphicon glyph={action.icon} style={{ paddingRight: '10px' }} />) : null}
-        {action.label}
-      </Button>
+      />
     ));
   }
 

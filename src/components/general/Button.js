@@ -30,8 +30,7 @@ export default class Button extends Component {
         bsStyle={bsStyle}
         onClick={this.onClick}
       >
-        {glyph && (<Glyphicon glyph={glyph} />)}
-        {label}
+        {glyph && (<Glyphicon glyph={glyph} />)} {label}
       </BootstrapButton>
     );
   }
