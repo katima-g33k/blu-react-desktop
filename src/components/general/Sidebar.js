@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Col, Glyphicon, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 
@@ -76,9 +76,11 @@ export default class Sidebar extends Component {
       location: '/',
     };
 
+    this.handleLogout = this.handleLogout.bind(this);
     this.isCurrentLocation = this.isCurrentLocation.bind(this);
     this.getMenuItems = this.getMenuItems.bind(this);
     this.renderBackButton = this.renderBackButton.bind(this);
+    this.renderLogoutButton = this.renderLogoutButton.bind(this);
     this.renderMenu = this.renderMenu.bind(this);
   }
 
@@ -88,6 +90,10 @@ export default class Sidebar extends Component {
     browserHistory.listen(({ pathname }) => {
       this.setState({ location: pathname });
     });
+  }
+
+  handleLogout() {
+    this.props.onLogout();
   }
 
   isCurrentLocation(key, href) {
@@ -105,6 +111,14 @@ export default class Sidebar extends Component {
 
     data.push(settingsMenuItem);
     return data;
+  }
+
+  renderLogoutButton() {
+    return (
+      <p id="backButton" onClick={this.handleLogout}>
+        <Glyphicon glyph="log-out" /> {'Déconnexion'}
+      </p>
+    );
   }
 
   renderBackButton() {
@@ -162,21 +176,32 @@ export default class Sidebar extends Component {
   render() {
     return (
       <Row componentClass='nav'>
-        <Row>
-          <Col md={12}>
-            {this.renderBackButton()}
-          </Col>
-        </Row>
-        <Row>
-          <Col
-            md={12}
-            componentClass='ul'
-            style={{ listStyle: 'none', fontSize: '1.1em', padding: '20px' }}
-          >
-            {this.renderMenu(this.getMenuItems())}
-          </Col>
-        </Row>
+        <Col md={12}>
+          <Row>
+            <Col md={12}>
+              {this.renderLogoutButton()}
+            </Col>
+          </Row>
+          <Row>
+            <Col md={12}>
+              {this.renderBackButton()}
+            </Col>
+          </Row>
+          <Row>
+            <Col
+              md={12}
+              componentClass='ul'
+              style={{ listStyle: 'none', fontSize: '1.1em', padding: '20px' }}
+            >
+              {this.renderMenu(this.getMenuItems())}
+            </Col>
+          </Row>
+        </Col>
       </Row>
     );
   }
 }
+
+Sidebar.propTypes = {
+  onLogout: PropTypes.func.isRequired,
+};
