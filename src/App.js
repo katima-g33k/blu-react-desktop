@@ -24,6 +24,7 @@ export default class App extends Component {
     };
 
     this.canChangeLocation = this.canChangeLocation.bind(this);
+    this.onLogout = this.onLogout.bind(this);
     this.onInvalidScan = this.onInvalidScan.bind(this);
     this.onItemScan = this.onItemScan.bind(this);
     this.onMemberScan = this.onMemberScan.bind(this);
@@ -79,6 +80,11 @@ export default class App extends Component {
     this.setState({ showModal: 'invalidCode' });
   }
 
+  onLogout() {
+    sessionStorage.removeItem('user');
+    this.setState({ user: null });
+  }
+
   renderMain() {
     const { apiKey, apiUrl, secretKey } = settings;
 
@@ -106,7 +112,7 @@ export default class App extends Component {
     return (
       <main>
         <Col componentClass="aside" md={2}>
-          <Sidebar />
+          <Sidebar onLogout={this.onLogout} />
         </Col>
         <Col sm={12} md={10}>
           <Routes />
