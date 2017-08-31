@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { Col, Row } from 'react-bootstrap';
 
 import Spinner from './Spinner';
-import Transaction, { Type } from '../../lib/Transaction';
 import { Translate } from '../../lib/i18n/i18n';
 
 const style = {
@@ -23,128 +22,135 @@ const style = {
   },
 };
 
-export default class ProfileStats extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      copies: props.copies || [],
-      stats: null,
-    };
-
-    this.getCopies = this.getCopies.bind(this);
-    this.getPrice = this.getPrice.bind(this);
-    this.calculateStats = this.calculateStats.bind(this);
-    this.renderPriceStats = this.renderPriceStats.bind(this);
-    this.renderTable = this.renderTable.bind(this);
-  }
-
-  componentWillMount() {
-    this.setState({ stats: this.calculateStats(this.state.copies) });
-  }
-
-  componentWillReceiveProps(props) {
-    this.setState({
-      copies: props.copies || [],
-      stats: this.calculateStats(this.props.copies || []),
-    });
-  }
-
-  getCopies(copies, filters) {
-    return copies.filter(copy => copy.transaction.filter(t => filters.indexOf(t.code) > -1).length);
-  }
-
-  getPrice(copies) {
-    return copies.reduce((acc, cur) => acc + +cur.price, 0);
-  }
-
-  calculateStats(copies) {
-    const copiesSold = this.getCopies(copies, Transaction.type.getAllSell());
-    const copiesPaid = this.getCopies(copies, [Type.PAY]);
-    const stats = {
+const calculateStats = (copies, callback) => {
+  const statistics = {
+    accountStats: {
       added: {
-        count: copies.length,
-        price: this.getPrice(copies),
+        count: 0,
+        price: 0,
       },
       sold: {
-        count: copiesSold.length,
-        price: this.getPrice(copiesSold),
+        count: 0,
+        price: 0,
       },
       paid: {
-        count: copiesPaid.length,
-        price: this.getPrice(copiesPaid),
+        count: 0,
+        price: 0,
       },
-      toSell: {},
-      toPay: {},
-    };
-
-    stats.toSell = {
-      count: stats.added.count - stats.sold.count,
-      price: stats.added.price - stats.sold.price,
-    };
-
-    stats.toPay = {
-      count: stats.sold.count - stats.paid.count,
-      price: stats.sold.price - stats.paid.price,
-    };
-
-    return stats;
-  }
-
-  renderPriceStats() {
-    let numInStock = 0;
-
-    const { copies } = this.state;
-    const priceStats = {
+      toSell: {
+        count: 0,
+        price: 0,
+      },
+      toPay: {
+        count: 0,
+        price: 0,
+      },
+    },
+    priceStats: {
       max: {
         all: 0,
         inStock: 0,
       },
       min: {
-        all: null,
-        inStock: null,
+        all: -1,
+        inStock: -1,
       },
       avg: {
         all: 0,
         inStock: 0,
       },
-    };
+    },
+  };
 
-    copies.forEach((copy) => {
-      priceStats.avg.all += copy.price;
+  const data = copies.reduce((acc, copy) => {
+    const { accountStats, priceStats } = acc;
+    const price = +copy.price;
 
-      if (copy.price > priceStats.max.all) {
-        priceStats.max.all = copy.price;
+    accountStats.added.count++;
+    accountStats.added.price += price;
+
+    if (copy.isAdded) {
+      accountStats.toSell.count++;
+      accountStats.toSell.price += price;
+
+      priceStats.avg.inStock += price;
+
+      if (price > priceStats.max.inStock) {
+        priceStats.max.inStock = price;
       }
 
-      if ((!priceStats.min.all && priceStats.min.all !== 0) || copy.price < priceStats.min.all) {
-        priceStats.min.all = copy.price;
+      if (priceStats.min.inStock === -1 || price < priceStats.min.inStock) {
+        priceStats.min.inStock = price;
       }
-
-      if (copy.isAdded) {
-        numInStock++;
-        priceStats.avg.inStock += copy.price;
-
-        if (copy.price > priceStats.max.inStock) {
-          priceStats.max.inStock = copy.price;
-        }
-
-        if ((!priceStats.min.inStock && priceStats.min.inStock !== 0) || copy.price < priceStats.min.inStock) {
-          priceStats.min.inStock = copy.price;
-        }
-      }
-    });
-
-    if (copies.length > 0) {
-      priceStats.avg.all = Math.round(priceStats.avg.all / copies.length);
-    } else {
-      priceStats.min.all = 0;
     }
 
-    if (numInStock > 0) {
-      priceStats.avg.inStock = Math.round(priceStats.avg.inStock / numInStock);
-    } else {
-      priceStats.min.inStock = 0;
+    if (copy.isSold) {
+      accountStats.sold.count++;
+      accountStats.sold.price += price;
+      accountStats.toPay.count++;
+      accountStats.toPay.price += price;
     }
+
+    if (copy.isPaid) {
+      accountStats.sold.count++;
+      accountStats.sold.price += price;
+      accountStats.paid.count++;
+      accountStats.paid.price += price;
+    }
+
+
+    priceStats.avg.all += price;
+
+    if (price > priceStats.max.all) {
+      priceStats.max.all = price;
+    }
+
+    if (priceStats.min.all === -1 || price < priceStats.min.all) {
+      priceStats.min.all = price;
+    }
+
+    return { accountStats, priceStats };
+  }, statistics);
+
+  const inStock = data.accountStats.toSell.count;
+
+  if (copies.length > 0) {
+    data.priceStats.avg.all = Math.round(data.priceStats.avg.all / copies.length);
+  } else {
+    data.priceStats.min.all = 0;
+  }
+
+  if (inStock > 0) {
+    data.priceStats.avg.inStock = Math.round(data.priceStats.avg.inStock / inStock);
+  } else {
+    data.priceStats.min.inStock = 0;
+  }
+
+  callback(data);
+};
+
+export default class ProfileStats extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { stats: null };
+  }
+
+  static propTypes = {
+    copies: PropTypes.array,
+    priceStats: PropTypes.bool,
+  }
+
+  componentWillMount = () => {
+    calculateStats(this.props.copies || [], stats => this.setState({ stats }));
+  }
+
+  componentWillReceiveProps = ({ copies = [] }) => {
+    this.setState({ stats: null });
+    calculateStats(copies, stats => this.setState({ stats }));
+  }
+
+  renderPriceStats = () => {
+    const { priceStats } = this.state.stats;
 
     return (
       <Row>
@@ -169,8 +175,8 @@ export default class ProfileStats extends Component {
     );
   }
 
-  renderTable() {
-    const { added, sold, toSell, toPay, paid } = this.state.stats;
+  renderTable = () => {
+    const { added, sold, toSell, toPay, paid } = this.state.stats.accountStats;
 
     return (
       <table style={style.table}>
@@ -250,8 +256,3 @@ export default class ProfileStats extends Component {
     ) : (<Spinner />);
   }
 }
-
-ProfileStats.propTypes = {
-  copies: PropTypes.array,
-  priceStats: PropTypes.bool,
-};
