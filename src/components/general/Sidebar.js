@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import { Col, Glyphicon, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 
 import { Translate } from '../../lib/i18n/i18n';
+import SidebarButton from './SidebarButton';
 
 const menuItems = [
   {
@@ -89,10 +90,6 @@ export default class Sidebar extends Component {
     });
   }
 
-  handleLogout = () => {
-    this.props.onLogout();
-  }
-
   isCurrentLocation = (key, href) => {
     const { location } = this.state;
     return location.includes(href) || location.includes(key.replace(/_/g, '/'));
@@ -112,17 +109,21 @@ export default class Sidebar extends Component {
 
   renderLogoutButton = () => {
     return (
-      <p id="backButton" onClick={this.handleLogout}>
-        <Glyphicon glyph="log-out" /> {'Déconnexion'}
-      </p>
+      <SidebarButton
+        icon="log-out"
+        onClick={this.props.onLogout}
+        title="Déconnexion"
+      />
     );
   }
 
   renderBackButton = () => {
     return (
-      <p id="backButton" onClick={browserHistory.goBack}>
-        <Glyphicon glyph="arrow-left" /> {'Page précédente'}
-      </p>
+      <SidebarButton
+        icon="arrow-left"
+        onClick={browserHistory.goBack}
+        title="Page précédente"
+      />
     );
   }
 

@@ -383,3 +383,9 @@ AutoForm.propTypes = {
   onCancel: React.PropTypes.func,
   onSave: React.PropTypes.func.isRequired,
 };
+
+AutoForm.defaultProps = {
+  data: {},
+  onSave: () => {},
+  schema: {},
+};

@@ -43,7 +43,7 @@ h4 {
   display: none;
 }
 
-#backButton {
+.menu-button {
   cursor: pointer;
   margin-left: 15px;
   padding: 15px;
