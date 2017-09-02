@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
-import { Col, Glyphicon, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 
 import { Translate } from '../../lib/i18n/i18n';
+import SidebarButton from './SidebarButton';
 
 const menuItems = [
   {
@@ -75,14 +76,11 @@ export default class Sidebar extends Component {
     this.state = {
       location: '/',
     };
-
-    this.handleLogout = this.handleLogout.bind(this);
-    this.isCurrentLocation = this.isCurrentLocation.bind(this);
-    this.getMenuItems = this.getMenuItems.bind(this);
-    this.renderBackButton = this.renderBackButton.bind(this);
-    this.renderLogoutButton = this.renderLogoutButton.bind(this);
-    this.renderMenu = this.renderMenu.bind(this);
   }
+
+  static propTypes = {
+    onLogout: PropTypes.func.isRequired,
+  };
 
   componentDidMount() {
     this.setState({ location: browserHistory.getCurrentLocation().pathname });
@@ -92,16 +90,12 @@ export default class Sidebar extends Component {
     });
   }
 
-  handleLogout() {
-    this.props.onLogout();
-  }
-
-  isCurrentLocation(key, href) {
+  isCurrentLocation = (key, href) => {
     const { location } = this.state;
     return location.includes(href) || location.includes(key.replace(/_/g, '/'));
   }
 
-  getMenuItems() {
+  getMenuItems = () => {
     const user = sessionStorage.getItem('user');
     const data = [...menuItems];
 
@@ -113,23 +107,27 @@ export default class Sidebar extends Component {
     return data;
   }
 
-  renderLogoutButton() {
+  renderLogoutButton = () => {
     return (
-      <p id="backButton" onClick={this.handleLogout}>
-        <Glyphicon glyph="log-out" /> {'Déconnexion'}
-      </p>
+      <SidebarButton
+        icon="log-out"
+        onClick={this.props.onLogout}
+        title="Déconnexion"
+      />
     );
   }
 
-  renderBackButton() {
+  renderBackButton = () => {
     return (
-      <p id="backButton" onClick={browserHistory.goBack}>
-        <Glyphicon glyph="arrow-left" /> {'Page précédente'}
-      </p>
+      <SidebarButton
+        icon="arrow-left"
+        onClick={browserHistory.goBack}
+        title="Page précédente"
+      />
     );
   }
 
-  renderMenu(data, isChild) {
+  renderMenu = (data, isChild) => {
     return data.map(({ children, key, href }) => {
       if (children) {
         return (
@@ -201,7 +199,3 @@ export default class Sidebar extends Component {
     );
   }
 }
-
-Sidebar.propTypes = {
-  onLogout: PropTypes.func.isRequired,
-};

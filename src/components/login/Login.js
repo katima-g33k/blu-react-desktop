@@ -35,17 +35,16 @@ const schema = {
 export default class Login extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       error: null,
     };
-
-    this.connect = this.connect.bind(this);
-    this.renderModal = this.renderModal.bind(this);
-    this.schema = schema;
   }
 
-  connect({ username, password }) {
+  static propTypes = {
+    onConnected: PropTypes.func.isRequired,
+  }
+
+  connect = ({ username, password }) => {
     API.employee.login(username, encrypt(password), (error, res) => {
       if (error) {
         this.setState({ error });
@@ -57,7 +56,11 @@ export default class Login extends Component {
     });
   }
 
-  renderModal() {
+  closeModal = () => {
+    this.setState({ error: null });
+  }
+
+  renderModal = () => {
     const { error } = this.state;
     const messages = {
       UNAUTHORIZED: 'Pseudonym ou mot de passe invalide.',
@@ -66,7 +69,7 @@ export default class Login extends Component {
     return error && (
       <InformationModal
         message={messages[error.message] || error.message}
-        onClick={() => this.setState({ error: null })}
+        onClick={this.closeModal}
         title={`Error ${error.code}`}
       />
     );
@@ -81,9 +84,8 @@ export default class Login extends Component {
               <Col md={10} mdOffset={1}>
                 <AutoForm
                   confirmButtonText={'Se connecter'}
-                  data={{}}
                   onSave={this.connect}
-                  schema={this.schema}
+                  schema={schema}
                 />
               </Col>
             </Row>
@@ -94,7 +96,3 @@ export default class Login extends Component {
     );
   }
 }
-
-Login.propTypes = {
-  onConnected: PropTypes.func.isRequired,
-};
