@@ -103,6 +103,21 @@ export default class MemberViewContainer extends Component {
       },
     ];
 
+    const adminActions = [{
+      label: 'Transférer à la BLU',
+      style: 'primary',
+      onClick: event => {
+        event.preventDefault();
+        this.setState({ showModal: 'transfer' });
+      },
+    }];
+
+    const user = JSON.parse(sessionStorage.getItem('user'));
+
+    if (user.isAdmin && this.state.member.account.isActive) {
+      return [...generalActions, ...activeActions, ...adminActions];
+    }
+
     return generalActions.concat(this.state.member.account.isActive ? activeActions : inactiveActions);
   }
 
@@ -145,9 +160,7 @@ export default class MemberViewContainer extends Component {
 
   transferAccount() {
     const member = this.state.member;
-    const copies = member.account.getAddedCopies();
-    copies.push(...member.account.getSoldCopies());
-
+    const copies = [...member.account.getAddedCopies(), ...member.account.getSoldCopies()];
     const copyIDs = copies.map(copy => copy.id);
 
     API.transaction.insert(member.no, copyIDs, Transaction.TYPES.DONATE, (error) => {
@@ -157,7 +170,7 @@ export default class MemberViewContainer extends Component {
       }
 
       member.account.donateAll();
-      this.setState({ member });
+      this.setState({ member, showModal: null });
     });
   }
 
