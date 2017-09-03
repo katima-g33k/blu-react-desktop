@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 
 import API from '../../../lib/API';
-import { InformationModal } from '../../general/modals';
+import { ConfirmModal, InformationModal } from '../../general/modals';
 import Member from '../../../lib/models/Member';
 import MemberForm from './MemberForm';
 import memberFormSchema from './memberFormSchema';
@@ -32,12 +32,19 @@ export default class MemberFormContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      email: '',
       error: null,
-      states: [],
+      isAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
       member: new Member(),
+      no: this.props.params && this.props.params.no,
+      showModal: null,
+      states: [],
     };
 
     this.cancel = this.cancel.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+    this.handleMerge = this.handleMerge.bind(this);
+    this.exists = this.exists.bind(this);
     this.getModal = this.getModal.bind(this);
     this.handleNo = this.handleNo.bind(this);
     this.insert = this.insert.bind(this);
@@ -69,7 +76,7 @@ export default class MemberFormContainer extends Component {
           return;
         }
 
-        this.setState({ member: new Member(res) });
+        this.setState({ member: new Member(res), email: res.email });
       });
     } else if (this.props.location.query.no) {
       const { no } = this.props.location.query;
@@ -77,10 +84,23 @@ export default class MemberFormContainer extends Component {
     }
   }
 
+  closeModal() {
+    this.setState({ error: null, isUpdate: null, showModal: null });
+  }
+
   cancel(event) {
     event.preventDefault();
     const { no } = this.props.params;
     browserHistory.push(no ? `/member/view/${no}` : '/search');
+  }
+
+  async exists(no, data) {
+    const distinct = {
+      no: `${no}` !== data.no ? data.no : undefined,
+      email: this.state.email !== data.email ? data.email : undefined,
+    };
+
+    return new Promise(resolve => API.member.exists(distinct, (error) => resolve(!error)));
   }
 
   insert(data) {
@@ -92,6 +112,28 @@ export default class MemberFormContainer extends Component {
 
       const no = res.no || data.no;
       browserHistory.push(`/member/view/${no}`);
+    });
+  }
+
+  handleMerge() {
+    const member = this.state.member;
+    const data = {};
+
+    if (member.no !== this.state.no) {
+      data.no = member.no;
+      data.duplicate = this.state.no;
+    } else {
+      data.email = member.email;
+      data.duplicate = this.state.email;
+    }
+
+    API.member.merge(data, (error) => {
+      if (error) {
+        this.setState({ error });
+        return;
+      }
+
+      this.setState({ showModal: 'merged' });
     });
   }
 
@@ -114,9 +156,13 @@ export default class MemberFormContainer extends Component {
     }
   }
 
-  save(member) {
+  async save(member) {
     const no = this.props.params && this.props.params.no;
     const data = removeEmptyPropperties({ ...member });
+
+    if (await this.exists(no, data)) {
+      return this.setState({ isUpdate: !!no, showModal: 'exists' });
+    }
 
     if (data.zip) {
       data.zip = data.zip.replace(/\s/g, '').toUpperCase();
@@ -137,15 +183,74 @@ export default class MemberFormContainer extends Component {
   }
 
   getModal() {
-    const { error } = this.state;
+    const { error, isAdmin, isUpdate, showModal } = this.state;
 
-    return error && (
-      <InformationModal
-        message={error.message}
-        onClick={() => this.setState({ error: null })}
-        title={`Erreur ${error.code}`}
-      />
-    );
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={this.closeModal}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
+      case 'exists':
+        if (!isUpdate) {
+          // TODO: Go to member
+          return (
+            <ConfirmModal
+              message={'Un membre avec les informations saisies existent déjà. Voulez-vous aller à sa fiche ?'}
+              onCancel={this.closeModal}
+              onConfirm={this.closeModal}
+              title={'Erreur = Membre existant'}
+            />
+          );
+        }
+
+        if (isAdmin) {
+          // eslint-disable-next-line max-len
+          const message = 'Les informations que vous avez inscrites correspondent à un compte déjà existant. Voulez-vous fusionner ce compte avec le compte correspondant ?';
+
+          return (
+            <ConfirmModal
+              customActions={[
+                {
+                  label: 'Annuler',
+                  onClick: this.closeModal,
+                },
+                {
+                  bsStyle: 'danger',
+                  label: 'Fusionner',
+                  onClick: this.handleMerge,
+                },
+              ]}
+              message={message}
+              title={'Erreur - Compte existant'}
+            />
+          );
+        }
+
+        return (
+          <InformationModal
+            message={'Les informations que vous avez inscrites correspondent à un compte déjà existant.'}
+            onClick={this.closeModal}
+            title={'Compte déjà existant'}
+          />
+        );
+      case 'merged':
+        // TODO: Go to member
+        return (
+          <InformationModal
+            message={'Les comptes ont été fusionnés, vous serez redirigé au compte du membre.'}
+            onClick={this.closeModal}
+            title={'Comptes fussionés'}
+          />
+        );
+      default:
+        return null;
+    }
   }
 
   render() {

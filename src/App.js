@@ -60,7 +60,7 @@ export default class App extends Component {
 
   onMemberScan = (no) => {
     if (this.canChangeLocation()) {
-      API.member.exists(no, (error, res) => {
+      API.member.exists({ no }, (error, res) => {
         if (error) {
           this.setState({ error });
           return;
