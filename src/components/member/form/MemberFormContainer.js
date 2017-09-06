@@ -37,6 +37,7 @@ export default class MemberFormContainer extends Component {
       isAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
       member: new Member(),
       no: this.props.params && this.props.params.no,
+      redirectTo: null,
       showModal: null,
       states: [],
     };
@@ -50,6 +51,8 @@ export default class MemberFormContainer extends Component {
     this.insert = this.insert.bind(this);
     this.save = this.save.bind(this);
     this.update = this.update.bind(this);
+    this.goToMember = this.goToMember.bind(this);
+    this.handleGoToMember = this.handleGoToMember.bind(this);
 
     this.schema = memberFormSchema;
     this.schema.title = !this.props.params.no ? 'Ajouter un membre' : 'Modifier un membre';
@@ -133,7 +136,7 @@ export default class MemberFormContainer extends Component {
         return;
       }
 
-      this.setState({ showModal: 'merged' });
+      this.setState({ showModal: 'merged', redirectTo: data.no });
     });
   }
 
@@ -161,7 +164,7 @@ export default class MemberFormContainer extends Component {
     const data = removeEmptyPropperties({ ...member });
 
     if (await this.exists(no, data)) {
-      return this.setState({ isUpdate: !!no, showModal: 'exists' });
+      return this.setState({ isUpdate: !!no, showModal: 'exists', redirectTo: data.no });
     }
 
     if (data.zip) {
@@ -178,8 +181,16 @@ export default class MemberFormContainer extends Component {
         return;
       }
 
-      browserHistory.push(`/member/view/${data.no}`);
+      this.goToMember(data.no);
     });
+  }
+
+  goToMember(no) {
+    browserHistory.push(`/member/view/${no}`);
+  }
+
+  handleGoToMember() {
+    this.goToMember(this.state.redirectTo);
   }
 
   getModal() {
@@ -198,12 +209,11 @@ export default class MemberFormContainer extends Component {
     switch (showModal) {
       case 'exists':
         if (!isUpdate) {
-          // TODO: Go to member
           return (
             <ConfirmModal
               message={'Un membre avec les informations saisies existent déjà. Voulez-vous aller à sa fiche ?'}
               onCancel={this.closeModal}
-              onConfirm={this.closeModal}
+              onConfirm={this.handleGoToMember}
               title={'Erreur = Membre existant'}
             />
           );
@@ -240,11 +250,10 @@ export default class MemberFormContainer extends Component {
           />
         );
       case 'merged':
-        // TODO: Go to member
         return (
           <InformationModal
             message={'Les comptes ont été fusionnés, vous serez redirigé au compte du membre.'}
-            onClick={this.closeModal}
+            onClick={this.handleGoToMember}
             title={'Comptes fussionés'}
           />
         );
