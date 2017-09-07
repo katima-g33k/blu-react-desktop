@@ -66,7 +66,7 @@ export default class App extends Component {
           return;
         }
 
-        const path = res.code === 200 ? `view/${no}` : `add?no=${no}`;
+        const path = res.no ? `view/${res.no}` : `add?no=${no}`;
         browserHistory.push(`/member/${path}`);
       });
     }

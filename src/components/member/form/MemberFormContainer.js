@@ -103,7 +103,15 @@ export default class MemberFormContainer extends Component {
       email: this.state.email !== data.email ? data.email : undefined,
     };
 
-    return new Promise(resolve => API.member.exists(distinct, (error) => resolve(!error)));
+    return new Promise((resolve, reject) => {
+      API.member.exists(distinct, (error, res) => {
+        if (error) {
+          return reject(error);
+        }
+
+        return resolve(res.no);
+      });
+    });
   }
 
   insert(data) {
@@ -119,24 +127,16 @@ export default class MemberFormContainer extends Component {
   }
 
   handleMerge() {
-    const member = this.state.member;
-    const data = {};
+    const duplicate = this.state.no;
+    const no = this.state.redirectTo;
 
-    if (member.no !== this.state.no) {
-      data.no = member.no;
-      data.duplicate = this.state.no;
-    } else {
-      data.email = member.email;
-      data.duplicate = this.state.email;
-    }
-
-    API.member.merge(data, (error) => {
+    API.member.merge({ duplicate, no }, (error) => {
       if (error) {
         this.setState({ error });
         return;
       }
 
-      this.setState({ showModal: 'merged', redirectTo: data.no });
+      this.setState({ showModal: 'merged' });
     });
   }
 
@@ -162,9 +162,10 @@ export default class MemberFormContainer extends Component {
   async save(member) {
     const no = this.props.params && this.props.params.no;
     const data = removeEmptyPropperties({ ...member });
+    const existingUser = await this.exists(no, data);
 
-    if (await this.exists(no, data)) {
-      return this.setState({ isUpdate: !!no, showModal: 'exists', redirectTo: data.no });
+    if (existingUser) {
+      return this.setState({ isUpdate: !!no, showModal: 'exists', redirectTo: existingUser });
     }
 
     if (data.zip) {
