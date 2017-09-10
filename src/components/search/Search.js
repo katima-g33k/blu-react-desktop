@@ -11,12 +11,22 @@ import {
   Row,
 } from 'react-bootstrap';
 import { Link } from 'react-router';
-import Table from '../general/Table.js';
+
 import I18n, { Translate } from '../../lib/i18n/i18n';
+import Logger from '../../lib/Logger';
 import Spinner from '../general/Spinner';
+import Table from '../general/Table.js';
 
 export default class Search extends Component {
+  constructor(props) {
+    super(props);
+    this.logger = new Logger(this.constructor.name);
+    this.logger.trace('constructor()');
+  }
+
   render() {
+    this.logger.trace('render()');
+
     return (
       <Panel header={this.props.noHeader ? null : I18n.t('Search.title')}>
         <Row>

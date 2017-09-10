@@ -1,29 +1,43 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
+import moment from 'moment';
 
 import API from '../../../lib/API';
+import capitalize from '../../../lib/capitalize';
 import { ConfirmModal, InformationModal } from '../../general/modals';
 import Member from '../../../lib/models/Member';
 import MemberForm from './MemberForm';
 import memberFormSchema from './memberFormSchema';
 
-const removeEmptyPropperties = (data) => {
-  Object.keys(data).forEach((key) => {
-    if (data[key] === null || (typeof data[key] === 'boolean' && key !== 'is_parent')) {
-      delete data[key];
-    } else if (typeof data[key] === 'string' && data[key] === '') {
-      delete data[key];
-    } else if (typeof data[key] === 'number' && data[key] === 0) {
-      delete data[key];
-    } else if (Array.isArray(data[key]) && !data[key].length) {
-      delete data[key];
-    } else if (typeof data[key] === 'object') {
-      const property = removeEmptyPropperties(data[key]);
-      if (!Object.keys(property).length) {
-        delete data[key];
-      }
-    }
-  });
+const formatData = (member) => {
+  const data = member;
+
+  data.firstName = capitalize(data.firstName);
+  data.lastName = capitalize(data.lastName);
+
+  if (data.noNo) {
+    delete data.noNo;
+    delete data.no;
+  } else if (data.no.length === 7) {
+    data.no = `${+data.no.substr(0, 2) <= +moment().format('YY') ? '20' : '19'}${data.no}`;
+  }
+
+  if (data.city.name) {
+    data.city.name = capitalize(data.city.name);
+    data.city.state.code = data.city.state.code || 'QC';
+  } else {
+    delete data.city;
+  }
+
+  if (data.zip) {
+    data.zip = data.zip.replace(/\s/g, '').toUpperCase();
+  }
+
+  if (data.address) {
+    data.address = capitalize(data.address);
+  }
+
+  data.phone = data.phone.filter(phone => phone.number);
 
   return data;
 };
@@ -36,26 +50,14 @@ export default class MemberFormContainer extends Component {
       error: null,
       isAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
       member: new Member(),
-      no: this.props.params && this.props.params.no,
+      no: props.params && props.params.no,
       redirectTo: null,
       showModal: null,
       states: [],
     };
 
-    this.cancel = this.cancel.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-    this.handleMerge = this.handleMerge.bind(this);
-    this.exists = this.exists.bind(this);
-    this.getModal = this.getModal.bind(this);
-    this.handleNo = this.handleNo.bind(this);
-    this.insert = this.insert.bind(this);
-    this.save = this.save.bind(this);
-    this.update = this.update.bind(this);
-    this.goToMember = this.goToMember.bind(this);
-    this.handleGoToMember = this.handleGoToMember.bind(this);
-
-    this.schema = memberFormSchema;
-    this.schema.title = !this.props.params.no ? 'Ajouter un membre' : 'Modifier un membre';
+    this.schema = JSON.parse(JSON.stringify(memberFormSchema));
+    this.schema.title = !props.params.no ? 'Ajouter un membre' : 'Modifier un membre';
     this.handleNo();
   }
 
@@ -72,8 +74,8 @@ export default class MemberFormContainer extends Component {
       this.setState({ states: res });
     });
 
-    if (this.props.params.no) {
-      API.member.select(this.props.params.no, (error, res) => {
+    if (this.state.no) {
+      API.member.select(this.state.no, (error, res) => {
         if (error) {
           this.setState({ error });
           return;
@@ -87,46 +89,47 @@ export default class MemberFormContainer extends Component {
     }
   }
 
-  closeModal() {
-    this.setState({ error: null, isUpdate: null, showModal: null });
-  }
+  closeModal = () => this.setState({ error: null, isUpdate: null, showModal: null })
 
-  cancel(event) {
+  cancel = (event) => {
     event.preventDefault();
-    const { no } = this.props.params;
+    const { no } = this.state;
     browserHistory.push(no ? `/member/view/${no}` : '/search');
   }
 
-  async exists(no, data) {
+  exists = async (no, data) => {
     const distinct = {
       no: `${no}` !== data.no ? data.no : undefined,
       email: this.state.email !== data.email ? data.email : undefined,
     };
 
     return new Promise((resolve, reject) => {
-      API.member.exists(distinct, (error, res) => {
-        if (error) {
-          return reject(error);
-        }
+      if (distinct.no || distinct.email) {
+        API.member.exists(distinct, (error, res) => {
+          if (error) {
+            return reject(error);
+          }
 
-        return resolve(res.no);
-      });
+          return resolve(res.no);
+        });
+      }
+
+      return resolve();
     });
   }
 
-  insert(data) {
+  insert = (data) => {
     API.member.insert(data, (error, res) => {
       if (error) {
         this.setState({ error });
         return;
       }
 
-      const no = res.no || data.no;
-      browserHistory.push(`/member/view/${no}`);
+      this.goToMember(res.no || data.no);
     });
   }
 
-  handleMerge() {
+  handleMerge = () => {
     const duplicate = this.state.no;
     const no = this.state.redirectTo;
 
@@ -140,9 +143,9 @@ export default class MemberFormContainer extends Component {
     });
   }
 
-  handleNo() {
-    const { member } = this.state;
-    const isEdit = !!(this.props.params && this.props.params.no);
+  handleNo = () => {
+    const { member, no } = this.state;
+    const isEdit = !!no;
     const inlineNo = this.schema.sections[0].fields.find(field => field.key === 'no');
 
     if (isEdit) {
@@ -159,9 +162,9 @@ export default class MemberFormContainer extends Component {
     }
   }
 
-  async save(member) {
+  save = async (member) => {
     const no = this.props.params && this.props.params.no;
-    const data = removeEmptyPropperties({ ...member });
+    const data = formatData({ ...member });
     const existingUser = await this.exists(no, data);
 
     if (existingUser) {
@@ -175,7 +178,7 @@ export default class MemberFormContainer extends Component {
     return no ? this.update(no, data) : this.insert(data);
   }
 
-  update(no, data) {
+  update = (no, data) => {
     API.member.update(no, data, (error) => {
       if (error) {
         this.setState({ error });
@@ -186,15 +189,11 @@ export default class MemberFormContainer extends Component {
     });
   }
 
-  goToMember(no) {
-    browserHistory.push(`/member/view/${no}`);
-  }
+  goToMember = (no) => browserHistory.push(`/member/view/${no}`)
 
-  handleGoToMember() {
-    this.goToMember(this.state.redirectTo);
-  }
+  handleGoToMember = () => this.goToMember(this.state.redirectTo)
 
-  getModal() {
+  getModal = () => {
     const { error, isAdmin, isUpdate, showModal } = this.state;
 
     if (error) {
