@@ -33,6 +33,7 @@ export default class ActionPanel extends Component {
                   <Button
                     block
                     bsStyle={action.style || 'default'}
+                    disabled={!!action.disabled}
                     onClick={action.onClick}
                   >
                     {action.label}
