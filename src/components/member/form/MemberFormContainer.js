@@ -1,29 +1,44 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 import { browserHistory } from 'react-router';
+import moment from 'moment';
 
 import API from '../../../lib/API';
-import { InformationModal } from '../../general/modals';
+import capitalize from '../../../lib/capitalize';
+import { ConfirmModal, InformationModal } from '../../general/modals';
 import Member from '../../../lib/models/Member';
 import MemberForm from './MemberForm';
 import memberFormSchema from './memberFormSchema';
 
-const removeEmptyPropperties = (data) => {
-  Object.keys(data).forEach((key) => {
-    if (data[key] === null || (typeof data[key] === 'boolean' && key !== 'is_parent')) {
-      delete data[key];
-    } else if (typeof data[key] === 'string' && data[key] === '') {
-      delete data[key];
-    } else if (typeof data[key] === 'number' && data[key] === 0) {
-      delete data[key];
-    } else if (Array.isArray(data[key]) && !data[key].length) {
-      delete data[key];
-    } else if (typeof data[key] === 'object') {
-      const property = removeEmptyPropperties(data[key]);
-      if (!Object.keys(property).length) {
-        delete data[key];
-      }
-    }
-  });
+const formatData = (member) => {
+  const data = member;
+
+  data.firstName = capitalize(data.firstName);
+  data.lastName = capitalize(data.lastName);
+
+  if (data.noNo) {
+    delete data.noNo;
+    delete data.no;
+  } else if (data.no.length === 7) {
+    data.no = `${+data.no.substr(0, 2) <= +moment().format('YY') ? '20' : '19'}${data.no}`;
+  }
+
+  if (data.city.name) {
+    data.city.name = capitalize(data.city.name);
+    data.city.state.code = data.city.state.code || 'QC';
+  } else {
+    delete data.city;
+  }
+
+  if (data.zip) {
+    data.zip = data.zip.replace(/\s/g, '').toUpperCase();
+  }
+
+  if (data.address) {
+    data.address = capitalize(data.address);
+  }
+
+  data.phone = data.phone.filter(phone => phone.number);
 
   return data;
 };
@@ -32,20 +47,18 @@ export default class MemberFormContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      email: '',
       error: null,
-      states: [],
+      isAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
       member: new Member(),
+      no: props.params && props.params.no,
+      redirectTo: null,
+      showModal: null,
+      states: [],
     };
 
-    this.cancel = this.cancel.bind(this);
-    this.getModal = this.getModal.bind(this);
-    this.handleNo = this.handleNo.bind(this);
-    this.insert = this.insert.bind(this);
-    this.save = this.save.bind(this);
-    this.update = this.update.bind(this);
-
-    this.schema = memberFormSchema;
-    this.schema.title = !this.props.params.no ? 'Ajouter un membre' : 'Modifier un membre';
+    this.schema = _.cloneDeep(memberFormSchema);
+    this.schema.title = !props.params.no ? 'Ajouter un membre' : 'Modifier un membre';
     this.handleNo();
   }
 
@@ -62,14 +75,14 @@ export default class MemberFormContainer extends Component {
       this.setState({ states: res });
     });
 
-    if (this.props.params.no) {
-      API.member.select(this.props.params.no, (error, res) => {
+    if (this.state.no) {
+      API.member.select(this.state.no, (error, res) => {
         if (error) {
           this.setState({ error });
           return;
         }
 
-        this.setState({ member: new Member(res) });
+        this.setState({ member: new Member(res), email: res.email });
       });
     } else if (this.props.location.query.no) {
       const { no } = this.props.location.query;
@@ -77,27 +90,63 @@ export default class MemberFormContainer extends Component {
     }
   }
 
-  cancel(event) {
+  closeModal = () => this.setState({ error: null, isUpdate: null, showModal: null })
+
+  cancel = (event) => {
     event.preventDefault();
-    const { no } = this.props.params;
+    const { no } = this.state;
     browserHistory.push(no ? `/member/view/${no}` : '/search');
   }
 
-  insert(data) {
+  exists = async (no, data) => {
+    const distinct = {
+      no: `${no}` !== data.no ? data.no : undefined,
+      email: this.state.email !== data.email ? data.email : undefined,
+    };
+
+    return new Promise((resolve, reject) => {
+      if (distinct.no || distinct.email) {
+        API.member.exists(distinct, (error, res) => {
+          if (error) {
+            return reject(error);
+          }
+
+          return resolve(res.no);
+        });
+      }
+
+      return resolve();
+    });
+  }
+
+  insert = (data) => {
     API.member.insert(data, (error, res) => {
       if (error) {
         this.setState({ error });
         return;
       }
 
-      const no = res.no || data.no;
-      browserHistory.push(`/member/view/${no}`);
+      this.goToMember(res.no || data.no);
     });
   }
 
-  handleNo() {
-    const { member } = this.state;
-    const isEdit = !!(this.props.params && this.props.params.no);
+  handleMerge = () => {
+    const duplicate = this.state.no;
+    const no = this.state.redirectTo;
+
+    API.member.merge({ duplicate, no }, (error) => {
+      if (error) {
+        this.setState({ error });
+        return;
+      }
+
+      this.setState({ showModal: 'merged' });
+    });
+  }
+
+  handleNo = () => {
+    const { member, no } = this.state;
+    const isEdit = !!no;
     const inlineNo = this.schema.sections[0].fields.find(field => field.key === 'no');
 
     if (isEdit) {
@@ -114,9 +163,14 @@ export default class MemberFormContainer extends Component {
     }
   }
 
-  save(member) {
+  save = async (member) => {
     const no = this.props.params && this.props.params.no;
-    const data = removeEmptyPropperties({ ...member });
+    const data = formatData({ ...member });
+    const existingUser = await this.exists(no, data);
+
+    if (existingUser) {
+      return this.setState({ isUpdate: !!no, showModal: 'exists', redirectTo: existingUser });
+    }
 
     if (data.zip) {
       data.zip = data.zip.replace(/\s/g, '').toUpperCase();
@@ -125,27 +179,88 @@ export default class MemberFormContainer extends Component {
     return no ? this.update(no, data) : this.insert(data);
   }
 
-  update(no, data) {
+  update = (no, data) => {
     API.member.update(no, data, (error) => {
       if (error) {
         this.setState({ error });
         return;
       }
 
-      browserHistory.push(`/member/view/${data.no}`);
+      this.goToMember(data.no);
     });
   }
 
-  getModal() {
-    const { error } = this.state;
+  goToMember = (no) => browserHistory.push(`/member/view/${no}`)
 
-    return error && (
-      <InformationModal
-        message={error.message}
-        onClick={() => this.setState({ error: null })}
-        title={`Erreur ${error.code}`}
-      />
-    );
+  handleGoToMember = () => this.goToMember(this.state.redirectTo)
+
+  getModal = () => {
+    const { error, isAdmin, isUpdate, showModal } = this.state;
+
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={this.closeModal}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
+      case 'exists':
+        if (!isUpdate) {
+          return (
+            <ConfirmModal
+              message={'Un membre avec les informations saisies existent déjà. Voulez-vous aller à sa fiche ?'}
+              onCancel={this.closeModal}
+              onConfirm={this.handleGoToMember}
+              title={'Erreur = Membre existant'}
+            />
+          );
+        }
+
+        if (isAdmin) {
+          // eslint-disable-next-line max-len
+          const message = 'Les informations que vous avez inscrites correspondent à un compte déjà existant. Voulez-vous fusionner ce compte avec le compte correspondant ?';
+
+          return (
+            <ConfirmModal
+              customActions={[
+                {
+                  label: 'Annuler',
+                  onClick: this.closeModal,
+                },
+                {
+                  bsStyle: 'danger',
+                  label: 'Fusionner',
+                  onClick: this.handleMerge,
+                },
+              ]}
+              message={message}
+              title={'Erreur - Compte existant'}
+            />
+          );
+        }
+
+        return (
+          <InformationModal
+            message={'Les informations que vous avez inscrites correspondent à un compte déjà existant.'}
+            onClick={this.closeModal}
+            title={'Compte déjà existant'}
+          />
+        );
+      case 'merged':
+        return (
+          <InformationModal
+            message={'Les comptes ont été fusionnés, vous serez redirigé au compte du membre.'}
+            onClick={this.handleGoToMember}
+            title={'Comptes fussionés'}
+          />
+        );
+      default:
+        return null;
+    }
   }
 
   render() {

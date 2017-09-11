@@ -5,6 +5,7 @@ import API from '../../lib/API';
 import I18n from '../../lib/i18n/i18n';
 import { InformationModal } from '../general/modals';
 import Item from '../../lib/models/Item';
+import Logger from '../../lib/Logger';
 import Member from '../../lib/models/Member';
 import Search from './Search';
 import { SearchColumns } from '../../lib/TableColumns';
@@ -20,6 +21,9 @@ export default class SearchContainer extends Component {
       search: '',
       type: props.type || 'member',
     };
+
+    this.logger = new Logger(this.constructor.name);
+    this.logger.trace('constructor()');
 
     this.cancelSearch = this.cancelSearch.bind(this);
     this.getModal = this.getModal.bind(this);
@@ -42,10 +46,13 @@ export default class SearchContainer extends Component {
 
   cancelSearch(event) {
     event.preventDefault();
+    this.logger.trace('cancelSearch()');
     this.setState({ isLoading: false, data: [] });
   }
 
   getModal() {
+    this.logger.trace('getModal()');
+
     const { error } = this.state;
 
     return error && (
@@ -58,11 +65,14 @@ export default class SearchContainer extends Component {
   }
 
   handleInput(event) {
+    this.logger.trace('handleInput()');
     this.setState({ search: event.target.value });
   }
 
   search(event) {
     event.preventDefault();
+    this.logger.trace('search()');
+
     this.setState({ isLoading: true, search: this.state.search.trim() });
     const { archives, search, type } = this.state;
     const searchType = type === 'item' ? 'item' : 'member';
@@ -96,6 +106,7 @@ export default class SearchContainer extends Component {
   }
 
   handleType(event) {
+    this.logger.trace('handleType()');
     this.setState({
       type: event.target.value,
       data: [],
@@ -103,10 +114,12 @@ export default class SearchContainer extends Component {
   }
 
   handleArchive() {
+    this.logger.trace('handleArchive()');
     this.setState({ archives: !this.state.archives });
   }
 
   render() {
+    this.logger.trace('render()');
     const type = this.state.type === 'parent' ? 'member' : this.state.type;
 
     return (

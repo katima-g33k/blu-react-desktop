@@ -60,13 +60,13 @@ export default class App extends Component {
 
   onMemberScan = (no) => {
     if (this.canChangeLocation()) {
-      API.member.exists(no, (error, res) => {
+      API.member.exists({ no }, (error, res) => {
         if (error) {
           this.setState({ error });
           return;
         }
 
-        const path = res.code === 200 ? `view/${no}` : `add?no=${no}`;
+        const path = res.no ? `view/${res.no}` : `add?no=${no}`;
         browserHistory.push(`/member/${path}`);
       });
     }

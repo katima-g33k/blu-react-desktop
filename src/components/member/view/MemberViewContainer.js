@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { browserHistory } from 'react-router';
 
 import API from '../../../lib/API';
 import { ConfirmModal, InformationModal } from '../../general/modals';
@@ -103,7 +104,48 @@ export default class MemberViewContainer extends Component {
       },
     ];
 
+    const adminActions = [
+      {
+        label: 'Transférer à la BLU',
+        style: 'primary',
+        onClick: event => {
+          event.preventDefault();
+          this.setState({ showModal: 'transfer' });
+        },
+      },
+      {
+        label: 'Supprimer',
+        style: 'danger',
+        onClick: event => {
+          event.preventDefault();
+          this.setState({ showModal: 'delete' });
+        },
+        disabled: this.state.member && this.state.member.account.copies.length,
+      },
+    ];
+
+    const user = JSON.parse(sessionStorage.getItem('user'));
+
+    if (user.isAdmin && this.state.member.account.isActive) {
+      return [...generalActions, ...activeActions, ...adminActions];
+    }
+
     return generalActions.concat(this.state.member.account.isActive ? activeActions : inactiveActions);
+  }
+
+  closeModal = () => {
+    this.setState({ error: null, showModal: null });
+  }
+
+  delete = () => {
+    API.member.delete(this.state.member.no, (error) => {
+      if (error) {
+        this.setState({ error });
+        return;
+      }
+
+      this.setState({ showModal: 'deleted' });
+    });
   }
 
   pay(callback = () => {}) {
@@ -145,9 +187,7 @@ export default class MemberViewContainer extends Component {
 
   transferAccount() {
     const member = this.state.member;
-    const copies = member.account.getAddedCopies();
-    copies.push(...member.account.getSoldCopies());
-
+    const copies = [...member.account.getAddedCopies(), ...member.account.getSoldCopies()];
     const copyIDs = copies.map(copy => copy.id);
 
     API.transaction.insert(member.no, copyIDs, Transaction.TYPES.DONATE, (error) => {
@@ -157,7 +197,7 @@ export default class MemberViewContainer extends Component {
       }
 
       member.account.donateAll();
-      this.setState({ member });
+      this.setState({ member, showModal: null });
     });
   }
 
@@ -175,6 +215,25 @@ export default class MemberViewContainer extends Component {
     }
 
     switch (showModal) {
+      case 'delete':
+        return (
+          <ConfirmModal
+            confirmationStyle={'danger'}
+            confirmText={'Supprimer'}
+            message={'Êtes-vous certain de vouloir supprimer ce compte? Cette action est IRRÉVERSIBLE'}
+            onCancel={this.closeModal}
+            onConfirm={this.delete}
+            title={'Suppression d\'un compte'}
+          />
+        );
+      case 'deleted':
+        return (
+          <InformationModal
+            message={'Le compte a été supprimé.'}
+            onClick={() => browserHistory.push('/search')}
+            title="Compte supprimé"
+          />
+        );
       case 'pay':
         return (
           <ConfirmModal

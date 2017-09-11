@@ -3,6 +3,7 @@ const PROPERTIES = [
   'apiUrl',
   'barcodeFirstChar',
   'barcodeLastChar',
+  'logLevel',
   'secretKey',
 ];
 
@@ -45,6 +46,18 @@ class Settings {
 
   set barcodeLastChar(barcodeLastChar) {
     localStorage.setItem('barcodeLastChar', barcodeLastChar);
+  }
+
+  get logLevel() {
+    return sessionStorage.getItem('logLevel') || localStorage.getItem('logLevel') || 'none';
+  }
+
+  set logLevel(logLevel) {
+    localStorage.setItem('logLevel', logLevel);
+  }
+
+  set sessionLogLevel(logLevel) {
+    sessionStorage.setItem('logLevel', logLevel);
   }
 
   get() {

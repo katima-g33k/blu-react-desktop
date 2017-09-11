@@ -85,14 +85,20 @@ export default class APIClient {
     };
 
     this.member = {
-      exists: (no, callback) => {
-        HTTP.post(`${this.url}/member/exists`, { no }, callback);
+      delete: (no, callback) => {
+        HTTP.post(`${this.url}/member/delete`, { no }, callback);
+      },
+      exists: ({ email, no }, callback) => {
+        HTTP.post(`${this.url}/member/exists`, { email, no }, callback);
       },
       getName: (no, callback) => {
         HTTP.post(`${this.url}/member/getName`, { no }, callback);
       },
       insert: (member, callback) => {
         HTTP.post(`${this.url}/member/insert`, member, callback);
+      },
+      merge: ({ duplicate, email, no }, callback) => {
+        HTTP.post(`${this.url}/member/merge`, { duplicate, email, no }, callback);
       },
       pay: (no, callback) => {
         HTTP.post(`${this.url}/member/pay`, { no }, callback);

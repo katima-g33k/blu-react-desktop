@@ -1,21 +1,17 @@
 import React, { Component } from 'react';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
+import Logger from '../../lib/Logger';
+
 export default class Table extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      data: this.props.data,
-    };
-
-    this.renderColumns = this.renderColumns.bind(this);
+    this.logger = new Logger(this.constructor.name);
+    this.logger.trace('constructor()');
   }
 
-  componentWillReceiveProps(props) {
-    this.setState({ data: props.data });
-  }
-
-  renderColumns() {
+  renderColumns = () => {
+    this.logger.trace('renderColumns()');
     return this.props.columns.map((column, index) => {
       const formatExtraData = column.formatExtraData;
 
@@ -24,10 +20,11 @@ export default class Table extends Component {
           formatExtraData[key] = this.props[key];
         });
       }
+
       return (
         <TableHeaderColumn
           {...column}
-          key={column.dataField + index}
+          key={`${column.dataField}${index}`}
         >
           {column.label}
         </TableHeaderColumn>
@@ -36,19 +33,23 @@ export default class Table extends Component {
   }
 
   render() {
+    this.logger.trace('render()');
+    const { data, options, placeholder, rowClass, striped } = this.props;
+    const columns = this.renderColumns();
+
     return (
       <BootstrapTable
         condensed
-        striped={this.props.striped}
+        data={data}
         hover
-        data={this.state.data}
         options={{
-          ...this.props.options,
-          noDataText: this.props.placeholder,
+          ...options,
+          noDataText: placeholder,
         }}
-        trClassName={this.props.rowClass}
+        striped={striped}
+        trClassName={rowClass}
       >
-        {this.renderColumns()}
+        {columns}
       </BootstrapTable>
     );
   }

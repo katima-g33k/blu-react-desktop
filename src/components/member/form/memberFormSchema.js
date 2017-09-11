@@ -79,14 +79,15 @@ const memberFormSchema = {
           type: 'text',
           label: 'Ville',
           placeholder: 'Ville',
-          value(value) {
-            return value ? value.name : '';
-          },
-          onChange(event, data) {
-            const member = data;
-            member.city.name = event.target.value;
-            return member;
-          },
+          value: (value = {}) => value.name || '',
+          onChange: (event, data) => ({
+            ...data,
+            city: {
+              ...data.city,
+              id: 0,
+              name: event.target.value,
+            },
+          }),
         },
         {
           key: 'state',
@@ -96,10 +97,15 @@ const memberFormSchema = {
           value(value, data = {}) {
             return data.city ? data.city.state.code : this.default;
           },
-          onChange(event, data) {
-            const member = data;
-            member.city.state.code = event.target.value;
-          },
+          onChange: (event, data) => ({
+            ...data,
+            city: {
+              ...data.city,
+              state: {
+                code: event.target.value,
+              },
+            },
+          }),
         },
         {
           key: 'email',
