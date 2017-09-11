@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 import { browserHistory } from 'react-router';
 import moment from 'moment';
 
@@ -56,7 +57,7 @@ export default class MemberFormContainer extends Component {
       states: [],
     };
 
-    this.schema = JSON.parse(JSON.stringify(memberFormSchema));
+    this.schema = _.cloneDeep(memberFormSchema);
     this.schema.title = !props.params.no ? 'Ajouter un membre' : 'Modifier un membre';
     this.handleNo();
   }

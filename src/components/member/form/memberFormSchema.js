@@ -79,9 +79,7 @@ const memberFormSchema = {
           type: 'text',
           label: 'Ville',
           placeholder: 'Ville',
-          value(value) {
-            return value ? value.name : '';
-          },
+          value: (value = {}) => value.name || '',
           onChange: (event, data) => ({
             ...data,
             city: {
