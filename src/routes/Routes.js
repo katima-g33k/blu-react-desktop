@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
 import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
-import ReservationTableView from '../components/admin/ReservationTableView';
+import DuplicateMembers from '../components/admin/DuplicateMembers';
 import EmployeesTable from '../components/admin/EmployeesTable';
 import ItemFormContainer from '../components/item/form/ItemFormContainer';
 import ItemList from '../components/admin/ItemList';
 import ItemViewContainer from '../components/item/view/ItemViewContainer';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
 import MemberViewContainer from '../components/member/view/MemberViewContainer';
+import ReservationTableView from '../components/admin/ReservationTableView';
 import SearchContainer from '../components/search/SearchContainer';
 import SettingsView from '../components/general/SettingsView';
 import Statistics from '../components/admin/Statistics';
@@ -51,6 +52,7 @@ export default class Routes extends Component {
           <Route name="statistics" path="statistics" component={Statistics} />
           <Route name="storage" path="storage" component={StorageTableView} />
           <Route name="itemList" path="item/list" component={ItemList} />
+          <Route name="duplicates" path="duplicates" component={DuplicateMembers} />
         </Route>
         <Route name="settings" path="/settings" component={SettingsView} />
       </Router>
