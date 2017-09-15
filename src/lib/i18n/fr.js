@@ -15,6 +15,9 @@ const fr = {
     storage: {
       title: 'Adminnistraton - Gestion des caisses de rangement',
     },
+    duplicates: {
+      title: 'Administration - Liste des comptes dupliqués',
+    },
   },
   ItemForm: {
     title: 'Formulaire de l\'ouvrage',
@@ -127,6 +130,7 @@ const fr = {
     admin_storage: 'Caisses de rangement',
     admin_statistics: 'Statistiques',
     admin_itemList: 'Liste des ouvrages',
+    admin_memberDuplicates: 'Comptes dupliqués',
     settings: 'Paramètres',
   },
   TableColumns: {

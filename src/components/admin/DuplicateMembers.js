@@ -1,9 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-import { Button, Col, Glyphicon, Panel, Row } from 'react-bootstrap';
+import { Col, Panel, Row } from 'react-bootstrap';
 import moment from 'moment';
 
 import API from '../../lib/API';
-import { ConfirmModal, FormModal, InformationModal } from '../general/modals';
 import I18n from '../../lib/i18n/i18n';
 import TableLayout from '../general/TableLayout';
 
@@ -22,7 +21,7 @@ class Cell extends Component {
   handleNameClick = () => this.props.onNameClick(this.props.no)
 
   handleOriginalClick = () => {
-    this.props.onOriginalClick()
+    this.props.onOriginalClick();
   }
 
   render() {
@@ -32,7 +31,6 @@ class Cell extends Component {
       name,
       no,
       registration,
-      isOriginal,
     } = this.props;
 
     return (
@@ -40,12 +38,7 @@ class Cell extends Component {
         <Col md={12}>
           <Row>
             <Col md={12}>
-              <Button
-                bsStyle="link"
-                onClick={this.onNameClick}
-              >
-                {name}
-              </Button>
+              {name}
             </Col>
           </Row>
           <Row>
@@ -68,18 +61,6 @@ class Cell extends Component {
               {`Dernière activité: ${moment(lastActivity).format('YYYY-MM-DD')}`}
             </Col>
           </Row>
-          {!isOriginal && (
-            <Row>
-              <Col md={12}>
-                <Button
-                  bsStyle="primary"
-                  onClick={this.handleOriginalClick}
-                >
-                  {'Marquer comme original'}
-                </Button>
-              </Col>
-            </Row>
-          )}
         </Col>
       </Row>
     );
@@ -133,22 +114,21 @@ export default class DuplicateMembers extends Component {
     const no = (members.find(({ isOriginal }) => isOriginal) || {}).no;
     const duplicate = (members.find(({ isOriginal }) => !isOriginal) || {}).no;
 
-    console.log(no, duplicate);
     if (!no || !duplicate) {
       return;
     }
 
-    // API.member.merge({ no, duplicate }, (error) => {
-    //   if (error) {
-    //     this.setState({ error });
-    //     return;
-    //   }
+    API.member.merge({ no, duplicate }, (error) => {
+      if (error) {
+        this.setState({ error });
+        return;
+      }
 
-    //   const { duplicates } = this.state;
-    //   this.setState({
-    //     duplicates: duplicates.filter(d => d !== members),
-    //   });
-    // });
+      const { duplicates } = this.state;
+      this.setState({
+        duplicates: duplicates.filter(d => d !== members),
+      });
+    });
   }
 
   getColumns = () => ([
@@ -169,19 +149,19 @@ export default class DuplicateMembers extends Component {
       label: 'Membre 2',
       dataFormat: (_, row) => (<Cell {...row[1]} />),
     },
-    {
-      dataField: 'actions',
-      label: 'Actions',
-      width: '120px',
-      dataFormat: (field, row) => (
-        <Button
-          bsStyle='danger'
-          onClick={() => this.handleMerge(row)}
-        >
-          <Glyphicon glyph="duplicate" /> {'Fusionner'}
-        </Button>
-      ),
-    },
+    // {
+    //   dataField: 'actions',
+    //   label: 'Actions',
+    //   width: '120px',
+    //   dataFormat: (field, row) => (
+    //     <Button
+    //       bsStyle='danger'
+    //       onClick={() => this.handleMerge(row)}
+    //     >
+    //       <Glyphicon glyph="duplicate" /> {'Fusionner'}
+    //     </Button>
+    //   ),
+    // },
   ])
 
   renderModal = () => {
