@@ -167,7 +167,7 @@ export default class MemberFormContainer extends Component {
     const no = this.props.params && this.props.params.no;
     const data = formatData({ ...member });
     const existingUser = await this.exists(no, data);
-    console.log(existingUser);
+
     if (existingUser) {
       return this.setState({ isUpdate: !!no, showModal: 'exists', redirectTo: existingUser });
     }
