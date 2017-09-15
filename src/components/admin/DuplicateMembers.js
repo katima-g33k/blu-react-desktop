@@ -1,5 +1,5 @@
 import React, { Component, PropTypes } from 'react';
-import { Col, Panel, Row } from 'react-bootstrap';
+import { Button, Col, Glyphicon, Panel, Row } from 'react-bootstrap';
 import moment from 'moment';
 
 import API from '../../lib/API';
@@ -7,59 +7,84 @@ import { ConfirmModal, FormModal, InformationModal } from '../general/modals';
 import I18n from '../../lib/i18n/i18n';
 import TableLayout from '../general/TableLayout';
 
-const Cell = ({ email, lastActivity, name, no, registration }) => (
-  <Row>
-    <Col md={12}>
-      <Row>
-        <Col md={12}>
-          {name}
-        </Col>
-      </Row>
-      <Row>
-        <Col md={12}>
-          {no}
-        </Col>
-      </Row>
-      <Row>
-        <Col md={12}>
-          {email}
-        </Col>
-      </Row>
-      <Row>
-        <Col md={12}>
-          {`Inscription: ${moment(registration).format('YYYY-MM-DD')}`}
-        </Col>
-      </Row>
-      <Row>
-        <Col md={12}>
-          {`Dernière activité: ${moment(lastActivity).format('YYYY-MM-DD')}`}
-        </Col>
-      </Row>
-    </Col>
-  </Row>
-);
+class Cell extends Component {
+  static propTypes = {
+    email: PropTypes.string,
+    isOriginal: PropTypes.bool,
+    onNameClick: PropTypes.func,
+    onOriginalClick: PropTypes.func,
+    lastActivity: PropTypes.string,
+    name: PropTypes.string,
+    no: PropTypes.number,
+    registration: PropTypes.string,
+  }
 
-Cell.propTypes = {
-  email: PropTypes.string,
-  lastActivity: PropTypes.string,
-  name: PropTypes.string,
-  no: PropTypes.number,
-  registration: PropTypes.string,
-};
+  handleNameClick = () => this.props.onNameClick(this.props.no)
 
-const columns = [
-  {
-    isKey: true,
-    dataField: 'member1',
-    label: 'Membre 1',
-    dataFormat: (_, row) => (<Cell {...row[0]} />),
-  },
-  {
-    dataField: 'member2',
-    label: 'Membre 2',
-    dataFormat: (_, row) => (<Cell {...row[1]} />),
-  },
-];
+  handleOriginalClick = () => {
+    this.props.onOriginalClick()
+  }
+
+  render() {
+    const {
+      email,
+      lastActivity,
+      name,
+      no,
+      registration,
+      isOriginal,
+    } = this.props;
+
+    return (
+      <Row>
+        <Col md={12}>
+          <Row>
+            <Col md={12}>
+              <Button
+                bsStyle="link"
+                onClick={this.onNameClick}
+              >
+                {name}
+              </Button>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={12}>
+              {no}
+            </Col>
+          </Row>
+          <Row>
+            <Col md={12}>
+              {email}
+            </Col>
+          </Row>
+          <Row>
+            <Col md={12}>
+              {`Inscription: ${moment(registration).format('YYYY-MM-DD')}`}
+            </Col>
+          </Row>
+          <Row>
+            <Col md={12}>
+              {`Dernière activité: ${moment(lastActivity).format('YYYY-MM-DD')}`}
+            </Col>
+          </Row>
+          {!isOriginal && (
+            <Row>
+              <Col md={12}>
+                <Button
+                  bsStyle="primary"
+                  onClick={this.handleOriginalClick}
+                >
+                  {'Marquer comme original'}
+                </Button>
+              </Col>
+            </Row>
+          )}
+        </Col>
+      </Row>
+    );
+  }
+}
 
 export default class DuplicateMembers extends Component {
   constructor(props) {
@@ -98,16 +123,79 @@ export default class DuplicateMembers extends Component {
     });
   }
 
-  getColumns = () => {
-    return columns;
+  openMemberModal = (no) => {
+    this.setState({ showModal: 'member', currentMember: no });
   }
 
-  getTableActions = () => {
-    return [];
+  setAsOriginal = () => {}
+
+  handleMerge = (members) => {
+    const no = (members.find(({ isOriginal }) => isOriginal) || {}).no;
+    const duplicate = (members.find(({ isOriginal }) => !isOriginal) || {}).no;
+
+    console.log(no, duplicate);
+    if (!no || !duplicate) {
+      return;
+    }
+
+    // API.member.merge({ no, duplicate }, (error) => {
+    //   if (error) {
+    //     this.setState({ error });
+    //     return;
+    //   }
+
+    //   const { duplicates } = this.state;
+    //   this.setState({
+    //     duplicates: duplicates.filter(d => d !== members),
+    //   });
+    // });
   }
+
+  getColumns = () => ([
+    {
+      isKey: true,
+      dataField: 'member1',
+      label: 'Membre 1',
+      dataFormat: (_, row) => (
+        <Cell
+          {...row[0]}
+          onNameClick={this.openMemberModal}
+          onOriginalClick={this.setAsOriginal}
+        />
+      ),
+    },
+    {
+      dataField: 'member2',
+      label: 'Membre 2',
+      dataFormat: (_, row) => (<Cell {...row[1]} />),
+    },
+    {
+      dataField: 'actions',
+      label: 'Actions',
+      width: '120px',
+      dataFormat: (field, row) => (
+        <Button
+          bsStyle='danger'
+          onClick={() => this.handleMerge(row)}
+        >
+          <Glyphicon glyph="duplicate" /> {'Fusionner'}
+        </Button>
+      ),
+    },
+  ])
 
   renderModal = () => {
-    return null;
+    const { error, showModal } = this.state;
+
+    if (error) {
+      return null;
+    }
+
+    switch (showModal) {
+      case 'member':
+      default:
+        return null;
+    }
   }
 
   render() {
@@ -116,7 +204,6 @@ export default class DuplicateMembers extends Component {
         <Row>
           <Col sm={12} md={6}>
             <TableLayout
-              actions={this.getTableActions()}
               columns={this.getColumns()}
               data={this.state.duplicates}
               placeholder={'Aucun duplicat détecté'}
