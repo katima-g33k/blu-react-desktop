@@ -88,6 +88,9 @@ export default class APIClient {
       delete: (no, callback) => {
         HTTP.post(`${this.url}/member/delete`, { no }, callback);
       },
+      duplicates: (callback) => {
+        HTTP.post(`${this.url}/member/duplicates`, {}, callback);
+      },
       exists: ({ email, no }, callback) => {
         HTTP.post(`${this.url}/member/exists`, { email, no }, callback);
       },

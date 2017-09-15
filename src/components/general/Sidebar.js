@@ -62,6 +62,10 @@ const adminMenuItems = {
       key: 'admin_itemList',
       href: '/admin/item/list',
     },
+    {
+      key: 'admin_memberDuplicates',
+      href: '/admin/duplicates',
+    },
   ],
 };
 
