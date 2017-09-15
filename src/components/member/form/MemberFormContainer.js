@@ -104,18 +104,18 @@ export default class MemberFormContainer extends Component {
       email: this.state.email !== data.email ? data.email : undefined,
     };
 
+    if (!distinct.no && !distinct.email) {
+      return false;
+    }
+
     return new Promise((resolve, reject) => {
-      if (distinct.no || distinct.email) {
-        API.member.exists(distinct, (error, res) => {
-          if (error) {
-            return reject(error);
-          }
+      API.member.exists(distinct, (error, res) => {
+        if (error) {
+          return reject(error);
+        }
 
-          return resolve(res.no);
-        });
-      }
-
-      return resolve();
+        return resolve(res.no);
+      });
     });
   }
 
@@ -167,7 +167,7 @@ export default class MemberFormContainer extends Component {
     const no = this.props.params && this.props.params.no;
     const data = formatData({ ...member });
     const existingUser = await this.exists(no, data);
-
+    console.log(existingUser);
     if (existingUser) {
       return this.setState({ isUpdate: !!no, showModal: 'exists', redirectTo: existingUser });
     }
