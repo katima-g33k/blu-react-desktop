@@ -1,10 +1,13 @@
 import React, { Component, PropTypes } from 'react';
+import _ from 'lodash';
 
 import API from '../../../lib/API';
 import Author from '../../../lib/models/Author';
+import formatData from './formatData';
 import { InformationModal } from '../../general/modals';
 import Item from '../../../lib/models/Item';
 import ItemForm from './ItemForm';
+import Logger from '../../../lib/Logger';
 import schema from './schema';
 
 export default class ItemFormContainer extends Component {
@@ -16,23 +19,27 @@ export default class ItemFormContainer extends Component {
       categories: [],
     };
 
-    this.getModal = this.getModal.bind(this);
-    this.handleAuthors = this.handleAuthors.bind(this);
-    this.handleEan13 = this.handleEan13.bind(this);
-    this.handleIsBook = this.handleIsBook.bind(this);
-    this.handleSubject = this.handleSubject.bind(this);
-    this.insert = this.insert.bind(this);
-    this.onCancel = this.onCancel.bind(this);
-    this.onSave = this.onSave.bind(this);
-    this.update = this.update.bind(this);
-    this.schema = schema;
+    this.logger = new Logger(this.constructor.name);
+    this.logger.trace('constructor()');
+
+    this.schema = _.cloneDeep(schema);
 
     this.handleAuthors();
     this.handleEan13();
     this.handleIsBook();
   }
 
-  componentWillMount() {
+  static propTypes = {
+    ean13: PropTypes.string,
+    location: PropTypes.shape(),
+    onCancel: PropTypes.func,
+    onSave: PropTypes.func,
+    params: PropTypes.shape(),
+    router: PropTypes.shape(),
+  };
+
+  componentWillMount = () => {
+    this.logger.trace('componentWillMount()');
     const { ean13, location, params } = this.props;
 
     API.category.select((error, res) => {
@@ -59,9 +66,11 @@ export default class ItemFormContainer extends Component {
     }
   }
 
-  handleAuthors() {
+  handleAuthors = () => {
+    this.logger.trace('handleAuthors()');
     const authorField = this.schema.book.sections[0].fields.find(field => field.key === 'author');
     authorField.onChange = (event, author) => {
+      this.logger.trace('author - onChange()');
       const { item } = this.state;
       const input = event.target;
 
@@ -71,12 +80,14 @@ export default class ItemFormContainer extends Component {
     };
 
     authorField.onAddButton = () => {
+      this.logger.trace('author - onAdd()');
       const { item } = this.state;
       item.author.push(new Author());
       this.setState({ item });
     };
 
     authorField.onRemoveButton = (event, author) => {
+      this.logger.trace('author - onRemove()');
       const { item } = this.state;
 
       if (item.author.length > 1) {
@@ -89,14 +100,22 @@ export default class ItemFormContainer extends Component {
     };
   }
 
-  handleEan13() {
+  handleEan13 = () => {
+    this.logger.trace('handleEan13()');
     Object.keys(this.schema).forEach((key) => {
       const inlineEan13 = this.schema[key].sections[0].fields.find(field => field.key === 'ean13');
       const ean13TextField = inlineEan13.inline.find(field => field.key === 'ean13');
       const ean13Checkbox = inlineEan13.inline.find(field => field.key === 'noEan13');
 
+      if (!this.state.item.id && !this.state.item.ean13) {
+        ean13TextField.disabled = true;
+        ean13Checkbox.checked = true;
+      }
+
       ean13Checkbox.onChange = (event) => {
-        const item = this.state.item;
+        this.logger.trace('noEan13 - onChange()');
+
+        const { item } = this.state;
         item.ean13 = null;
         ean13TextField.disabled = event.target.checked;
 
@@ -105,19 +124,22 @@ export default class ItemFormContainer extends Component {
     });
   }
 
-  handleIsBook() {
+  handleIsBook = () => {
+    this.logger.trace('handleIsBook()');
     const { item } = this.state;
 
     Object.keys(this.schema).forEach((key) => {
       const checkbox = this.schema[key].sections[0].fields.find(field => field.key === 'isBook');
       checkbox.onChange = (event) => {
+        this.logger.trace('isBook - onChange()');
         item.isBook = event.target.checked;
         this.setState({ item });
       };
     });
   }
 
-  handleSubject() {
+  handleSubject = () => {
+    this.logger.trace('handleSubject()');
     Object.keys(this.schema).forEach((key) => {
       const subjectField = this.schema[key].sections[0].fields.find(field => field.key === 'subject');
       subjectField.optgroups = this.state.categories.map(category => ({
@@ -130,7 +152,8 @@ export default class ItemFormContainer extends Component {
     });
   }
 
-  insert(item) {
+  insert = (item) => {
+    this.logger.trace('insert()');
     API.item.insert(item, (error, res) => {
       if (error) {
         this.setState({ error });
@@ -147,41 +170,22 @@ export default class ItemFormContainer extends Component {
     });
   }
 
-  onCancel() {
+  onCancel = () => {
+    this.logger.trace('onCancel()');
     const id = this.props.params ? this.props.params.id : null;
     this.props.router.push(id ? `/item/view/${id}` : '/search');
   }
 
-  onSave(event, data) {
+  onSave = () => {
+    this.logger.trace('onSave()');
     const id = this.props.params ? this.props.params.id : null;
-    const { item } = this.state;
+    const item = formatData(this.state.item);
 
-    if (typeof item.subject === 'object') {
-      if (data.subject.id) {
-        item.subject = item.subject.id;
-      } else {
-        item.subject = document.getElementById('subject').value;
-      }
-    }
-
-    if (!item.isBook) {
-      delete item.author;
-      delete item.edition;
-      delete item.editor;
-      delete item.publication;
-    }
-
-    if (item.noEan13) {
-      delete item.ean13;
-    }
-
-    delete item.id;
-    delete item.noEan13;
-    delete item.stats;
     return id ? this.update(item) : this.insert(item);
   }
 
-  update(item) {
+  update = (item) => {
+    this.logger.trace('update()');
     const { id } = this.props.params;
 
     API.item.update(id, item, (error) => {
@@ -199,7 +203,8 @@ export default class ItemFormContainer extends Component {
     });
   }
 
-  getModal() {
+  getModal = () => {
+    this.logger.trace('getModal()');
     const { error } = this.state;
 
     return error && (
@@ -211,7 +216,8 @@ export default class ItemFormContainer extends Component {
     );
   }
 
-  render() {
+  render = () => {
+    this.logger.trace('render()');
     const { item } = this.state;
     delete item.copies;
     delete item.reservation;
@@ -231,12 +237,3 @@ export default class ItemFormContainer extends Component {
     );
   }
 }
-
-ItemFormContainer.propTypes = {
-  ean13: PropTypes.string,
-  location: PropTypes.shape(),
-  onCancel: PropTypes.func,
-  onSave: PropTypes.func,
-  params: PropTypes.shape(),
-  router: PropTypes.shape(),
-};
