@@ -10,7 +10,7 @@ export default class Item {
     this.edition = item.edition || '';
     this.editor = item.editor || '';
     this.subject = item.subject || {};
-    this.is_book = item.is_book || item.isBook || false;
+    this.isBook = item.isBook || false;
     this.ean13 = item.ean13;
     this.author = item.author ? item.author.map(author => new Author(author)) : [];
     this.copies = item.copies ? item.copies.map(copy => new Copy(copy)) : [];
@@ -53,14 +53,6 @@ export default class Item {
         this.status[status] = new Date();
         break;
     }
-  }
-
-  get isBook() {
-    return this.is_book;
-  }
-
-  set isBook(isBook) {
-    this.is_book = isBook;
   }
 
   get isInStock() {

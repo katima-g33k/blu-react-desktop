@@ -76,7 +76,7 @@ export const SearchColumns = {
         if (!Array.isArray(authors)) {
           return '';
         }
-        const str = authors.map((author) => `${author.first_name} ${author.last_name}`).join(', ');
+        const str = authors.map(author => author.toString()).join(', ');
         return highlightSearchResults(str, extra.highlight);
       },
       formatExtraData: { props: ['highlight'] },
