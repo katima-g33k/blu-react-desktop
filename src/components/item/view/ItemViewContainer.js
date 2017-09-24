@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { browserHistory } from 'react-router';
 import moment from 'moment';
 
 import API from '../../../lib/API';
@@ -33,6 +34,7 @@ export default class ItemViewContainer extends Component {
     };
 
     this.getItem = this.getItem.bind(this);
+    this.delete = this.delete.bind(this);
     this.decreaseStatus = this.decreaseStatus.bind(this);
     this.increaseStatus = this.increaseStatus.bind(this);
     this.reserve = this.reserve.bind(this);
@@ -60,6 +62,17 @@ export default class ItemViewContainer extends Component {
       }
 
       this.setState({ item: new Item(res) });
+    });
+  }
+
+  delete() {
+    API.item.delete(this.state.item.id, (error) => {
+      if (error) {
+        this.setState({ error });
+        return;
+      }
+
+      this.setState({ showModal: 'deleted' });
     });
   }
 
@@ -139,7 +152,7 @@ export default class ItemViewContainer extends Component {
   }
 
   getActions() {
-    const user = JSON.parse(sessionStorage.getItem('user'));
+    const { isAdmin } = JSON.parse(sessionStorage.getItem('user'));
 
     return [
       {
@@ -159,7 +172,7 @@ export default class ItemViewContainer extends Component {
         },
         rightButton: {
           onClick: this.increaseStatus,
-          disabled: this.state.item.isValid || (!user.isAdmin && this.state.item.isRemoved),
+          disabled: this.state.item.isValid || (!isAdmin && this.state.item.isRemoved),
         },
       },
       {
@@ -178,7 +191,15 @@ export default class ItemViewContainer extends Component {
           this.setState({ showModal: this.state.item.isInStock ? 'reserveWarning' : 'reserve' });
         },
       },
-    ];
+    ].concat(isAdmin ? [{
+      label: 'Supprimer',
+      style: 'danger',
+      onClick: event => {
+        event.preventDefault();
+        this.setState({ showModal: 'delete' });
+      },
+      disabled: this.state.item && this.state.item.copies.length,
+    }] : []);
   }
 
   getModal() {
@@ -195,6 +216,25 @@ export default class ItemViewContainer extends Component {
     }
 
     switch (showModal) {
+      case 'delete':
+        return (
+          <ConfirmModal
+            confirmationStyle={'danger'}
+            confirmText={'Supprimer'}
+            message={'Êtes-vous certain de vouloir supprimer cet ouvrage? Cette action est IRRÉVERSIBLE'}
+            onCancel={() => this.setState({ showModal: null })}
+            onConfirm={this.delete}
+            title={'Suppression d\'un ouvrage'}
+          />
+        );
+      case 'deleted':
+        return (
+          <InformationModal
+            message={'L\'ouvrage a été supprimé.'}
+            onClick={() => browserHistory.push('/search')}
+            title="Ouvrage supprimé"
+          />
+        );
       case 'reserve':
         return (
           <SearchModal
