@@ -16,7 +16,7 @@ export default class ItemFormContainer extends Component {
     super(props);
     this.state = {
       categories: [],
-      ean13: props.ean13 || props.location && props.location.query.ean13 || '',
+      ean13: props.ean13 || (props.location && props.location.query.ean13) || '',
       error: null,
       id: props.params && props.params.id,
       isAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,

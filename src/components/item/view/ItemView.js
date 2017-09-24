@@ -31,16 +31,17 @@ export default class ItemView extends Component {
   }
 
   renderInformation() {
+    const type = this.props.data.isBook ? 'book' : 'item';
     return (
       <section>
         <h4>
           <Translate value="ItemView.information.title" />
         </h4>
-        {Object.keys(INFORMATION_FIELDS).map(key => (
+        {Object.keys(INFORMATION_FIELDS[type]).map(key => (
           <AlignedData
             key={key}
             label={<Translate value={`ItemView.information.${key}`} />}
-            value={this.props.data[INFORMATION_FIELDS[key]] || ''}
+            value={this.props.data[INFORMATION_FIELDS[type][key]] || ''}
           />
         ))}
       </section>
