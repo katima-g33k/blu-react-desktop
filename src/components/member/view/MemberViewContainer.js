@@ -275,6 +275,7 @@ export default class MemberViewContainer extends Component {
                 onClick: () => this.setState({ showModal: null }),
               },
               {
+                bsStyle: 'danger',
                 label: 'Transférer et Réactiver',
                 onClick: () => {
                   this.transferAccount();
@@ -282,6 +283,7 @@ export default class MemberViewContainer extends Component {
                 },
               },
               {
+                bsStyle: 'primary',
                 label: 'Réactiver',
                 onClick: this.renewAccount,
               },

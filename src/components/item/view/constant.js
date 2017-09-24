@@ -1,10 +1,16 @@
 export const INFORMATION_FIELDS = {
-  authors: 'authorString',
-  edition: 'edition',
-  editor: 'editor',
-  publication: 'publication',
-  ean13: 'ean13',
-  comment: 'comment',
+  book: {
+    authors: 'authorString',
+    edition: 'edition',
+    editor: 'editor',
+    publication: 'publication',
+    ean13: 'ean13',
+    comment: 'comment',
+  },
+  item: {
+    ean13: 'ean13',
+    comment: 'comment',
+  },
 };
 
 export const LABEL_STYLE = {
