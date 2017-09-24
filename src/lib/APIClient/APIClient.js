@@ -66,6 +66,9 @@ export default class APIClient {
       list: (callback) => {
         HTTP.post(`${this.url}/item/list`, {}, callback);
       },
+      merge: (id, duplicate, callback) => {
+        HTTP.post(`${this.url}/item/merge`, { duplicate, id }, callback);
+      },
       search: (search, options, callback) => {
         HTTP.post(`${this.url}/item/search`, { ...options, search }, callback);
       },

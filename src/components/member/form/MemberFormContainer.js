@@ -172,10 +172,6 @@ export default class MemberFormContainer extends Component {
       return this.setState({ isUpdate: !!no, showModal: 'exists', redirectTo: existingUser });
     }
 
-    if (data.zip) {
-      data.zip = data.zip.replace(/\s/g, '').toUpperCase();
-    }
-
     return no ? this.update(no, data) : this.insert(data);
   }
 
@@ -212,10 +208,10 @@ export default class MemberFormContainer extends Component {
         if (!isUpdate) {
           return (
             <ConfirmModal
-              message={'Un membre avec les informations saisies existent déjà. Voulez-vous aller à sa fiche ?'}
+              message={'Un membre avec les informations saisies existe déjà. Voulez-vous aller à sa fiche ?'}
               onCancel={this.closeModal}
               onConfirm={this.handleGoToMember}
-              title={'Erreur = Membre existant'}
+              title={'Erreur - Membre existant'}
             />
           );
         }
@@ -255,7 +251,7 @@ export default class MemberFormContainer extends Component {
           <InformationModal
             message={'Les comptes ont été fusionnés, vous serez redirigé au compte du membre.'}
             onClick={this.handleGoToMember}
-            title={'Comptes fussionés'}
+            title={'Comptes fusionmés'}
           />
         );
       default:

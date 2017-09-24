@@ -1,10 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import _ from 'lodash';
+import { browserHistory } from 'react-router';
 
 import API from '../../../lib/API';
 import Author from '../../../lib/models/Author';
 import formatData from './formatData';
-import { InformationModal } from '../../general/modals';
+import { ConfirmModal, InformationModal } from '../../general/modals';
 import Item from '../../../lib/models/Item';
 import ItemForm from './ItemForm';
 import Logger from '../../../lib/Logger';
@@ -14,9 +15,14 @@ export default class ItemFormContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      error: null,
-      item: new Item({ isBook: true, author: [new Author()] }),
       categories: [],
+      ean13: props.ean13 || props.location && props.location.query.ean13 || '',
+      error: null,
+      id: props.params && props.params.id,
+      isAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
+      item: new Item({ isBook: true, author: [new Author()] }),
+      redirectTo: null,
+      showModal: null,
     };
 
     this.logger = new Logger(this.constructor.name);
@@ -40,30 +46,51 @@ export default class ItemFormContainer extends Component {
 
   componentWillMount = () => {
     this.logger.trace('componentWillMount()');
-    const { ean13, location, params } = this.props;
+    const { ean13, id } = this.state;
 
-    API.category.select((error, res) => {
+    API.category.select((error, categories) => {
       if (error) {
         this.setState({ error });
         return;
       }
 
-      this.setState({ categories: res });
+      this.setState({ categories });
     });
 
-    if (params && params.id) {
-      API.item.select(params.id, {}, (error, res) => {
+    if (id) {
+      API.item.select(id, {}, (error, item) => {
         if (error) {
           this.setState({ error });
           return;
         }
 
-        this.setState({ item: new Item(res) });
+        this.setState({ item: new Item(item), ean13: item.ean13 });
       });
-    } else if (ean13 || (location && location.query.ean13)) {
-      const code = ean13 || location.query.ean13;
-      this.setState({ item: new Item({ ean13: code, isBook: true, author: [new Author()] }) });
+    } else if (ean13) {
+      this.setState({ item: new Item({ ean13, isBook: true, author: [new Author()] }) });
     }
+  }
+
+  handleGoToItem = () => this.goToItem(this.state.redirectTo)
+
+  goToItem = (id) => browserHistory.push(`/item/view/${id}`)
+
+  exists = () => {
+    const { ean13, item } = this.state;
+
+    if (item.noEan13 || ean13 === item.ean13) {
+      return false;
+    }
+
+    return new Promise((resolve, reject) => {
+      API.item.exists(item.ean13, (error, res) => {
+        if (error) {
+          return reject(error);
+        }
+
+        return resolve(res.id);
+      });
+    });
   }
 
   handleAuthors = () => {
@@ -152,41 +179,58 @@ export default class ItemFormContainer extends Component {
     });
   }
 
+  handleMerge = () => {
+    const duplicate = this.state.id;
+    const id = this.state.redirectTo;
+
+    API.item.merge(id, duplicate, (error) => {
+      if (error) {
+        this.setState({ error });
+        return;
+      }
+
+      this.setState({ showModal: 'merged' });
+    });
+  }
+
   insert = (item) => {
     this.logger.trace('insert()');
-    API.item.insert(item, (error, res) => {
+    API.item.insert(item, (error, { id }) => {
       if (error) {
         this.setState({ error });
         return;
       }
 
       if (this.props.onSave) {
-        // TODO: update item with res
-        item.id = res.id;
+        item.id = id;
         this.props.onSave(item);
       } else {
-        this.props.router.push(`/item/view/${res.id}`);
+        this.goToItem(id);
       }
     });
   }
 
   onCancel = () => {
     this.logger.trace('onCancel()');
-    const id = this.props.params ? this.props.params.id : null;
+    const { id } = this.state;
     this.props.router.push(id ? `/item/view/${id}` : '/search');
   }
 
-  onSave = () => {
+  onSave = async () => {
     this.logger.trace('onSave()');
-    const id = this.props.params ? this.props.params.id : null;
-    const item = formatData(this.state.item);
+    const { id } = this.state;
+    const existingItem = await this.exists();
 
-    return id ? this.update(item) : this.insert(item);
+    if (existingItem) {
+      return this.setState({ isUpdate: !!id, showModal: 'exists', redirectTo: existingItem });
+    }
+
+    const item = formatData(this.state.item);
+    return id ? this.update(id, item) : this.insert(item);
   }
 
-  update = (item) => {
+  update = async (id, item) => {
     this.logger.trace('update()');
-    const { id } = this.props.params;
 
     API.item.update(id, item, (error) => {
       if (error) {
@@ -195,25 +239,83 @@ export default class ItemFormContainer extends Component {
       }
 
       if (this.props.onSave) {
-        // TODO: update item with res
         this.props.onSave(item);
       } else {
-        this.props.router.push(`/item/view/${id}`);
+        this.goToItem(id);
       }
     });
   }
 
+  closeModal = () => this.setState({ error: null, isUpdate: null, showModal: null })
+
   getModal = () => {
     this.logger.trace('getModal()');
-    const { error } = this.state;
+    const { error, isAdmin, isUpdate, showModal } = this.state;
 
-    return error && (
-      <InformationModal
-        message={error.message}
-        onClick={() => this.setState({ error: null })}
-        title={`Erreur ${error.code}`}
-      />
-    );
+    if (error) {
+      return (
+        <InformationModal
+          message={error.message}
+          onClick={this.closeModal}
+          title={`Erreur ${error.code}`}
+        />
+      );
+    }
+
+    switch (showModal) {
+      case 'exists':
+        if (!isUpdate) {
+          return (
+            <ConfirmModal
+              message={'Un ouvrage avec les informations saisies existe déjà. Voulez-vous aller à sa fiche ?'}
+              onCancel={this.closeModal}
+              onConfirm={this.handleGoToItem}
+              title={'Erreur - Ouvrage existant'}
+            />
+          );
+        }
+
+        if (isAdmin) {
+          // eslint-disable-next-line max-len
+          const message = 'Les informations que vous avez inscrites correspondent à un ouvrage déjà existant. Voulez-vous fusionner cette fiche avec la fiche correspondante ?';
+
+          return (
+            <ConfirmModal
+              customActions={[
+                {
+                  label: 'Annuler',
+                  onClick: this.closeModal,
+                },
+                {
+                  bsStyle: 'danger',
+                  label: 'Fusionner',
+                  onClick: this.handleMerge,
+                },
+              ]}
+              message={message}
+              title={'Erreur - Ouvrage existant'}
+            />
+          );
+        }
+
+        return (
+          <InformationModal
+            message={'Les informations que vous avez inscrites correspondent à un ouvrage déjà existant.'}
+            onClick={this.closeModal}
+            title={'Ouvrage déjà existant'}
+          />
+        );
+      case 'merged':
+        return (
+          <InformationModal
+            message={'Les ouvrages ont été fusionnés, vous serez redirigé la fiche de l\'ouvrage.'}
+            onClick={this.handleGoToItem}
+            title={'Ouvrages fusionnés'}
+          />
+        );
+      default:
+        return null;
+    }
   }
 
   render = () => {
