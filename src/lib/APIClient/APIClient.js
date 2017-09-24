@@ -57,6 +57,9 @@ export default class APIClient {
     };
 
     this.item = {
+      delete: (id, callback) => {
+        HTTP.post(`${this.url}/item/delete`, { id }, callback);
+      },
       exists: (ean13, callback) => {
         HTTP.post(`${this.url}/item/exists`, { ean13 }, callback);
       },
