@@ -1,3 +1,5 @@
+import { version } from '../../package';
+
 const PROPERTIES = [
   'apiKey',
   'apiUrl',
@@ -58,6 +60,10 @@ class Settings {
 
   set sessionLogLevel(logLevel) {
     sessionStorage.setItem('logLevel', logLevel);
+  }
+
+  get appVersion() {
+    return `v${version}`;
   }
 
   get() {

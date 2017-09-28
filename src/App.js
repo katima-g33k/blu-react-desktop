@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 import moment from 'moment';
+import request from 'request';
 
 import API from './lib/API';
+import Github from './lib/Github';
 import Header from './components/general/Header';
 import { InformationModal } from './components/general/modals';
 import Login from './components/login/Login';
@@ -20,11 +22,37 @@ export default class App extends Component {
       error: null,
       settingsUpdatedAt: null,
       showModal: null,
+      update: {
+        currentVersion: settings.appVersion,
+        assetId: null,
+        newVersion: null,
+        url: null,
+      },
       user: null,
     };
   }
 
-  componentWillMount() {
+  async componentWillMount() {
+    const { currentVersion } = this.state.update;
+    const { tag_name, assets } = await Github.repos.releases.latest('katima-g33k', 'blu-react-desktop');
+
+    if (currentVersion < tag_name) {
+      const asset = assets.find(({ content_type }) => content_type === 'application/x-ms-dos-executable');
+
+      if (asset) {
+        this.setState({
+          showModal: 'update',
+          update: {
+            currentVersion,
+            assetId: asset.id,
+            newVersion: tag_name,
+            url: asset.browser_download_url,
+          },
+        });
+      }
+    }
+
+
     const user = sessionStorage.getItem('user');
 
     scanner.addListener('onInvalidScan', this.onInvalidScan);
@@ -121,14 +149,14 @@ export default class App extends Component {
         <Col sm={12} md={10}>
           <Routes />
         </Col>
-        {this.renderModal()}
       </Row>
     );
   }
 
 
   renderModal = () => {
-    const { error, showModal } = this.state;
+    const { error, showModal, update } = this.state;
+    const { assetId, currentVersion, newVersion, url } = update;
 
     if (error) {
       return (
@@ -136,6 +164,32 @@ export default class App extends Component {
           message={error.message}
           onClick={this.resetState}
           title={`Error ${error.code}`}
+        />
+      );
+    }
+
+    if (newVersion && url) {
+       // eslint-disable-next-line max-len
+      const message = `Vous êtes sur la version ${currentVersion} et la version la plus récente est la ${newVersion}. Voulez-vous mettre à jour maintenant ?`;
+      return (
+        <InformationModal
+          message={message}
+          onClick={async () => {
+            try {
+              const options = {
+                mode: 'no-cors',
+                headers: {
+                  Accept: 'application/octet-stream',
+                },
+              };
+              const asset = await fetch('https://api.github.com/repos/katima-g33k/blu-react-desktop/releases/assets/4592766', options);
+              // const asset = await Github.repos.releases.getAssets('katima-g33ks', 'blu-react-desktop', assetId);
+              console.log(asset);
+            } catch (err) {
+              console.log('ERR', err);
+            }
+          }}
+          title={'Mise à jour disponible'}
         />
       );
     }
@@ -149,6 +203,7 @@ export default class App extends Component {
             title={'Code invalide'}
           />
         );
+      case 'update':
       default:
         return null;
     }
@@ -169,6 +224,7 @@ export default class App extends Component {
             </Col>
           </Row>
         </Col>
+        {this.renderModal()}
       </Row>
     );
   }
