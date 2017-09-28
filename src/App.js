@@ -36,10 +36,6 @@ export default class App extends Component {
     }
   }
 
-  canChangeLocation = () => {
-    return !browserHistory.getCurrentLocation().pathname.match(/add|edit|copies/);
-  }
-
   onInvalidScan = () => {
     this.setState({ showModal: 'invalidCode' });
   }
@@ -84,6 +80,9 @@ export default class App extends Component {
   onSettingsSave = () => {
     this.setState({ settingsUpdatedAt: moment() });
   }
+
+  canChangeLocation = () =>
+    !browserHistory.getCurrentLocation().pathname.match(/add|edit|copies/);
 
   resetState = () => {
     this.setState({ error: null, showModal: null });

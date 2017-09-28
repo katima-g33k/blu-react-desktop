@@ -1,6 +1,6 @@
 {
   "name": "blu-react-desktop",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "A React based version of the BLU desktop app.",
   "repository": {
     "type": "git",
@@ -15,6 +15,10 @@
     "electron": "^1.7.3",
     "electron-builder": "^18.6.2",
     "eslint": "^3.9.1",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "eslint-plugin-react": "^7.4.0",
     "react-scripts": "0.8.4"
   },
   "dependencies": {
@@ -45,6 +49,7 @@
     "dist": "yarn run build && build",
     "dist:win": "yarn run build && build --win --x64",
     "electron": "electron -r babel-register .",
+    "lint": "eslint ./src",
     "pack": "build --dir",
     "start": "react-scripts start"
   },
