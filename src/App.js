@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
+import GitHub from 'github';
 import moment from 'moment';
 import request from 'request';
 
@@ -33,24 +34,24 @@ export default class App extends Component {
   }
 
   async componentWillMount() {
-    const { currentVersion } = this.state.update;
-    const { tag_name, assets } = await Github.repos.releases.latest('katima-g33k', 'blu-react-desktop');
+    // const { currentVersion } = this.state.update;
+    // const { tag_name, assets } = await Github.repos.releases.latest('katima-g33k', 'blu-react-desktop');
 
-    if (currentVersion < tag_name) {
-      const asset = assets.find(({ content_type }) => content_type === 'application/x-ms-dos-executable');
+    // if (currentVersion < tag_name) {
+    //   const asset = assets.find(({ content_type }) => content_type === 'application/x-ms-dos-executable');
 
-      if (asset) {
-        this.setState({
-          showModal: 'update',
-          update: {
-            currentVersion,
-            assetId: asset.id,
-            newVersion: tag_name,
-            url: asset.browser_download_url,
-          },
-        });
-      }
-    }
+    //   if (asset) {
+    //     this.setState({
+    //       showModal: 'update',
+    //       update: {
+    //         currentVersion,
+    //         assetId: asset.id,
+    //         newVersion: tag_name,
+    //         url: asset.browser_download_url,
+    //       },
+    //     });
+    //   }
+    // }
 
 
     const user = sessionStorage.getItem('user');
@@ -168,31 +169,31 @@ export default class App extends Component {
       );
     }
 
-    if (newVersion && url) {
-       // eslint-disable-next-line max-len
-      const message = `Vous êtes sur la version ${currentVersion} et la version la plus récente est la ${newVersion}. Voulez-vous mettre à jour maintenant ?`;
-      return (
-        <InformationModal
-          message={message}
-          onClick={async () => {
-            try {
-              const options = {
-                mode: 'no-cors',
-                headers: {
-                  Accept: 'application/octet-stream',
-                },
-              };
-              const asset = await fetch('https://api.github.com/repos/katima-g33k/blu-react-desktop/releases/assets/4592766', options);
-              // const asset = await Github.repos.releases.getAssets('katima-g33ks', 'blu-react-desktop', assetId);
-              console.log(asset);
-            } catch (err) {
-              console.log('ERR', err);
-            }
-          }}
-          title={'Mise à jour disponible'}
-        />
-      );
-    }
+    // if (newVersion && url) {
+    //    // eslint-disable-next-line max-len
+    //   const message = `Vous êtes sur la version ${currentVersion} et la version la plus récente est la ${newVersion}. Voulez-vous mettre à jour maintenant ?`;
+    //   return (
+    //     <InformationModal
+    //       message={message}
+    //       onClick={async () => {
+    //         try {
+    //           const options = {
+    //             mode: 'no-cors',
+    //             headers: {
+    //               Accept: 'application/octet-stream',
+    //             },
+    //           };
+    //           const asset = await fetch('https://api.github.com/repos/katima-g33k/blu-react-desktop/releases/assets/4592766', options);
+    //           // const asset = await Github.repos.releases.getAssets('katima-g33ks', 'blu-react-desktop', assetId);
+    //           console.log(asset);
+    //         } catch (err) {
+    //           console.log('ERR', err);
+    //         }
+    //       }}
+    //       title={'Mise à jour disponible'}
+    //     />
+    //   );
+    // }
 
     switch (showModal) {
       case 'invalidCode':
