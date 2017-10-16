@@ -62,7 +62,7 @@ export default class MemberViewContainer extends Component {
       {
         label: 'Renouveler le compte',
         style: 'primary',
-        onClick: event => {
+        onClick: (event) => {
           event.preventDefault();
           this.renewAccount();
         },
@@ -70,7 +70,7 @@ export default class MemberViewContainer extends Component {
       {
         label: 'Remettre l\'argent',
         style: 'primary',
-        onClick: event => {
+        onClick: (event) => {
           event.preventDefault();
           this.setState({ showModal: 'pay' });
         },
@@ -78,7 +78,7 @@ export default class MemberViewContainer extends Component {
       {
         label: 'Imprimer l\'état du compte',
         style: 'primary',
-        onClick: event => {
+        onClick: (event) => {
           event.preventDefault();
           this.setState({ printReceipt: true });
         },
@@ -89,7 +89,7 @@ export default class MemberViewContainer extends Component {
       {
         label: 'Réactiver le compte',
         style: 'primary',
-        onClick: event => {
+        onClick: (event) => {
           event.preventDefault();
           this.setState({ showModal: 'reactivate' });
         },
@@ -97,7 +97,7 @@ export default class MemberViewContainer extends Component {
       {
         label: 'Transférer à la BLU',
         style: 'primary',
-        onClick: event => {
+        onClick: (event) => {
           event.preventDefault();
           this.setState({ showModal: 'transfer' });
         },
@@ -108,7 +108,7 @@ export default class MemberViewContainer extends Component {
       {
         label: 'Transférer à la BLU',
         style: 'primary',
-        onClick: event => {
+        onClick: (event) => {
           event.preventDefault();
           this.setState({ showModal: 'transfer' });
         },
@@ -116,7 +116,7 @@ export default class MemberViewContainer extends Component {
       {
         label: 'Supprimer',
         style: 'danger',
-        onClick: event => {
+        onClick: (event) => {
           event.preventDefault();
           this.setState({ showModal: 'delete' });
         },
@@ -130,7 +130,9 @@ export default class MemberViewContainer extends Component {
       return [...generalActions, ...activeActions, ...adminActions];
     }
 
-    return generalActions.concat(this.state.member.account.isActive ? activeActions : inactiveActions);
+    return generalActions.concat(
+      this.state.member.account.isActive ? activeActions : inactiveActions,
+    );
   }
 
   closeModal = () => {
@@ -258,10 +260,9 @@ export default class MemberViewContainer extends Component {
           />
         );
       case 'paySuccessfull':
-        const { amount } = this.state;
         return (
           <InformationModal
-            message={`Le montant de ${amount} $  a été remis avec succès`}
+            message={`Le montant de ${this.state.amount} $  a été remis avec succès`}
             onClick={() => this.setState({ amount: 0, showModal: null })}
             title="Argent remis"
           />
@@ -320,7 +321,7 @@ export default class MemberViewContainer extends Component {
         printReceipt={printReceipt}
         onAfterPrint={() => this.setState({ printReceipt: false })}
       />
-    ) : (<Spinner/>);
+    ) : (<Spinner />);
   }
 }
 

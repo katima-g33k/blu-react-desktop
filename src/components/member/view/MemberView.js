@@ -13,7 +13,11 @@ import ProfileStats from '../../general/ProfileStats';
 
 const dir = __dirname;
 const formatDate = (date) => {
-  return date ? moment(new Date(date)).format('LL') : '';
+  if (date) {
+    return moment(date).format('LL');
+  }
+
+  return '';
 };
 
 const border = {
@@ -97,19 +101,17 @@ export default class MemberView extends Component {
   }
 
   renderPhones() {
-    return this.props.member.phone.map((phone, index) => {
-      return (
-        <AlignedData
-          key={index}
-          label={
-            <span>
-              <Translate value="MemberView.general.phone" /> {index + 1}
-            </span>
+    return this.props.member.phone.map((phone, index) => (
+      <AlignedData
+        key={index}
+        label={
+          <span>
+            <Translate value="MemberView.general.phone" /> {index + 1}
+          </span>
           }
-          value={phone.toString()}
-        />
-      );
-    });
+        value={phone.toString()}
+      />
+      ));
   }
 
   renderStats() {
@@ -118,7 +120,7 @@ export default class MemberView extends Component {
         <h4>
           <Translate value="MemberView.stats.title" />
         </h4>
-        <ProfileStats copies={this.props.member.account.copies}/>
+        <ProfileStats copies={this.props.member.account.copies} />
       </section>
     );
   }
@@ -148,7 +150,7 @@ export default class MemberView extends Component {
               <Col sm={12} md={6} style={border}>{this.renderGeneralInformation()}</Col>
               <Col sm={12} md={6}>{this.renderAccountState()}</Col>
             </Row>
-            <hr/>
+            <hr />
             <Row>
               <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
               <Col sm={12} md={6}>
@@ -158,7 +160,7 @@ export default class MemberView extends Component {
                 />
               </Col>
             </Row>
-            <hr/>
+            <hr />
             <Row>
               <Col md={12}>
                 <CopyTableContainer

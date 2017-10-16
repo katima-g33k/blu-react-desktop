@@ -86,9 +86,8 @@ const schema = {
             md: 8,
             sm: 10,
           },
-          validationFn: ({ setPassword, password, confirmPassword }) => {
-            return !setPassword || password === confirmPassword;
-          },
+          validationFn: ({ setPassword, password, confirmPassword }) =>
+            !setPassword || password === confirmPassword,
         },
         {
           key: 'confirmPassword',
@@ -100,9 +99,8 @@ const schema = {
             md: 8,
             sm: 10,
           },
-          validationFn: ({ setPassword, password, confirmPassword }) => {
-            return !setPassword || password === confirmPassword;
-          },
+          validationFn: ({ setPassword, password, confirmPassword }) =>
+            !setPassword || password === confirmPassword,
         },
       ],
     },
@@ -165,7 +163,8 @@ export default class EmployeesTable extends Component {
     });
   }
 
-  insert(employee) {
+  insert(data) {
+    const employee = data;
     API.employee.insert(employee, (error, res) => {
       if (error) {
         this.setState({ error, currentEmployee: null, showModal: null });
@@ -181,7 +180,8 @@ export default class EmployeesTable extends Component {
     });
   }
 
-  save(employee) {
+  save(data) {
+    const employee = data;
     if (employee.setPassword) {
       delete employee.setPassword;
       delete employee.confirmPassword;
@@ -210,7 +210,7 @@ export default class EmployeesTable extends Component {
     return (field, employee) => (
       <ButtonGroup>
         <Button
-          bsStyle='primary'
+          bsStyle="primary"
           onClick={() => this.setState({
             currentEmployee: { ...employee },
             showModal: 'update',
@@ -219,7 +219,7 @@ export default class EmployeesTable extends Component {
           <Glyphicon glyph="pencil" />
         </Button>
         <Button
-          bsStyle='danger'
+          bsStyle="danger"
           onClick={() => this.setState({ currentEmployee: employee, showModal: 'delete' })}
         >
           <Glyphicon glyph="trash" />
@@ -273,7 +273,7 @@ export default class EmployeesTable extends Component {
             onCancel={() => this.setState({ currentEmployee: null, showModal: null })}
             onSave={this.save}
             schema={this.schema}
-            title={`${currentEmployee.id ? 'Modifier' : 'Ajouter'} un.e employé.e` }
+            title={`${currentEmployee.id ? 'Modifier' : 'Ajouter'} un.e employé.e`}
           />
         );
       default:

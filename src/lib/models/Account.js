@@ -36,7 +36,7 @@ export default class Account {
   }
 
   donateAll() {
-    this.copies.forEach(copy => {
+    this.copies.forEach((copy) => {
       if ((copy.isAdded || copy.isReserved || copy.isSold) && !copy.isDonated) {
         copy.donate();
       }

@@ -96,7 +96,6 @@ export default class AuthorInput extends Component {
         {authors.length < MAX_AUTHORS && this.renderAddAuthor()}
       </Col>
     );
-
   }
 }
 

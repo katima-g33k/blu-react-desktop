@@ -11,27 +11,23 @@ import FileSaver from 'file-saver';
 import Button from './Button';
 import Table from './Table';
 
-const renderOptions = (options) => {
-  return options.map((option) => (
-    <option
-      key={`option${option.value}`}
-      value={option.value}
-    >
-      {option.label}
-    </option>
+const renderOptions = options => options.map(option => (
+  <option
+    key={`option${option.value}`}
+    value={option.value}
+  >
+    {option.label}
+  </option>
   ));
-};
 
-const renderOptgroups = (optgroups) => {
-  return optgroups.map((optgroup, index) => (
-    <optgroup
-      key={`optgroup${index}`}
-      label={optgroup.label}
-    >
-      {renderOptions(optgroup.options)}
-    </optgroup>
+const renderOptgroups = optgroups => optgroups.map((optgroup, index) => (
+  <optgroup
+    key={`optgroup${index}`}
+    label={optgroup.label}
+  >
+    {renderOptions(optgroup.options)}
+  </optgroup>
   ));
-};
 
 export default class TableLayout extends Component {
   constructor(props) {
@@ -58,7 +54,7 @@ export default class TableLayout extends Component {
         }
 
         return `"${row[column.dataField]}"` || '""';
-      }).join(',')
+      }).join(','),
     ).join('\r\n');
 
     return new Blob([`${header}${body}`], { type: 'csv' });
@@ -119,11 +115,14 @@ export default class TableLayout extends Component {
                 </Col>
                 <Col md={9}>
                   <FormControl
-                    componentClass='select'
+                    componentClass="select"
                     value={filter.value}
                     onChange={filter.onChange}
                   >
-                    {filter.optgroups ? renderOptgroups(filter.optgroups) : renderOptions(filter.options || [])}
+                    {filter.optgroups ?
+                      renderOptgroups(filter.optgroups) :
+                      renderOptions(filter.options || [])
+                    }
                   </FormControl>
                 </Col>
               </Row>

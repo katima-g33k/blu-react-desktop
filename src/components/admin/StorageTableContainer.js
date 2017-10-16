@@ -67,7 +67,13 @@ export default class StorageTableContainer extends Component {
       }
 
       const storage = Object.keys(res).map((key) => {
-        const item = res[key].sort((a, b) => a.name < b.name ? -1 : 1);
+        const item = res[key].sort((a, b) => {
+          if (a.name < b.name) {
+            return -1;
+          }
+
+          return 1;
+        });
         return new Storage({ no: key, item });
       });
       this.setState({ storage });

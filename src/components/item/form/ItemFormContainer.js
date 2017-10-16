@@ -73,7 +73,7 @@ export default class ItemFormContainer extends Component {
 
   handleGoToItem = () => this.goToItem(this.state.redirectTo)
 
-  goToItem = (id) => browserHistory.push(`/item/view/${id}`)
+  goToItem = id => browserHistory.push(`/item/view/${id}`)
 
   exists = () => {
     const { ean13, item } = this.state;
@@ -193,7 +193,8 @@ export default class ItemFormContainer extends Component {
     });
   }
 
-  insert = (item) => {
+  insert = (data) => {
+    const item = data;
     this.logger.trace('insert()');
     API.item.insert(item, (error, { id }) => {
       if (error) {

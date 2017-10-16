@@ -99,7 +99,7 @@ export default class Statistics extends Component {
                 <Select
                   data={semesterListdata}
                   label={'Début'}
-                  onChange={(event) => this.onSemesterChange('start', event.target.value)}
+                  onChange={event => this.onSemesterChange('start', event.target.value)}
                   value={start.semester}
                 />
               </Col>
@@ -107,7 +107,7 @@ export default class Statistics extends Component {
                 <Select
                   data={semesterListdata}
                   label={'Fin'}
-                  onChange={(event) => this.onSemesterChange('end', event.target.value)}
+                  onChange={event => this.onSemesterChange('end', event.target.value)}
                   value={end.semester}
                 />
               </Col>
@@ -144,10 +144,10 @@ export default class Statistics extends Component {
             height={400}
             width={800}
           >
-            <XAxis dataKey="name"/>
-            <YAxis/>
-            <CartesianGrid strokeDasharray="3 3"/>
-            <Tooltip/>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip />
             <Legend />
             <Bar dataKey="amount" name={'Argent'} fill="#A0B389" />
             <Bar dataKey="quantity" name={'Quantité'} fill="#BB7739" />

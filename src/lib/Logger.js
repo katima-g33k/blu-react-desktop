@@ -12,7 +12,8 @@ const LOG_LEVELS = {
   none: 0,
 };
 
-const canLog = level => LOG_LEVELS[Settings.logLevel] && LOG_LEVELS[level] >= LOG_LEVELS[Settings.logLevel];
+const canLog = level =>
+  LOG_LEVELS[Settings.logLevel] && LOG_LEVELS[level] >= LOG_LEVELS[Settings.logLevel];
 
 const log = (alias, method, logLevel, ...args) => {
   console[method](`${logLevel} [${moment().format()}] ${alias} -`, ...args);

@@ -18,7 +18,7 @@ export default class Copy {
   get status() {
     const transactions = {};
 
-    this.transaction.forEach(transaction => {
+    this.transaction.forEach((transaction) => {
       transactions[transaction.code] = true;
     });
 
@@ -82,9 +82,9 @@ export default class Copy {
   }
 
   cancelReservation() {
-    this.transaction = this.transaction.filter((transaction) => {
-      return Transaction.TYPES.RESERVE !== transaction.code;
-    });
+    this.transaction = this.transaction.filter(transaction =>
+      Transaction.TYPES.RESERVE !== transaction.code,
+    );
   }
 
   donate() {
@@ -113,9 +113,9 @@ export default class Copy {
   }
 
   refund() {
-    this.transaction = this.transaction.filter((transaction) => {
-      return Transaction.TYPES.ALL_SELL.indexOf(transaction.code) === -1;
-    });
+    this.transaction = this.transaction.filter(transaction =>
+      Transaction.TYPES.ALL_SELL.indexOf(transaction.code) === -1,
+    );
   }
 
   pay() {

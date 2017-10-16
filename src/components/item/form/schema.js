@@ -31,7 +31,7 @@ const ean13 = {
       inputWidth: {
         md: 3,
       },
-      validationFn: (item) => item.ean13 || item.noEan13,
+      validationFn: item => item.ean13 || item.noEan13,
     },
     {
       label: 'Pas de numéro',

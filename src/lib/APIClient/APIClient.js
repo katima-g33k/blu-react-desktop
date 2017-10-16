@@ -1,3 +1,4 @@
+/* eslint-disable */
 import HTTP from './HTTP';
 
 export default class APIClient {

@@ -96,7 +96,7 @@ export default class Search extends Component {
                 </Button>
               </Link>
             )}
-            {this.props.isLoading ? (<Spinner/>) : (
+            {this.props.isLoading ? (<Spinner />) : (
               <Table
                 columns={this.props.columns}
                 data={this.props.data}
@@ -130,7 +130,7 @@ Search.propTypes = {
   modal: React.PropTypes.shape(),
   noHeader: React.PropTypes.bool,
   onAddButton: React.PropTypes.func,
-  onRowClick: React.PropTypes.func,
+  // onRowClick: React.PropTypes.func,
   search: React.PropTypes.string,
   tableOptions: React.PropTypes.shape(),
   type: React.PropTypes.string,

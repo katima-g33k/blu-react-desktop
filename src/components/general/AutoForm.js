@@ -179,11 +179,18 @@ export default class AutoForm extends Component {
   }
 
   renderSelect(input) {
+    const {
+      default: defaultVal,
+      key,
+      optgroups,
+      options,
+      value: valueFn,
+    } = input;
     const labelWidth = input.labelWidth || { md: 3, sm: 2 };
     const inputWidth = input.inputWidth || { md: 9, sm: 10 };
     const data = this.state.data;
     const onChange = this.onChange;
-    const value = input.value ? input.value(data[input.key], data) || input.default : data[input.key] || input.default;
+    const value = valueFn ? valueFn(data[key], data) || defaultVal : data[key] || defaultVal;
     const actions = {
       onChange(event) {
         if (input.onChange) {
@@ -201,11 +208,11 @@ export default class AutoForm extends Component {
         </Col>
         <Col {...inputWidth}>
           <FormControl
-            componentClass='select'
+            componentClass="select"
             value={value}
             onChange={actions.onChange}
           >
-            {input.optgroups ? this.renderOptgroups(input.optgroups) : this.renderOptions(input.options || [])}
+            {optgroups ? this.renderOptgroups(optgroups) : this.renderOptions(options || [])}
           </FormControl>
         </Col>
       </div>
@@ -283,7 +290,7 @@ export default class AutoForm extends Component {
   }
 
   renderInline(fields) {
-    return fields.map((field) => this.renderField(field));
+    return fields.map(field => this.renderField(field));
   }
 
   renderField(field) {
@@ -341,7 +348,7 @@ export default class AutoForm extends Component {
             </Col>
           ) : ''}
           {this.renderFields(fields)}
-          <hr/>
+          <hr />
         </Row>
       );
     });

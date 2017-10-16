@@ -5,7 +5,13 @@ import moment from 'moment';
 import AlignedData from '../../general/AlignedData';
 import Table from '../../general/Table';
 
-const formatDate = date => date ? moment(date).format('YYYY-MM-DD') : '';
+const formatDate = (date) => {
+  if (date) {
+    return moment(date).format('YYYY-MM-DD');
+  }
+
+  return '';
+};
 const columns = [
   {
     dataField: 'id',
@@ -108,16 +114,14 @@ export default class MemberReceipt extends Component {
   renderPhone() {
     const phones = this.props.member.phone;
 
-    return phones.map((phone, index) => {
-      return (
-        <AlignedData
-          key={phone.number}
-          label={<span>{`Téléphone ${index + 1}`}</span>}
-          value={phone.toString()}
-          className="userdata"
-        />
-      );
-    });
+    return phones.map((phone, index) => (
+      <AlignedData
+        key={phone.number}
+        label={<span>{`Téléphone ${index + 1}`}</span>}
+        value={phone.toString()}
+        className="userdata"
+      />
+      ));
   }
 
   renderAccount() {
@@ -132,16 +136,14 @@ export default class MemberReceipt extends Component {
     return (
       <section>
         <h3>{'Compte étudiant'}</h3>
-        {fields.map(field => {
-          return (
-            <AlignedData
-              key={field.key}
-              label={field.label}
-              value={member[field.key]}
-              className="userdata"
-            />
-          );
-        })}
+        {fields.map(field => (
+          <AlignedData
+            key={field.key}
+            label={field.label}
+            value={member[field.key]}
+            className="userdata"
+          />
+          ))}
         {this.renderPhone()}
       </section>
     );

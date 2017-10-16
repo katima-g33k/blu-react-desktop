@@ -61,10 +61,10 @@ class Settings {
   }
 
   get() {
-    return PROPERTIES.reduce((settings, key) => {
-      settings[key] = localStorage.getItem(key);
-      return settings;
-    }, {});
+    return PROPERTIES.reduce((settings, key) => ({
+      ...settings,
+      [key]: localStorage.getItem(key),
+    }), {});
   }
 
   set(settings) {
