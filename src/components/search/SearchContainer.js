@@ -44,12 +44,6 @@ export default class SearchContainer extends Component {
     };
   }
 
-  cancelSearch(event) {
-    event.preventDefault();
-    this.logger.trace('cancelSearch()');
-    this.setState({ isLoading: false, data: [] });
-  }
-
   getModal() {
     this.logger.trace('getModal()');
 
@@ -62,6 +56,12 @@ export default class SearchContainer extends Component {
         title={`Erreur ${error.code}`}
       />
     );
+  }
+
+  cancelSearch(event) {
+    event.preventDefault();
+    this.logger.trace('cancelSearch()');
+    this.setState({ isLoading: false, data: [] });
   }
 
   handleInput(event) {

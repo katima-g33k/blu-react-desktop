@@ -8,7 +8,7 @@ export default class Header extends Component {
     return (
       <Row componentClass="header">
         <Col md={1}>
-           <Image
+          <Image
             src={`${dir === '/' ? '' : `${dir}/`}../../assets/images/logo_blu.svg`}
             thumbnail
           />

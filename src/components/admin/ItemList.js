@@ -106,7 +106,7 @@ export default class ItemList extends Component {
         error,
         items: error ? [] : res.map(data => new Item(data)),
         loading: false,
-      })
+      }),
     );
   }
 
@@ -193,7 +193,7 @@ export default class ItemList extends Component {
                 placeholder={'Aucun ouvrage dans le système'}
                 title={`Liste des ouvrages (${items.length})`}
               />
-            ) : (<Spinner/>)}
+            ) : (<Spinner />)}
           </Col>
         </Row>
         {this.renderModal()}

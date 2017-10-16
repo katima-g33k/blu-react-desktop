@@ -93,7 +93,7 @@ export default class ItemView extends Component {
             <Row>
               <Col sm={12} md={6} style={border}>
                 {this.renderInformation()}
-                <hr/>
+                <hr />
                 {this.renderInternalManagement()}
               </Col>
               <Col sm={12} md={6}>

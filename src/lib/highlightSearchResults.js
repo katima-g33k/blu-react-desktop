@@ -1,4 +1,11 @@
-const formatString = (str, highlight) => highlight ? `<span class="highlight">${str}</span>` : str;
+const formatString = (str, highlight) => {
+  if (highlight) {
+    return `<span class="highlight">${str}</span>`;
+  }
+
+  return str;
+};
+
 const highlightSearchResults = (string, highlight) => {
   if (!highlight) {
     return string;

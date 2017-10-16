@@ -12,6 +12,6 @@ const Transaction = {
 };
 
 Transaction.type.getAllSell = () => [Type.SELL, Type.SELL_PARENT];
-Transaction.type.getAsArray = () => Object.keys(Type).map((key) => Type[key]);
+Transaction.type.getAsArray = () => Object.keys(Type).map(key => Type[key]);
 
 export default Transaction;

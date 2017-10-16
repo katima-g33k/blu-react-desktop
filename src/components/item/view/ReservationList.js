@@ -62,7 +62,7 @@ export default class ReservationList extends Component {
     this.columns.find(column => column.dataField === 'actions').dataFormat = (field, reservation) => (
       <Button
         data
-        bsStyle='danger'
+        bsStyle="danger"
         onClick={() => this.setState({ activeReservation: reservation, showModal: 'delete' })}
       >
         <Glyphicon glyph="trash" />
@@ -99,6 +99,7 @@ export default class ReservationList extends Component {
 
   getModal() {
     const { activeReservation, error, showModal } = this.state;
+    const { name } = activeReservation.parent;
 
     if (error) {
       return (
@@ -112,8 +113,6 @@ export default class ReservationList extends Component {
 
     switch (showModal) {
       case 'delete':
-        const { name } = activeReservation.parent;
-
         return (
           <ConfirmModal
             message={`Êtes vous certain.e.s de vouloir supprimer la réservation de  ${name} ?`}

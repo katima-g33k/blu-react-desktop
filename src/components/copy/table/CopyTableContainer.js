@@ -26,7 +26,13 @@ export default class CopyTableContainer extends Component {
     this.updatePrice = this.updatePrice.bind(this);
     this.getModal = this.getModal.bind(this);
 
-    this.columns = CopyColumns.filter(column => this.props.member ? !column.itemOnly : !column.memberOnly);
+    this.columns = CopyColumns.filter((column) => {
+      if (this.props.member) {
+        return !column.itemOnly;
+      }
+
+      return !column.memberOnly;
+    });
   }
 
   componentWillMount() {
@@ -51,7 +57,7 @@ export default class CopyTableContainer extends Component {
             placement="bottom"
             overlay={<Tooltip id="cancel">{'Annuler la vente'}</Tooltip>}
           >
-            <Button bsStyle='danger' onClick={() => this.refund(copy.id)}>
+            <Button bsStyle="danger" onClick={() => this.refund(copy.id)}>
               <Glyphicon glyph="ban-circle" />
             </Button>
           </OverlayTrigger>
@@ -115,7 +121,7 @@ export default class CopyTableContainer extends Component {
           >
             <Button
               onClick={() => this.sell(copy)}
-              bsStyle='success'
+              bsStyle="success"
             >
               {'$$'}
             </Button>
@@ -125,7 +131,7 @@ export default class CopyTableContainer extends Component {
             overlay={<Tooltip id="delete">{'Supprimer de l\'inventaire'}</Tooltip>}
           >
             <Button
-              bsStyle='danger'
+              bsStyle="danger"
               onClick={() => this.setState({ activeCopy: copy, showModal: 'delete' })}
             >
               <Glyphicon glyph="trash" />
@@ -170,7 +176,7 @@ export default class CopyTableContainer extends Component {
       }
 
       this.setState({
-        copies: this.state.copies.filter((copy) => copy.id !== id),
+        copies: this.state.copies.filter(copy => copy.id !== id),
         showModal: null,
         activeCopy: null,
       });

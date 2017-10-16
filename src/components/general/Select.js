@@ -45,7 +45,7 @@ export default class Select extends Component {
         </Col>
         <Col md={10}>
           <FormControl
-            componentClass='select'
+            componentClass="select"
             onChange={onChange}
             value={value}
           >

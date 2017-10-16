@@ -42,9 +42,7 @@ const memberFormSchema = {
               inputWidth: {
                 md: 3,
               },
-              validationFn: ({ no, noNo }) => {
-                return noNo || /^(\d{7}|\d{9})$/.test(no);
-              },
+              validationFn: ({ no, noNo }) => noNo || /^(\d{7}|\d{9})$/.test(no),
             },
             {
               label: 'Pas de numéro',

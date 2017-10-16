@@ -1,3 +1,4 @@
+/* eslint jsx-a11y/no-noninteractive-element-interactions: 0 */
 import React, { Component, PropTypes } from 'react';
 import { Glyphicon } from 'react-bootstrap';
 

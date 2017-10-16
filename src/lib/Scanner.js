@@ -53,8 +53,7 @@ class Scanner {
 
         switch (code.length) {
           case 10:
-            const no = 2 + code.slice(1, 9);
-            this.dispatch('onMemberScan', no);
+            this.dispatch('onMemberScan', 2 + code.slice(1, 9));
             break;
           case 13:
             this.dispatch('onItemScan', code);

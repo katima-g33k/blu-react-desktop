@@ -186,7 +186,7 @@ export default class MemberFormContainer extends Component {
     });
   }
 
-  goToMember = (no) => browserHistory.push(`/member/view/${no}`)
+  goToMember = no => browserHistory.push(`/member/view/${no}`)
 
   handleGoToMember = () => this.goToMember(this.state.redirectTo)
 
@@ -278,5 +278,4 @@ export default class MemberFormContainer extends Component {
 MemberFormContainer.propTypes = {
   params: React.PropTypes.shape(),
   location: React.PropTypes.shape(),
-  router: React.PropTypes.shape(),
 };

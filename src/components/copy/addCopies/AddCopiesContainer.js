@@ -35,24 +35,22 @@ export default class AddCopiesContainer extends Component {
     this.updatePrice = this.updatePrice.bind(this);
 
     this.columns = addCopiesColums;
-    this.columns.find(column => column.dataField === 'actions').dataFormat = (cell, copy) => {
-      return !copy.reservation && (
-        <div>
-          <Button
-            bsStyle="default"
-            onClick={() => this.setState({ copy, showModal: 'input', isSearch: true })}
-          >
-            <Glyphicon glyph="pencil" />
-          </Button>
-          <Button
-            bsStyle="danger"
-            onClick={() => this.deleteCopy(copy.id)}
-          >
-            <Glyphicon glyph="trash" />
-          </Button>
-        </div>
+    this.columns.find(column => column.dataField === 'actions').dataFormat = (cell, copy) => !copy.reservation && (
+    <div>
+      <Button
+        bsStyle="default"
+        onClick={() => this.setState({ copy, showModal: 'input', isSearch: true })}
+      >
+        <Glyphicon glyph="pencil" />
+      </Button>
+      <Button
+        bsStyle="danger"
+        onClick={() => this.deleteCopy(copy.id)}
+      >
+        <Glyphicon glyph="trash" />
+      </Button>
+    </div>
       );
-    };
   }
 
   componentWillMount() {

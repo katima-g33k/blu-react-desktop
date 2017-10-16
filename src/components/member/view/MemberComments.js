@@ -106,8 +106,12 @@ export default class MemberComment extends Component {
   }
 
   handleSave = (event, value) => {
-    return this.state.activeComment ? this.handleUpdate(value) : this.handleInsert(value);
-  }
+    if (this.state.activeComment) {
+      return this.handleUpdate(value);
+    }
+
+    return this.handleInsert(value);
+  };
 
   handleUpdate = (value) => {
     API.comment.update(this.state.activeComment.id, value, (error) => {
@@ -170,23 +174,21 @@ export default class MemberComment extends Component {
     }
   }
 
-  renderRowActions = (actions, activeComment) => {
-    return (
-      <ButtonGroup>
-        <Button
-          actionData={{ activeComment, showModal: 'input' }}
-          glyph="pencil"
-          onClick={this.handleButtonClick}
-        />
-        <Button
-          actionData={{ activeComment, showModal: 'confirm' }}
-          bsStyle="danger"
-          glyph="trash"
-          onClick={this.handleButtonClick}
-        />
-      </ButtonGroup>
-    );
-  }
+  renderRowActions = (actions, activeComment) => (
+    <ButtonGroup>
+      <Button
+        actionData={{ activeComment, showModal: 'input' }}
+        glyph="pencil"
+        onClick={this.handleButtonClick}
+      />
+      <Button
+        actionData={{ activeComment, showModal: 'confirm' }}
+        bsStyle="danger"
+        glyph="trash"
+        onClick={this.handleButtonClick}
+      />
+    </ButtonGroup>
+    )
 
   render() {
     return (

@@ -1,3 +1,4 @@
+/* eslint react/no-multi-comp: 0 */
 import React, { Component, PropTypes } from 'react';
 import { Button, Panel, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';

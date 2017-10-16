@@ -194,7 +194,7 @@ export default class ItemViewContainer extends Component {
     ].concat(isAdmin ? [{
       label: 'Supprimer',
       style: 'danger',
-      onClick: event => {
+      onClick: (event) => {
         event.preventDefault();
         this.setState({ showModal: 'delete' });
       },
@@ -276,7 +276,7 @@ export default class ItemViewContainer extends Component {
         modal={this.getModal()}
         onReservationDeleted={this.removeReservation}
       />
-    ) : (<Spinner/>);
+    ) : (<Spinner />);
   }
 }
 

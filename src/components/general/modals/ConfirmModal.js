@@ -2,41 +2,35 @@ import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
 export default class ConfirmModal extends Component {
-  renderButtons = () => {
-    return (
-      <div>
-        <Button
-          onClick={this.props.onCancel}
-        >
-          {this.props.cancelText || 'Annuler'}
-        </Button>
-        <Button
-          bsStyle={this.props.confirmationStyle || 'primary'}
-          onClick={this.props.onConfirm}
-        >
-          {this.props.confirmText || 'Confirmer'}
-        </Button>
-      </div>
-    );
-  }
+  renderButtons = () => (
+    <div>
+      <Button
+        onClick={this.props.onCancel}
+      >
+        {this.props.cancelText || 'Annuler'}
+      </Button>
+      <Button
+        bsStyle={this.props.confirmationStyle || 'primary'}
+        onClick={this.props.onConfirm}
+      >
+        {this.props.confirmText || 'Confirmer'}
+      </Button>
+    </div>
+    )
 
-  renderCustomActions = () => {
-    return (
-      <div>
-        {this.props.customActions.map((action, index) => {
-          return (
-            <Button
-              bsStyle={action.bsStyle}
-              key={`${action.label}-${index}`}
-              onClick={action.onClick}
-            >
-              {action.label}
-            </Button>
-          );
-        })}
-      </div>
-    );
-  }
+  renderCustomActions = () => (
+    <div>
+      {this.props.customActions.map((action, index) => (
+        <Button
+          bsStyle={action.bsStyle}
+          key={`${action.label}-${index}`}
+          onClick={action.onClick}
+        >
+          {action.label}
+        </Button>
+          ))}
+    </div>
+    )
 
   render() {
     return (

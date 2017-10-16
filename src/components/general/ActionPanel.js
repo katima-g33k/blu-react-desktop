@@ -22,11 +22,13 @@ export default class ActionPanel extends Component {
     };
 
     return (
-      <Panel header='actions'>
+      <Panel header="actions">
         {this.props.actions.map((action, index) => {
-          return action.custom ? (
-            <CustomButton key={`action${index}`} {...action} />
-          ) : (
+          if (action.custom) {
+            return (<CustomButton key={`action${index}`} {...action} />);
+          }
+
+          return (
             <Row key={`action${index}`} style={style}>
               <Col md={12}>
                 <Link to={action.href || '#'}>

@@ -1,6 +1,7 @@
 import capitalize from '../../../lib/capitalize';
 
-export default (item) => {
+export default (data) => {
+  const item = data;
   item.name = capitalize(item.name);
 
   if (typeof item.subject !== 'object' || !item.subject.id) {
@@ -16,10 +17,11 @@ export default (item) => {
     delete item.publication;
   } else {
     item.editor = capitalize(item.editor);
-    item.author.forEach((author) => {
-      author.firstName = capitalize(author.firstName);
-      author.lastName = capitalize(author.lastName);
-    });
+    item.author = item.author.map(author => ({
+      ...author,
+      firstName: capitalize(author.firstName),
+      lastName: capitalize(author.lastName),
+    }));
   }
 
   if (item.noEan13) {

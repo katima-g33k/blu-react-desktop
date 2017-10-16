@@ -1,3 +1,4 @@
+/* eslint react/no-multi-comp: 0 */
 import React, { Component, PropTypes } from 'react';
 import { Col, Panel, Row } from 'react-bootstrap';
 import moment from 'moment';
@@ -9,7 +10,6 @@ import TableLayout from '../general/TableLayout';
 class Cell extends Component {
   static propTypes = {
     email: PropTypes.string,
-    isOriginal: PropTypes.bool,
     onNameClick: PropTypes.func,
     onOriginalClick: PropTypes.func,
     lastActivity: PropTypes.string,
@@ -84,7 +84,7 @@ export default class DuplicateMembers extends Component {
 
       const duplicates = res.reduce((acc, cur) => {
         const duplicate = acc.find(({ email, no }) =>
-          email === cur.email || `${no}`.includes(cur.no) || `${cur.no}`.includes(no)
+          email === cur.email || `${no}`.includes(cur.no) || `${cur.no}`.includes(no),
         );
 
         if (duplicate) {
@@ -149,19 +149,6 @@ export default class DuplicateMembers extends Component {
       label: 'Membre 2',
       dataFormat: (_, row) => (<Cell {...row[1]} />),
     },
-    // {
-    //   dataField: 'actions',
-    //   label: 'Actions',
-    //   width: '120px',
-    //   dataFormat: (field, row) => (
-    //     <Button
-    //       bsStyle='danger'
-    //       onClick={() => this.handleMerge(row)}
-    //     >
-    //       <Glyphicon glyph="duplicate" /> {'Fusionner'}
-    //     </Button>
-    //   ),
-    // },
   ])
 
   renderModal = () => {

@@ -5,7 +5,14 @@ import moment from 'moment';
 import highlightSearchResults from '../../../lib/highlightSearchResults';
 import I18n from '../../../lib/i18n/i18n';
 
-const formatDate = date => date ? moment(date).format('YYYY-MM-DD') : '';
+const formatDate = (date) => {
+  if (date) {
+    return moment(date).format('YYYY-MM-DD');
+  }
+
+  return '';
+};
+
 const link = (href, label) => (
   <Link
     to={{ pathname: href }}
@@ -75,7 +82,8 @@ export default [
     dataSort: true,
     memberOnly: true,
     formatExtraData: { props: ['highlight'] },
-    dataFormat: (cell, { item }, extra = {}) => highlightSearchResults(item.editor, extra.highlight),
+    dataFormat: (cell, { item }, extra = {}) =>
+      highlightSearchResults(item.editor, extra.highlight),
     sortFunc: (a, b, order) => {
       if (a.item.editor < b.item.editor) {
         return order === 'asc' ? -1 : 1;
@@ -161,7 +169,13 @@ export default [
     label: I18n.t('TableColumns.memberCopy.price'),
     dataSort: true,
     width: '60px',
-    sortFunc: (a, b, order) => order === 'asc' ? b.price - a.price : a.price - b.price,
+    sortFunc: (a, b, order) => {
+      if (order === 'asc') {
+        return b.price - a.price;
+      }
+
+      return a.price - b.price;
+    },
   },
   {
     dataField: 'actions',

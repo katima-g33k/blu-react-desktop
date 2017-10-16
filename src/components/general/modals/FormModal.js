@@ -17,12 +17,12 @@ export default class FormModal extends Component {
         <Modal.Body>
           <Row>
             <Col md={12}>
-          <AutoForm
-            schema={schema}
-            data={data}
-            onCancel={onCancel}
-            onSave={onSave}
-          />
+              <AutoForm
+                schema={schema}
+                data={data}
+                onCancel={onCancel}
+                onSave={onSave}
+              />
             </Col>
           </Row>
         </Modal.Body>
