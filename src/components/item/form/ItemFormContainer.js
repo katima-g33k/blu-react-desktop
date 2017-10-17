@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import _ from 'lodash';
 import { browserHistory } from 'react-router';
 
-import API from '../../../lib/API';
 import Author from '../../../lib/models/Author';
 import formatData from './formatData';
 import { ConfirmModal, InformationModal } from '../../general/modals';
@@ -36,6 +35,7 @@ export default class ItemFormContainer extends Component {
   }
 
   static propTypes = {
+    api: PropTypes.shape().isRequired,
     ean13: PropTypes.string,
     location: PropTypes.shape(),
     onCancel: PropTypes.func,
@@ -44,28 +44,24 @@ export default class ItemFormContainer extends Component {
     router: PropTypes.shape(),
   };
 
-  componentWillMount = () => {
+  componentWillMount = async () => {
     this.logger.trace('componentWillMount()');
     const { ean13, id } = this.state;
 
-    API.category.select((error, categories) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+    try {
+      const categories = await this.props.api.category.get();
       this.setState({ categories });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
 
     if (id) {
-      API.item.select(id, {}, (error, item) => {
-        if (error) {
-          this.setState({ error });
-          return;
-        }
-
+      try {
+        const item = await this.props.api.item.get(id);
         this.setState({ item: new Item(item), ean13: item.ean13 });
-      });
+      } catch (error) {
+        this.setState({ error });
+      }
     } else if (ean13) {
       this.setState({ item: new Item({ ean13, isBook: true, author: [new Author()] }) });
     }
@@ -82,14 +78,12 @@ export default class ItemFormContainer extends Component {
       return false;
     }
 
-    return new Promise((resolve, reject) => {
-      API.item.exists(item.ean13, (error, res) => {
-        if (error) {
-          return reject(error);
-        }
-
-        return resolve(res.id);
-      });
+    return new Promise(async (resolve, reject) => {
+      try {
+        resolve((await this.props.api.item.exists(item.ean13)).id);
+      } catch (error) {
+        reject(error);
+      }
     });
   }
 
@@ -179,28 +173,24 @@ export default class ItemFormContainer extends Component {
     });
   }
 
-  handleMerge = () => {
+  handleMerge = async () => {
     const duplicate = this.state.id;
     const id = this.state.redirectTo;
 
-    API.item.merge(id, duplicate, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+    try {
+      await this.props.api.item.merge(duplicate, id);
       this.setState({ showModal: 'merged' });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  insert = (data) => {
+  insert = async (data) => {
     const item = data;
     this.logger.trace('insert()');
-    API.item.insert(item, (error, { id }) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
+
+    try {
+      const { id } = await this.props.api.item.insert(item);
 
       if (this.props.onSave) {
         item.id = id;
@@ -208,7 +198,9 @@ export default class ItemFormContainer extends Component {
       } else {
         this.goToItem(id);
       }
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   onCancel = () => {
@@ -233,18 +225,17 @@ export default class ItemFormContainer extends Component {
   update = async (id, item) => {
     this.logger.trace('update()');
 
-    API.item.update(id, item, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
+    try {
+      await this.props.api.item.update(id, item);
 
       if (this.props.onSave) {
         this.props.onSave(item);
       } else {
         this.goToItem(id);
       }
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   closeModal = () => this.setState({ error: null, isUpdate: null, showModal: null })

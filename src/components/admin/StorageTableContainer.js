@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Link } from 'react-router';
 
-import API from '../../lib/API';
 import { ConfirmModal, InformationModal } from '../general/modals';
 import Storage from '../../lib/models/Storage';
 import TableLayout from '../general/TableLayout';
@@ -50,22 +49,19 @@ export default class StorageTableContainer extends Component {
       showModal: false,
     };
 
-    this.deleteStorage = this.deleteStorage.bind(this);
-    this.getModal = this.getModal.bind(this);
-
     this.actions = actions;
     actions.find(action => action.name === 'delete-storage').onClick = () => {
       this.setState({ showModal: true });
     };
   }
 
-  componentWillMount() {
-    API.storage.select((error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
+  static propTypes = {
+    api: PropTypes.api.shape().isRequired,
+  }
 
+  async componentWillMount() {
+    try {
+      const res = await this.props.api.item.storage.list();
       const storage = Object.keys(res).map((key) => {
         const item = res[key].sort((a, b) => {
           if (a.name < b.name) {
@@ -77,21 +73,21 @@ export default class StorageTableContainer extends Component {
         return new Storage({ no: key, item });
       });
       this.setState({ storage });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  deleteStorage() {
-    API.storage.clear((error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  deleteStorage = async () => {
+    try {
+      await this.props.api.item.storage.clear();
       this.setState({ storage: [], showModal: false });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  getModal() {
+  getModal = () => {
     const { error, showModal } = this.state;
     // eslint-disable-next-line max-len
     const message = 'Êtes-vous certains de vouloir vider les caisses de rangement ? Ceci est IRRÉVERSIBLE. Ne le faîtes pas à moins d\'être certain de ne plus avoir besoin des caisses présentement enregistrées.';

@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import _ from 'lodash';
 import { browserHistory } from 'react-router';
 import moment from 'moment';
 
-import API from '../../../lib/API';
 import capitalize from '../../../lib/capitalize';
 import { ConfirmModal, InformationModal } from '../../general/modals';
 import Member from '../../../lib/models/Member';
@@ -62,28 +61,24 @@ export default class MemberFormContainer extends Component {
     this.handleNo();
   }
 
-  componentWillMount() {
-    API.state.select((error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  async componentWillMount() {
+    try {
+      const states = this.props.api.state.get();
       const stateSelect = this.schema.sections[1].fields.find(field => field.key === 'state');
-      stateSelect.options = res.map(state => ({ value: state, label: state }));
+      stateSelect.options = states.map(state => ({ value: state, label: state }));
 
-      this.setState({ states: res });
-    });
+      this.setState({ states });
+    } catch (error) {
+      this.setState({ error });
+    }
 
     if (this.state.no) {
-      API.member.select(this.state.no, (error, res) => {
-        if (error) {
-          this.setState({ error });
-          return;
-        }
-
+      try {
+        const res = this.props.api.member.get(this.state.no);
         this.setState({ member: new Member(res), email: res.email });
-      });
+      } catch (error) {
+        this.setState({ error });
+      }
     } else if (this.props.location.query.no) {
       const { no } = this.props.location.query;
       this.setState({ member: new Member({ no }) });
@@ -108,40 +103,34 @@ export default class MemberFormContainer extends Component {
       return false;
     }
 
-    return new Promise((resolve, reject) => {
-      API.member.exists(distinct, (error, res) => {
-        if (error) {
-          return reject(error);
-        }
-
-        return resolve(res.no);
-      });
-    });
-  }
-
-  insert = (data) => {
-    API.member.insert(data, (error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
+    return new Promise(async (resolve, reject) => {
+      try {
+        resolve((await this.props.api.member.exists(distinct)).no);
+      } catch (error) {
+        reject(error);
       }
-
-      this.goToMember(res.no || data.no);
     });
   }
 
-  handleMerge = () => {
+  insert = async (data) => {
+    try {
+      const { no } = this.props.api.member.insert(data);
+      this.goToMember(no);
+    } catch (error) {
+      this.setState({ error });
+    }
+  }
+
+  handleMerge = async () => {
     const duplicate = this.state.no;
     const no = this.state.redirectTo;
 
-    API.member.merge({ duplicate, no }, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+    try {
+      await this.props.api.member.duplicates.merge(duplicate, no);
       this.setState({ showModal: 'merged' });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   handleNo = () => {
@@ -175,15 +164,13 @@ export default class MemberFormContainer extends Component {
     return no ? this.update(no, data) : this.insert(data);
   }
 
-  update = (no, data) => {
-    API.member.update(no, data, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  update = async (no, data) => {
+    try {
+      await this.props.api.member.update(no, data);
       this.goToMember(data.no);
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   goToMember = no => browserHistory.push(`/member/view/${no}`)
@@ -276,6 +263,7 @@ export default class MemberFormContainer extends Component {
 }
 
 MemberFormContainer.propTypes = {
-  params: React.PropTypes.shape(),
-  location: React.PropTypes.shape(),
+  api: PropTypes.shape().isRequired,
+  params: PropTypes.shape(),
+  location: PropTypes.shape(),
 };

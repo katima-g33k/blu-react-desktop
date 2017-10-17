@@ -1,8 +1,7 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { browserHistory } from 'react-router';
 import moment from 'moment';
 
-import API from '../../../lib/API';
 import { ConfirmModal, InformationModal, InputModal, SearchModal } from '../../general/modals';
 import Member from '../../../lib/models/Member';
 import Item from '../../../lib/models/Item';
@@ -39,11 +38,14 @@ export default class ItemViewContainer extends Component {
     this.increaseStatus = this.increaseStatus.bind(this);
     this.reserve = this.reserve.bind(this);
     this.removeReservation = this.removeReservation.bind(this);
-    this.renewParentAccount = this.renewParentAccount.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
     this.updateStorage = this.updateStorage.bind(this);
     this.getActions = this.getActions.bind(this);
     this.getModal = this.getModal.bind(this);
+  }
+
+  static propTypes = {
+    api: PropTypes.shape().isRequired,
   }
 
   componentWillMount() {
@@ -54,26 +56,22 @@ export default class ItemViewContainer extends Component {
     this.getItem(props.params.id);
   }
 
-  getItem(id) {
-    API.item.select(id, {}, (error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  async getItem(id) {
+    try {
+      const res = this.props.api.item.get(id);
       this.setState({ item: new Item(res) });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  delete() {
-    API.item.delete(this.state.item.id, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  async delete() {
+    try {
+      await this.props.api.item.delete(this.state.item.id);
       this.setState({ showModal: 'deleted' });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   decreaseStatus() {
@@ -98,20 +96,12 @@ export default class ItemViewContainer extends Component {
     this.updateStatus(newStatus);
   }
 
-  renewParentAccount(no) {
-    API.member.renew(no);
-  }
-
-  reserve(parent) {
+  async reserve(parent) {
     const { item } = this.state;
 
-    API.reservation.insert(parent.no, item.id, (error, res) => {
-      if (error) {
-        this.setState({ error, showModal: null });
-        return;
-      }
+    try {
+      const res = await this.props.api.reservation.insert(parent.no, item.id);
 
-      this.renewParentAccount(parent.no);
       item.reservation.push({
         id: res.id,
         date: moment().format(),
@@ -120,35 +110,33 @@ export default class ItemViewContainer extends Component {
       });
 
       this.setState({ item, showModal: null });
-    });
+    } catch (error) {
+      this.setState({ error, showModal: null });
+    }
   }
 
-  updateStatus(newStatus) {
-    API.item.updateStatus(this.props.params.id, newStatus, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  async updateStatus(newStatus) {
+    try {
+      await this.props.api.item.status.set(this.props.params.id, newStatus);
       const { item } = this.state;
       item.updateStatus(newStatus);
       this.setState({ item });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  updateStorage(event, value) {
+  async updateStorage(event, value) {
     const storage = value.replace(/\D+/g, ' ').split(/\D/).sort((a, b) => a - b);
 
-    API.item.updateStorage(this.props.params.id, storage, (error) => {
-      if (error) {
-        this.setState({ error, showModal: null });
-        return;
-      }
-
+    try {
+      await this.props.api.item.storage.set(this.props.params.id, storage);
       const { item } = this.state;
       item.storage = storage;
       this.setState({ item, showModal: null });
-    });
+    } catch (error) {
+      this.setState({ error, showModal: null });
+    }
   }
 
   getActions() {

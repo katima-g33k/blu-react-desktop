@@ -3,7 +3,6 @@ import { Button, Glyphicon, Label } from 'react-bootstrap';
 import { Link } from 'react-router';
 import moment from 'moment';
 
-import API from '../../../lib/API';
 import { ConfirmModal, InformationModal } from '../../general/modals';
 import TableLayout from '../../general/TableLayout';
 import Transaction from '../../../lib/models/Transaction';
@@ -74,13 +73,15 @@ export default class ReservationList extends Component {
     this.setState({ activeReservation: null, showModal: null });
   }
 
-  deleteReservation() {
+  async deleteReservation() {
     const reservation = this.state.activeReservation;
     const { copy, item, parent } = reservation;
-    const onDelete = (error) => {
-      if (error) {
-        this.setState({ error, activeReservation: null, showModal: null });
-        return;
+
+    try {
+      if (copy) {
+        await this.props.api.member.copy.transaction.delete(copy.id, Transaction.TYPES.RESERVE);
+      } else {
+        await this.props.api.reservation.delete(parent.no, item.id);
       }
 
       this.setState({ activeReservation: null, showModal: null });
@@ -88,12 +89,8 @@ export default class ReservationList extends Component {
       if (this.props.onReservationDeleted) {
         this.props.onReservationDeleted(reservation);
       }
-    };
-
-    if (copy) {
-      API.transaction.delete(copy.id, Transaction.TYPES.RESERVE, onDelete);
-    } else {
-      API.reservation.delete(parent.no, item.id, onDelete);
+    } catch (error) {
+      this.setState({ error, activeReservation: null, showModal: null });
     }
   }
 
@@ -139,6 +136,7 @@ export default class ReservationList extends Component {
 }
 
 ReservationList.propTypes = {
+  api: PropTypes.shape().isRequired,
   onReservationDeleted: PropTypes.func,
   reservations: PropTypes.arrayOf(PropTypes.shape()).isRequired,
 };

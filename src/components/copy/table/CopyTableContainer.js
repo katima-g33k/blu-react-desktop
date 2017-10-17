@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Button, ButtonGroup, Glyphicon, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
-import API from '../../../lib/API';
 import CopyTable from './CopyTable';
 import CopyColumns from './columns';
 import { ConfirmModal, InformationModal, InputModal, SearchModal } from '../../general/modals';
@@ -20,7 +19,6 @@ export default class CopyTableContainer extends Component {
     this.cancelReservation = this.cancelReservation.bind(this);
     this.delete = this.delete.bind(this);
     this.refund = this.refund.bind(this);
-    this.renewParentAccount = this.renewParentAccount.bind(this);
     this.reserve = this.reserve.bind(this);
     this.sell = this.sell.bind(this);
     this.updatePrice = this.updatePrice.bind(this);
@@ -33,6 +31,10 @@ export default class CopyTableContainer extends Component {
 
       return !column.memberOnly;
     });
+  }
+
+  static propTypes = {
+    api: PropTypes.shape().isRequired,
   }
 
   componentWillMount() {
@@ -151,82 +153,64 @@ export default class CopyTableContainer extends Component {
     });
   }
 
-  cancelReservation() {
+  async cancelReservation() {
     const { id } = this.state.activeCopy;
 
-    API.transaction.delete(id, Transaction.TYPES.RESERVE, (error) => {
-      if (error) {
-        this.setState({ error, showModal: null, activeCopy: null });
-        return;
-      }
-
+    try {
+      await this.props.api.member.copy.transaction.delete(id, Transaction.TYPES.RESERVE);
       const { copies } = this.state;
       copies.find(copy => copy.id === id).cancelReservation();
       this.setState({ copies, showModal: null, activeCopy: null });
-    });
+    } catch (error) {
+      this.setState({ error, showModal: null, activeCopy: null });
+    }
   }
 
-  delete() {
+  async delete() {
     const { id } = this.state.activeCopy;
 
-    API.copy.delete(id, (error) => {
-      if (error) {
-        this.setState({ error, showModal: null, activeCopy: null });
-        return;
-      }
-
+    try {
+      await this.props.api.member.copy.delete(id);
       this.setState({
         copies: this.state.copies.filter(copy => copy.id !== id),
         showModal: null,
         activeCopy: null,
       });
-    });
+    } catch (error) {
+      this.setState({ error, showModal: null, activeCopy: null });
+    }
   }
 
-  refund(id) {
-    API.transaction.delete(id, Transaction.TYPES.SELL, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  async refund(id) {
+    try {
+      await this.props.api.member.copy.transaction.delete(id, Transaction.TYPES.SELL);
       const { copies } = this.state;
       copies.find(copy => copy.id === id).refund();
       this.setState({ copies });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  renewParentAccount(no) {
-    API.member.renew(no);
-  }
-
-  reserve(parent) {
+  async reserve(parent) {
     const { id } = this.state.activeCopy;
 
-    API.transaction.insert(parent.no, [id], Transaction.TYPES.RESERVE, (error) => {
-      if (error) {
-        this.setState({ error, showModal: null, activeCopy: null });
-        return;
-      }
-
-      this.renewParentAccount(parent.no);
-
+    try {
+      await this.props.api.member.copy.transaction.insert(parent.no, id, Transaction.TYPES.RESERVE);
       const { copies } = this.state;
       copies.find(copy => copy.id === id).reserve(parent);
       this.setState({ copies, activeCopy: null, showModal: null });
-    });
+    } catch (error) {
+      this.setState({ error, showModal: null, activeCopy: null });
+    }
   }
 
-  sell(copy, halfPrice) {
+  async sell(copy, halfPrice) {
     const member = this.props.member || copy.member.no;
     const transactionType = Transaction.TYPES[halfPrice ? 'SELL_PARENT' : 'SELL'];
 
-    API.transaction.insert(member, [copy.id], transactionType, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+    try {
+      await this.props.api.member.copy.transaction.insert(member, copy.id, transactionType);
       const { copies } = this.state;
 
       if (halfPrice) {
@@ -236,23 +220,23 @@ export default class CopyTableContainer extends Component {
       }
 
       this.setState({ copies });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  updatePrice(event, value) {
+  async updatePrice(event, value) {
     const { id } = this.state.activeCopy;
     const price = parseInt(value, 10);
 
-    API.copy.update(id, price, (error) => {
-      if (error) {
-        this.setState({ error, showModal: null, activeCopy: null });
-        return;
-      }
-
+    try {
+      await this.props.api.member.copy.update(id, price);
       const { copies } = this.state;
       copies.find(copy => copy.id === id).price = price;
       this.setState({ copies, showModal: null, activeCopy: null });
-    });
+    } catch (error) {
+      this.setState({ error, showModal: null, activeCopy: null });
+    }
   }
 
   getModal() {

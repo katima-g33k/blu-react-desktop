@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
+import API from 'blu-api';
 import moment from 'moment';
 
-import API from './lib/API';
 import Header from './components/general/Header';
 import { InformationModal } from './components/general/modals';
 import Login from './components/login/Login';
@@ -16,6 +16,7 @@ import Sidebar from './components/general/Sidebar';
 export default class App extends Component {
   constructor(props) {
     super(props);
+    this.api = new API(settings.apiUrl, settings.apiKey);
     this.state = {
       error: null,
       settingsUpdatedAt: null,
@@ -40,31 +41,27 @@ export default class App extends Component {
     this.setState({ showModal: 'invalidCode' });
   }
 
-  onItemScan = (ean13) => {
+  onItemScan = async (ean13) => {
     if (this.canChangeLocation()) {
-      API.item.exists(ean13, (error, res) => {
-        if (error) {
-          this.setState({ error });
-          return;
-        }
-
-        const path = res.id ? `view/${res.id}` : `add?ean13=${ean13}`;
+      try {
+        const { id } = await this.api.item.exists(ean13);
+        const path = id ? `view/${id}` : `add?ean13=${ean13}`;
         browserHistory.push(`/item/${path}`);
-      });
+      } catch (error) {
+        this.setState({ error });
+      }
     }
   }
 
-  onMemberScan = (no) => {
+  onMemberScan = async (no) => {
     if (this.canChangeLocation()) {
-      API.member.exists({ no }, (error, res) => {
-        if (error) {
-          this.setState({ error });
-          return;
-        }
-
+      try {
+        const res = await this.api.member.exists(no);
         const path = res.no ? `view/${res.no}` : `add?no=${no}`;
         browserHistory.push(`/member/${path}`);
-      });
+      } catch (error) {
+        this.setState({ error });
+      }
     }
   }
 
@@ -73,6 +70,7 @@ export default class App extends Component {
   }
 
   onLogout = () => {
+    this.api.employee.logout();
     sessionStorage.removeItem('user');
     this.setState({ user: null });
   }
@@ -107,7 +105,7 @@ export default class App extends Component {
     if (!this.state.user) {
       return (
         <Row componentClass="main">
-          <Login onConnected={this.onLogin} />
+          <Login onConnected={this.onLogin} api={this.api} />
         </Row>
       );
     }
@@ -118,7 +116,7 @@ export default class App extends Component {
           <Sidebar onLogout={this.onLogout} />
         </Col>
         <Col sm={12} md={10}>
-          <Routes />
+          <Routes api={this.api} />
         </Col>
         {this.renderModal()}
       </Row>

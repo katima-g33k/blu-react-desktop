@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Button, ButtonGroup, Col, Glyphicon, Label, Panel, Row } from 'react-bootstrap';
 
-import API from '../../lib/API';
 import { ConfirmModal, FormModal, InformationModal } from '../general/modals';
 import Employee from '../../lib/models/Employee';
 import { encrypt } from '../../lib/cipher';
@@ -138,46 +137,45 @@ export default class EmployeesTable extends Component {
     };
   }
 
-  componentWillMount() {
-    API.employee.list((error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
-      this.setState({ employees: res.map(employee => new Employee(employee)) });
-    });
+  static propTypes = {
+    api: PropTypes.shape(),
   }
 
-  delete() {
+  async componentWillMount() {
+    try {
+      const res = await this.props.api.employee.list();
+      this.setState({ employees: res.map(employee => new Employee(employee)) });
+    } catch (error) {
+      this.setState({ error });
+    }
+  }
+
+  async delete() {
     const { id } = this.state.currentEmployee;
 
-    API.employee.delete(id, (error) => {
-      if (error) {
-        this.setState({ error, showModal: null, currentEmployee: null });
-        return;
-      }
-
+    try {
+      await this.props.api.employee.delete(id);
       const employees = this.state.employees.filter(employee => employee.id !== id);
       this.setState({ employees, showModal: null, currentEmployee: null });
-    });
+    } catch (error) {
+      this.setState({ error, showModal: null, currentEmployee: null });
+    }
   }
 
-  insert(data) {
+  async insert(data) {
     const employee = data;
-    API.employee.insert(employee, (error, res) => {
-      if (error) {
-        this.setState({ error, currentEmployee: null, showModal: null });
-        return;
-      }
 
+    try {
+      const { id } = await this.props.api.employee.insert(employee);
       const { employees } = this.state;
 
-      employee.id = res;
+      employee.id = id;
       employees.push(employee);
 
       this.setState({ employees, currentEmployee: null, showModal: null });
-    });
+    } catch (error) {
+      this.setState({ error, currentEmployee: null, showModal: null });
+    }
   }
 
   save(data) {
@@ -191,19 +189,17 @@ export default class EmployeesTable extends Component {
     return employee.id ? this.update(employee) : this.insert(employee);
   }
 
-  update(currentEmployee) {
-    API.employee.update(currentEmployee.id, currentEmployee, (error) => {
-      if (error) {
-        this.setState({ error, currentEmployee: null, showModal: null });
-        return;
-      }
-
+  async update(currentEmployee) {
+    try {
+      await this.props.api.employee.update(currentEmployee.id, currentEmployee);
       const { employees } = this.state;
       const index = employees.findIndex(employee => employee.id === currentEmployee.id);
 
       employees[index] = currentEmployee;
       this.setState({ employees, currentEmployee: null, showModal: null });
-    });
+    } catch (error) {
+      this.setState({ error, currentEmployee: null, showModal: null });
+    }
   }
 
   getRowActions() {

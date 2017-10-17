@@ -2,7 +2,6 @@ import React, { Component, PropTypes } from 'react';
 import { ButtonGroup, Col, Row } from 'react-bootstrap';
 import { I18n } from 'react-i18nify';
 
-import API from '../../../lib/API';
 import Button from '../../general/Button';
 import CommentColumns from './CommentColumns';
 import { ConfirmModal, InformationModal, InputModal } from '../../general/modals';
@@ -36,6 +35,7 @@ export default class MemberComment extends Component {
   }
 
   static propTypes = {
+    api: PropTypes.shape().isRequired,
     comments: PropTypes.array.isRequired,
     member: PropTypes.string,
   }
@@ -69,40 +69,36 @@ export default class MemberComment extends Component {
     this.setState({ showModal: 'input' });
   }
 
-  handleDelete = () => {
+  handleDelete = async () => {
     const { id } = this.state.activeComment;
 
-    API.comment.delete(id, (error) => {
-      if (error) {
-        this.setState({ error, activeComment: null, showModal: null });
-        return;
-      }
-
+    try {
+      await this.props.api.member.comment.delete(id);
       this.setState({
         activeComment: null,
         comments: this.state.comments.filter(comment => comment.id !== id),
         showModal: null,
       });
-    });
+    } catch (error) {
+      this.setState({ error, activeComment: null, showModal: null });
+    }
   }
 
-  handleInsert = (value) => {
-    API.comment.insert(this.props.member, value, (error, res) => {
-      if (error) {
-        this.setState({ error, activeComment: null, showModal: null });
-        return;
-      }
-
+  handleInsert = async (value) => {
+    try {
+      const { id } = await this.props.api.member.comment.insert(this.props.member, value);
       const comments = this.state.comments || [];
 
       comments.push({
-        id: res.id,
+        id,
         updatedAt: new Date(),
         comment: value,
       });
 
       this.resetState(comments);
-    });
+    } catch (error) {
+      this.setState({ error, activeComment: null, showModal: null });
+    }
   }
 
   handleSave = (event, value) => {
@@ -113,13 +109,9 @@ export default class MemberComment extends Component {
     return this.handleInsert(value);
   };
 
-  handleUpdate = (value) => {
-    API.comment.update(this.state.activeComment.id, value, (error) => {
-      if (error) {
-        this.setState({ error, activeComment: null, showModal: null });
-        return;
-      }
-
+  handleUpdate = async (value) => {
+    try {
+      await this.props.api.member.comment.update(this.state.activeComment.id, value);
       const comments = this.state.comments;
       const currentComment = comments.find(comment => comment.id === this.state.activeComment.id);
 
@@ -131,7 +123,9 @@ export default class MemberComment extends Component {
         activeComment: null,
         showModal: null,
       });
-    });
+    } catch (error) {
+      this.setState({ error, activeComment: null, showModal: null });
+    }
   }
 
   renderModal = () => {

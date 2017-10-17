@@ -12,6 +12,7 @@
     "url": "https://github.com/katima-g33k/blu-react-desktop/issues"
   },
   "devDependencies": {
+    "babel-polyfill": "^6.26.0",
     "electron": "^1.7.3",
     "electron-builder": "^18.6.2",
     "eslint": "^3.9.1",
@@ -27,6 +28,7 @@
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
     "babel-register": "^6.24.1",
+    "blu-api": "https://github.com/katima-g33k/blu-api.git#api-client",
     "crypto": "^0.0.3",
     "file-saver": "^1.3.3",
     "halogen": "^0.2.0",

@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import { Col, Panel, Row } from 'react-bootstrap';
 
-import API from '../../lib/API';
 import AutoForm from '../general/AutoForm';
 import { encrypt } from '../../lib/cipher';
 import I18n from '../../lib/i18n/i18n';
@@ -41,19 +40,18 @@ export default class Login extends Component {
   }
 
   static propTypes = {
+    api: PropTypes.shape(),
     onConnected: PropTypes.func.isRequired,
   }
 
-  connect = ({ username, password }) => {
-    API.employee.login(username, encrypt(password), (error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  connect = async ({ username, password }) => {
+    try {
+      const res = await this.props.api.employee.login(username, encrypt(password));
       sessionStorage.setItem('user', JSON.stringify(res));
       this.props.onConnected(res);
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   closeModal = () => {
