@@ -3,7 +3,6 @@ import React, { Component, PropTypes } from 'react';
 import { Col, Panel, Row } from 'react-bootstrap';
 import moment from 'moment';
 
-import API from '../../lib/API';
 import I18n from '../../lib/i18n/i18n';
 import TableLayout from '../general/TableLayout';
 
@@ -75,13 +74,13 @@ export default class DuplicateMembers extends Component {
     };
   }
 
-  componentWillMount() {
-    API.member.duplicates((error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
+  static propTypes = {
+    api: PropTypes.shape(),
+  }
 
+  async componentWillMount() {
+    try {
+      const res = await this.props.api.member.duplicates.list();
       const duplicates = res.reduce((acc, cur) => {
         const duplicate = acc.find(({ email, no }) =>
           email === cur.email || `${no}`.includes(cur.no) || `${cur.no}`.includes(no),
@@ -101,7 +100,9 @@ export default class DuplicateMembers extends Component {
       }, []).filter(({ members }) => members.length > 1).map(({ members }) => members);
 
       this.setState({ duplicates });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   openMemberModal = (no) => {
@@ -110,7 +111,7 @@ export default class DuplicateMembers extends Component {
 
   setAsOriginal = () => {}
 
-  handleMerge = (members) => {
+  handleMerge = async (members) => {
     const no = (members.find(({ isOriginal }) => isOriginal) || {}).no;
     const duplicate = (members.find(({ isOriginal }) => !isOriginal) || {}).no;
 
@@ -118,17 +119,15 @@ export default class DuplicateMembers extends Component {
       return;
     }
 
-    API.member.merge({ no, duplicate }, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+    try {
+      await this.props.api.member.duplicates.merge(duplicate, no);
       const { duplicates } = this.state;
       this.setState({
         duplicates: duplicates.filter(d => d !== members),
       });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   getColumns = () => ([

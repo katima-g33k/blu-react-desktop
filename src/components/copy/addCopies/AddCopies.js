@@ -10,6 +10,7 @@ import Table from '../../general/Table';
 export default class AddCopies extends Component {
   renderSearch = () => (
     <SearchContainer
+      {...this.props}
       noHeader
       type="item"
       onRowClick={item => this.props.openModal({ item })}

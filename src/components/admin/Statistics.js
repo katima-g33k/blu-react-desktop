@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Col, Panel, Row } from 'react-bootstrap';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import moment from 'moment';
 
 import I18n from '../../lib/i18n/i18n';
-import API from '../../lib/API';
 import DatePicker from '../general/DatePicker';
 import Select from '../general/Select';
 
@@ -24,27 +23,23 @@ export default class Statistics extends Component {
       },
       data: [],
     };
+  }
 
-    this.getStatistics = this.getStatistics.bind(this);
-    this.onDateChange = this.onDateChange.bind(this);
-    this.onSemesterChange = this.onSemesterChange.bind(this);
-    this.updateDates = this.updateDates.bind(this);
+  static propTypes = {
+    api: PropTypes.shape().isRequired,
   }
 
   componentWillMount() {
     this.getStatistics();
   }
 
-  getStatistics() {
+  getStatistics = async () => {
     const { start, end } = this.state;
     const startDate = start.date.format('YYYY-MM-DD');
     const endDate = end.date.format('YYYY-MM-DD');
 
-    API.statistics.byInterval(startDate, endDate, (err, res) => {
-      if (err) {
-        return;
-      }
-
+    try {
+      const res = await this.props.api.statistics.byInterval(startDate, endDate);
       this.setState({
         data: Object.keys(res).map(key => ({
           amount: +res[key].amount || 0,
@@ -53,18 +48,20 @@ export default class Statistics extends Component {
           savings: key === 'soldParent' ? +res[key].savings || 0 : undefined,
         })),
       });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  onDateChange(key, date) {
+  onDateChange = (key, date) => {
     this.updateDates(key, date, moment.semester('code', date));
   }
 
-  onSemesterChange(key, semester) {
+  onSemesterChange = (key, semester) => {
     this.updateDates(key, moment.semester(key, semester), semester);
   }
 
-  updateDates(key, date, semester) {
+  updateDates = (key, date, semester) => {
     const data = {};
     data[key] = { date, semester };
 

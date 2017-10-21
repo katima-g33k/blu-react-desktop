@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Glyphicon, Label } from 'react-bootstrap';
 import { Link } from 'react-router';
 import moment from 'moment';
 
-import API from '../../lib/API';
 import { ConfirmModal, InformationModal } from '../general/modals';
 import Reservation from '../../lib/models/Reservation';
 import TableLayout from '../general/TableLayout';
@@ -71,27 +70,27 @@ export default class ReservationTableContainer extends Component {
     };
   }
 
-  componentWillMount() {
-    API.reservation.select((error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
-      const reservations = res.map(reservation => new Reservation(reservation));
-      this.setState({ reservations });
-    });
+  static propTypes = {
+    api: PropTypes.shape(),
   }
 
-  deleteReservations() {
-    API.reservation.clear((error) => {
-      if (error) {
-        this.setState({ error, showModal: false });
-        return;
-      }
+  async componentWillMount() {
+    try {
+      const res = await this.props.api.reservation.list();
+      const reservations = res.map(reservation => new Reservation(reservation));
+      this.setState({ reservations });
+    } catch (error) {
+      this.setState({ error });
+    }
+  }
 
+  async deleteReservations() {
+    try {
+      await this.props.api.reservation.clear();
       this.setState({ reservations: [], showModal: false });
-    });
+    } catch (error) {
+      this.setState({ error, showModal: false });
+    }
   }
 
   getModal() {

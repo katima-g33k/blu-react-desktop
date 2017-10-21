@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 
-import API from '../../lib/API';
 import I18n from '../../lib/i18n/i18n';
 import { InformationModal } from '../general/modals';
 import Item from '../../lib/models/Item';
@@ -69,40 +68,25 @@ export default class SearchContainer extends Component {
     this.setState({ search: event.target.value });
   }
 
-  search(event) {
+  async search(event) {
     event.preventDefault();
     this.logger.trace('search()');
 
     this.setState({ isLoading: true, search: this.state.search.trim() });
     const { archives, search, type } = this.state;
     const searchType = type === 'item' ? 'item' : 'member';
-    const options = {};
 
-    if (searchType === 'member') {
-      options.is_parent = type === 'parent';
-      options.deactivated = archives;
-    } else {
-      options.outdated = archives;
-    }
-
-    API[searchType].search(search, options, (error, res) => {
-      // If search was stopped by user
-      if (!this.state.isLoading) {
-        return;
-      }
-
-      if (error) {
-        this.setState({ error, isLoading: false });
-        return;
-      }
-
+    try {
+      const res = await this.props.api[searchType].search(search, archives, type === 'parent');
       const Instance = searchType === 'item' ? Item : Member;
 
       this.setState({
         data: res.map(row => new Instance(row)),
         isLoading: false,
       });
-    });
+    } catch (error) {
+      this.setState({ error, isLoading: false });
+    }
   }
 
   handleType(event) {
@@ -146,6 +130,7 @@ export default class SearchContainer extends Component {
 }
 
 SearchContainer.propTypes = {
+  api: React.PropTypes.shape(),
   disableArchive: React.PropTypes.bool,
   noHeader: React.PropTypes.bool,
   onAddButton: React.PropTypes.func,

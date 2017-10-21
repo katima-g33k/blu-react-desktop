@@ -1,9 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Button, Glyphicon } from 'react-bootstrap';
 
 import AddCopies from './AddCopies';
 import addCopiesColums from './addCopiesColumns';
-import API from '../../../lib/API';
 import Copy from '../../../lib/models/Copy';
 import { InformationModal, InputModal } from '../../general/modals';
 import Item from '../../../lib/models/Item';
@@ -53,35 +52,35 @@ export default class AddCopiesContainer extends Component {
       );
   }
 
-  componentWillMount() {
+  static propTypes = {
+    api: PropTypes.shape().isRequired,
+  }
+
+  async componentWillMount() {
     const { no } = this.props.params;
 
     scanner.addListener('onItemScan', this.onItemScan);
 
-    API.member.getName(no, (error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+    try {
+      const res = await this.props.api.member.getName(no);
       this.setState({ member: new Member({ ...res, no }) });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   componentWillUnmount() {
     scanner.removeListener('onItemScan', this.onItemScan);
   }
 
-  deleteCopy(id) {
-    API.copy.delete(id, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  async deleteCopy(id) {
+    try {
+      await this.props.api.member.copy.delete(id);
       const copies = this.state.copies.filter(copy => copy.id !== id);
       this.setState({ copies });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   closeModal(state = {}) {
@@ -138,32 +137,28 @@ export default class AddCopiesContainer extends Component {
     this.setState({ ...data, showModal: 'input', isSearch: true });
   }
 
-  onItemScan(ean13) {
-    API.item.select(ean13, { forCopy: true }, (error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
+  async onItemScan(ean13) {
+    try {
+      const { id } = await this.props.api.item.exists(ean13);
 
-      if (res.id) {
+      if (id) {
+        const res = this.props.api.item.get(id, { forCopy: true });
         this.setState({ item: new Item(res), showModal: 'input', isSearch: true });
       } else {
         this.setState({ ean13, isSearch: false });
       }
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  save(event, value) {
+  async save(event, value) {
     const price = parseInt(value, 10);
     const memberNo = this.props.params.no;
     const itemId = this.state.item.id;
 
-    API.copy.insert(memberNo, itemId, price, (error, res) => {
-      if (error) {
-        this.closeModal({ error });
-        return;
-      }
-
+    try {
+      const res = await this.props.api.member.copy.insert(memberNo, itemId, price);
       const { id, reservation } = res;
       const { copies, item } = this.state;
       const copy = new Copy({
@@ -187,23 +182,23 @@ export default class AddCopiesContainer extends Component {
       if (reservation) {
         this.setState({ showModal: 'reservation', reservation: new Reservation({ parent: reservation }) });
       }
-    });
+    } catch (error) {
+      this.closeModal({ error });
+    }
   }
 
-  updatePrice(event, value) {
+  async updatePrice(event, value) {
     const price = parseInt(value, 10);
     const { id } = this.state.copy;
 
-    API.copy.update(id, price, (error) => {
-      if (error) {
-        this.closeModal({ error });
-        return;
-      }
-
+    try {
+      await this.props.api.member.copy.update(id, price);
       const { copies } = this.state;
       copies.find(copy => copy.id === id).price = price;
       this.closeModal({ copies });
-    });
+    } catch (error) {
+      this.closeModal({ error });
+    }
   }
 
   render() {

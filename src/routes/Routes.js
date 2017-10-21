@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
 import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
@@ -16,6 +16,10 @@ import Statistics from '../components/admin/Statistics';
 import StorageTableView from '../components/admin/StorageTableView';
 
 export default class Routes extends Component {
+  static propTypes = {
+    api: PropTypes.shape(),
+  }
+
   componentDidMount() {
     if (/index\.html/.test(browserHistory.getCurrentLocation().pathname)) {
       browserHistory.push('/search');
@@ -23,38 +27,99 @@ export default class Routes extends Component {
   }
 
   render() {
+    const { api } = this.props;
+
     return (
       <Router history={browserHistory}>
-        <Route path="/" component={SearchContainer}>
+        <Route
+          component={props => (<SearchContainer {...props} api={api} />)}
+          path="/"
+        >
           <IndexRedirect to="/search" />
           <Route
+            component={props => (<SearchContainer {...props} api={api} />)}
             name="Search"
             path="/search"
-            component={SearchContainer}
           />
         </Route>
         <Route name="Member" path="/member">
           <IndexRedirect to="add" />
-          <Route name="MemberView" path="view/:no" component={MemberViewContainer} />
-          <Route name="MemberAdd" path="add" component={MemberFormContainer} />
-          <Route name="MemberEdit" path="edit/:no" component={MemberFormContainer} />
-          <Route name="AddCopies" path="copies/:no" component={AddCopiesContainer} />
+          <Route
+            component={props => (<MemberViewContainer {...props} api={api} />)}
+            name="MemberView"
+            path="view/:no"
+          />
+          <Route
+            component={props => (<MemberFormContainer {...props} api={api} />)}
+            name="MemberAdd"
+            path="add"
+          />
+          <Route
+            component={props => (<MemberFormContainer {...props} api={api} />)}
+            name="MemberEdit"
+            path="edit/:no"
+          />
+          <Route
+            component={props => (<AddCopiesContainer {...props} api={api} />)}
+            name="AddCopies"
+            path="copies/:no"
+          />
         </Route>
         <Route name="Item" path="/item">
           <IndexRedirect to="add" />
-          <Route name="ItemView" path="view/:id" component={ItemViewContainer} />
-          <Route name="ItemAdd" path="add" component={ItemFormContainer} />
-          <Route name="ItemEdit" path="edit/:id" component={ItemFormContainer} />
+          <Route
+            component={props => (<ItemViewContainer {...props} api={api} />)}
+            name="ItemView"
+            path="view/:id"
+          />
+          <Route
+            component={props => (<ItemFormContainer {...props} api={api} />)}
+            name="ItemAdd"
+            path="add"
+          />
+          <Route
+            component={props => (<ItemFormContainer {...props} api={api} />)}
+            name="ItemEdit"
+            path="edit/:id"
+          />
         </Route>
         <Route name="Admin" path="/admin">
-          <Route name="employees" path="employees" component={EmployeesTable} />
-          <Route name="reservations" path="reservations" component={ReservationTableView} />
-          <Route name="statistics" path="statistics" component={Statistics} />
-          <Route name="storage" path="storage" component={StorageTableView} />
-          <Route name="itemList" path="item/list" component={ItemList} />
-          <Route name="duplicates" path="duplicates" component={DuplicateMembers} />
+          <Route
+            component={props => (<EmployeesTable {...props} api={api} />)}
+            name="employees"
+            path="employees"
+          />
+          <Route
+            component={props => (<ReservationTableView {...props} api={api} />)}
+            name="reservations"
+            path="reservations"
+          />
+          <Route
+            component={props => (<Statistics {...props} api={api} />)}
+            name="statistics"
+            path="statistics"
+          />
+          <Route
+            component={props => (<StorageTableView {...props} api={api} />)}
+            name="storage"
+            path="storage"
+          />
+          <Route
+            component={props => (<ItemList {...props} api={api} />)}
+            name="itemList"
+            path="item/list"
+          />
+          <Route
+            component={props => (<DuplicateMembers {...props} api={api} />)}
+            name="duplicates"
+            path="duplicates"
+          />
         </Route>
-        <Route name="settings" path="/settings" component={SettingsView} />
+        <Route
+          component={props => (<SettingsView {...props} api={api} />)}
+          name="settings"
+          path="/settings"
+        />
       </Router>
     );
   }

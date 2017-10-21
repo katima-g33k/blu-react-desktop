@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { Col, Panel, Row } from 'react-bootstrap';
 
-import API from '../../lib/API';
 import I18n from '../../lib/i18n/i18n';
 import { InformationModal } from '../general/modals';
 import Item from '../../lib/models/Item';
@@ -90,24 +89,25 @@ export default class ItemList extends Component {
     this.renderModal = this.renderModal.bind(this);
   }
 
-  componentWillMount() {
-    API.category.select((error, res) => {
+  static propTypes = {
+    api: PropTypes.shape(),
+  }
+
+  async componentWillMount() {
+    try {
+      const categories = await this.props.api.category.get();
+      const items = await this.props.api.item.list();
       this.setState({
-        error,
-        categories: error ? [] : res.map(data => ({
+        categories: categories.map(data => ({
           label: data.name,
           options: data.subject.map(({ id, name }) => ({ label: name, value: id })),
         })),
-      });
-    });
-
-    API.item.list((error, res) =>
-      this.setState({
-        error,
-        items: error ? [] : res.map(data => new Item(data)),
+        items: items.map(data => new Item(data)),
         loading: false,
-      }),
-    );
+      });
+    } catch (error) {
+      this.setState({ error, loading: false });
+    }
   }
 
   getFilteredData() {

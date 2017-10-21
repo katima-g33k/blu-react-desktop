@@ -105,6 +105,7 @@ export default class ItemView extends Component {
             </Row>
             {data.reservation.length > 0 && (
               <ReservationList
+                {...this.props}
                 onReservationDeleted={onReservationDeleted}
                 reservations={this.getReservations()}
               />

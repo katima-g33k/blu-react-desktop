@@ -15,7 +15,7 @@ export default class StorageTableView extends Component {
       <Panel header={I18n.t('Admin.storage.title')}>
         <Row>
           <Col sm={12} md={6}>
-            <StorageTableContainer />
+            <StorageTableContainer {...this.props} />
           </Col>
         </Row>
       </Panel>

@@ -14,6 +14,7 @@ export default class SearchModal extends Component {
         </Modal.Header>
         <Modal.Body>
           <SearchContainer
+            {...this.props}
             type={this.props.type}
             onRowClick={this.props.onRowClick}
             noHeader

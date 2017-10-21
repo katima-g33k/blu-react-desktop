@@ -1,12 +1,10 @@
 import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 
-import API from '../../../lib/API';
 import { ConfirmModal, InformationModal } from '../../general/modals';
 import Member from '../../../lib/models/Member';
 import MemberView from './MemberView';
 import Spinner from '../../general/Spinner';
-import Transaction from '../../../lib/models/Transaction';
 
 export default class MemberViewContainer extends Component {
   constructor(props) {
@@ -35,15 +33,13 @@ export default class MemberViewContainer extends Component {
     this.getMember(props.params.no);
   }
 
-  getMember(no) {
-    API.member.select(no, (error, res) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  async getMember(no) {
+    try {
+      const res = await this.props.api.member.get(no);
       this.setState({ member: new Member(res) });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   getActions() {
@@ -139,26 +135,21 @@ export default class MemberViewContainer extends Component {
     this.setState({ error: null, showModal: null });
   }
 
-  delete = () => {
-    API.member.delete(this.state.member.no, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+  delete = async () => {
+    try {
+      await this.props.api.member.delete(this.state.member.no);
       this.setState({ showModal: 'deleted' });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  pay(callback = () => {}) {
+  async pay(callback = () => {}) {
     let amount = 0;
     const { member } = this.state;
 
-    API.member.pay(member.no, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
+    try {
+      await this.props.api.member.pay(member.no);
 
       this.renewAccount();
       member.account.copies.forEach((copy) => {
@@ -170,37 +161,33 @@ export default class MemberViewContainer extends Component {
 
       this.setState({ amount, member, showModal: 'paySuccessfull' });
       callback();
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
-  renewAccount() {
+  async renewAccount() {
     const { member } = this.state;
 
-    API.member.renew(member.no, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+    try {
+      await this.props.api.member.renew(member.no);
       member.account.lastActivity = new Date();
       this.setState({ member });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   transferAccount() {
-    const member = this.state.member;
-    const copies = [...member.account.getAddedCopies(), ...member.account.getSoldCopies()];
-    const copyIDs = copies.map(copy => copy.id);
+    const { member } = this.state;
 
-    API.transaction.insert(member.no, copyIDs, Transaction.TYPES.DONATE, (error) => {
-      if (error) {
-        this.setState({ error });
-        return;
-      }
-
+    try {
+      this.props.api.member.transfer(member.no);
       member.account.donateAll();
       this.setState({ member, showModal: null });
-    });
+    } catch (error) {
+      this.setState({ error });
+    }
   }
 
   getModal() {
@@ -314,6 +301,7 @@ export default class MemberViewContainer extends Component {
 
     return member ? (
       <MemberView
+        {...this.props}
         actions={this.getActions()}
         amount={amount}
         member={member}
@@ -326,5 +314,6 @@ export default class MemberViewContainer extends Component {
 }
 
 MemberViewContainer.propTypes = {
+  api: React.PropTypes.shape(),
   params: React.PropTypes.shape(),
 };
