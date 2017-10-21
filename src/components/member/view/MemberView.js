@@ -155,6 +155,7 @@ export default class MemberView extends Component {
               <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
               <Col sm={12} md={6}>
                 <MemberComments
+                  {...this.props}
                   member={no}
                   comments={account.comment}
                 />
@@ -164,6 +165,7 @@ export default class MemberView extends Component {
             <Row>
               <Col md={12}>
                 <CopyTableContainer
+                  {...this.props}
                   member={no}
                   copies={account.copies.filter(copy => !copy.isDonated)}
                 />

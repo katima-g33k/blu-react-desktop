@@ -63,9 +63,9 @@ export default class MemberFormContainer extends Component {
 
   async componentWillMount() {
     try {
-      const states = this.props.api.state.get();
+      const states = await this.props.api.state.list();
       const stateSelect = this.schema.sections[1].fields.find(field => field.key === 'state');
-      stateSelect.options = states.map(state => ({ value: state, label: state }));
+      stateSelect.options = states.map(({ code, name }) => ({ value: code, label: name }));
 
       this.setState({ states });
     } catch (error) {
@@ -74,7 +74,7 @@ export default class MemberFormContainer extends Component {
 
     if (this.state.no) {
       try {
-        const res = this.props.api.member.get(this.state.no);
+        const res = await this.props.api.member.get(this.state.no);
         this.setState({ member: new Member(res), email: res.email });
       } catch (error) {
         this.setState({ error });
@@ -95,21 +95,19 @@ export default class MemberFormContainer extends Component {
 
   exists = async (no, data) => {
     const distinct = {
-      no: `${no}` !== data.no ? data.no : undefined,
+      no: +no !== +data.no ? data.no : undefined,
       email: this.state.email !== data.email ? data.email : undefined,
     };
 
-    if (!distinct.no && !distinct.email) {
+    if (!distinct.no || !distinct.email) {
       return false;
     }
 
-    return new Promise(async (resolve, reject) => {
-      try {
-        resolve((await this.props.api.member.exists(distinct)).no);
-      } catch (error) {
-        reject(error);
-      }
-    });
+    try {
+      return (await this.props.api.member.exists(distinct)).no;
+    } catch (error) {
+      return false;
+    }
   }
 
   insert = async (data) => {

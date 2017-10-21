@@ -287,6 +287,7 @@ export default class CopyTableContainer extends Component {
       case 'reserve':
         return (
           <SearchModal
+            {...this.props}
             disableArchive
             onCancel={() => this.setState({ activeCopy: null, showModal: null })}
             onRowClick={this.reserve}

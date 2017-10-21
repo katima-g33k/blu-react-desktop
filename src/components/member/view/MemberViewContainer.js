@@ -301,6 +301,7 @@ export default class MemberViewContainer extends Component {
 
     return member ? (
       <MemberView
+        {...this.props}
         actions={this.getActions()}
         amount={amount}
         member={member}

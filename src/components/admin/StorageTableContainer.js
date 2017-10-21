@@ -56,7 +56,7 @@ export default class StorageTableContainer extends Component {
   }
 
   static propTypes = {
-    api: PropTypes.api.shape().isRequired,
+    api: PropTypes.shape().isRequired,
   }
 
   async componentWillMount() {

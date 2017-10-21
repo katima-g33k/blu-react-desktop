@@ -58,7 +58,7 @@ export default class ItemViewContainer extends Component {
 
   async getItem(id) {
     try {
-      const res = this.props.api.item.get(id);
+      const res = await this.props.api.item.get(id);
       this.setState({ item: new Item(res) });
     } catch (error) {
       this.setState({ error });
@@ -226,6 +226,7 @@ export default class ItemViewContainer extends Component {
       case 'reserve':
         return (
           <SearchModal
+            {...this.props}
             disableArchive
             onCancel={() => this.setState({ activeCopy: null, showModal: null })}
             onRowClick={this.reserve}

@@ -15,7 +15,7 @@ export default class Admin extends Component {
       <Panel header={I18n.t('Admin.reservation.title')}>
         <Row>
           <Col sm={12} md={6}>
-            <ReservationTableContainer />
+            <ReservationTableContainer {...this.props} />
           </Col>
         </Row>
       </Panel>
