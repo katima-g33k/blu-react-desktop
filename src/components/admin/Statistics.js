@@ -13,6 +13,10 @@ export default class Statistics extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      due: {
+        amount: 0,
+        date: moment(),
+      },
       start: {
         date: moment.semester('start'),
         semester: moment.semester('code'),
@@ -30,6 +34,7 @@ export default class Statistics extends Component {
   }
 
   componentWillMount() {
+    this.getAmountDue();
     this.getStatistics();
   }
 
@@ -47,6 +52,22 @@ export default class Statistics extends Component {
           quantity: +res[key].quantity || 0,
           savings: key === 'soldParent' ? +res[key].savings || 0 : undefined,
         })),
+      });
+    } catch (error) {
+      this.setState({ error });
+    }
+  }
+
+  getAmountDue = async () => {
+    const date = moment(this.state.due.date).format('YYYY-MM-DD');
+
+    try {
+      const res = await this.props.api.statistics.amountDue(date);
+      this.setState({
+        due: {
+          ...this.state.due,
+          ...res,
+        },
       });
     } catch (error) {
       this.setState({ error });
@@ -75,8 +96,15 @@ export default class Statistics extends Component {
     this.getStatistics();
   }
 
+  updateAmountDue = (date) => {
+    this.setState({ due: { ...this.state.due, date } });
+    this.getAmountDue();
+  }
+
   render() {
-    const { data, start, end } = this.state;
+    const { data, start, end, due } = this.state;
+    const amountDue = due.amount.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1 ').replace('.00', '');
+    const dueDate = moment(due.date).format('LL');
     const semesterListdata = semesterList.map(({ code, name }) => ({
       label: name,
       value: code,
@@ -84,6 +112,24 @@ export default class Statistics extends Component {
 
     return (
       <Panel header={I18n.t('Admin.statistics.title')}>
+        <Row>
+          <Col md={12}>
+            <h3>Montant à rembourser aux membres</h3>
+            <DatePicker
+              label={'Choisir une date'}
+              onChange={this.updateAmountDue}
+              value={due.date}
+            />
+            <p style={{ marginTop: '15px' }}>
+              {`En date du ${dueDate}, la BLU doit `}<b>{`${amountDue} $`}</b>{' à ses membres actifs'}
+            </p>
+          </Col>
+        </Row>
+        <Row>
+          <Col md={12}>
+            <h3>Montant par transaction</h3>
+          </Col>
+        </Row>
         <Row>
           <Col sm={12} md={5}>
             <Row>

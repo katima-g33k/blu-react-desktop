@@ -1103,9 +1103,9 @@ block-stream@*:
   dependencies:
     inherits "~2.0.0"
 
-"blu-api@https://github.com/katima-g33k/blu-api.git#api-client":
+"blu-api@https://github.com/katima-g33k/blu-api.git#v2.0.0":
   version "2.0.0"
-  resolved "https://github.com/katima-g33k/blu-api.git#27be0881ddef11ab96f90dca81bd102a930d6aff"
+  resolved "https://github.com/katima-g33k/blu-api.git#00718348d8c684093d5ab18a6fbccaa45185b9f7"
   dependencies:
     request "^2.83.0"
 
