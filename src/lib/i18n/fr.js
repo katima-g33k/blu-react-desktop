@@ -2,6 +2,14 @@ const fr = {
   Admin: {
     statistics: {
       title: 'Adminnistraton - Statistiques',
+      chart: {
+        labels: {
+          added: 'Ajoutés',
+          sold: 'Ventes',
+          soldParent: 'Ventes parents-étudiants',
+          paid: 'Remboursés',
+        },
+      },
     },
     employees: {
       title: 'Adminnistraton - Gestion des employé.e.s',

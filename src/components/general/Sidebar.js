@@ -183,11 +183,11 @@ export default class Sidebar extends Component {
               {this.renderLogoutButton()}
             </Col>
           </Row>
-          <Row>
+          {/* <Row>
             <Col md={12}>
               {this.renderBackButton()}
             </Col>
-          </Row>
+          </Row> */}
           <Row>
             <Col
               md={12}
