@@ -7,67 +7,67 @@ const PROPERTIES = [
   'secretKey',
 ];
 
-class Settings {
-  get apiUrl() {
+export default class Settings {
+  static get apiUrl() {
     return localStorage.getItem('apiUrl');
   }
 
-  set apiUrl(apiUrl) {
+  static set apiUrl(apiUrl) {
     localStorage.setItem('apiUrl', apiUrl);
   }
 
-  get apiKey() {
+  static get apiKey() {
     return localStorage.getItem('apiKey');
   }
 
-  set apiKey(apiKey) {
+  static set apiKey(apiKey) {
     localStorage.setItem('apiKey', apiKey);
   }
 
-  get secretKey() {
+  static get secretKey() {
     return localStorage.getItem('secretKey');
   }
 
-  set secretKey(secretKey) {
+  static set secretKey(secretKey) {
     localStorage.setItem('secretKey', secretKey);
   }
 
-  get barcodeFirstChar() {
+  static get barcodeFirstChar() {
     return localStorage.getItem('barcodeFirstChar');
   }
 
-  set barcodeFirstChar(barcodeFirstChar) {
+  static set barcodeFirstChar(barcodeFirstChar) {
     localStorage.setItem('barcodeFirstChar', barcodeFirstChar);
   }
 
-  get barcodeLastChar() {
+  static get barcodeLastChar() {
     return localStorage.getItem('barcodeLastChar');
   }
 
-  set barcodeLastChar(barcodeLastChar) {
+  static set barcodeLastChar(barcodeLastChar) {
     localStorage.setItem('barcodeLastChar', barcodeLastChar);
   }
 
-  get logLevel() {
+  static get logLevel() {
     return sessionStorage.getItem('logLevel') || localStorage.getItem('logLevel') || 'none';
   }
 
-  set logLevel(logLevel) {
+  static set logLevel(logLevel) {
     localStorage.setItem('logLevel', logLevel);
   }
 
-  set sessionLogLevel(logLevel) {
+  static set sessionLogLevel(logLevel) {
     sessionStorage.setItem('logLevel', logLevel);
   }
 
-  get() {
+  static get() {
     return PROPERTIES.reduce((settings, key) => ({
       ...settings,
       [key]: localStorage.getItem(key),
     }), {});
   }
 
-  set(settings) {
+  static set(settings) {
     Object.keys(settings).forEach((key) => {
       if (PROPERTIES.includes(key)) {
         localStorage.setItem(key, settings[key]);
@@ -75,9 +75,7 @@ class Settings {
     });
   }
 
-  getProperties() {
+  static getProperties() {
     return PROPERTIES;
   }
 }
-
-export default new Settings();

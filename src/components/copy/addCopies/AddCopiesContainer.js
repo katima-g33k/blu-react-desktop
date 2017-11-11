@@ -152,7 +152,9 @@ export default class AddCopiesContainer extends Component {
     }
   }
 
-  async save(event, value) {
+  save = async (event, value) => {
+    event.preventDefault();
+
     const price = parseInt(value, 10);
     const memberNo = this.props.params.no;
     const itemId = this.state.item.id;
@@ -187,7 +189,9 @@ export default class AddCopiesContainer extends Component {
     }
   }
 
-  async updatePrice(event, value) {
+  updatePrice = async (event, value) => {
+    event.preventDefault();
+
     const price = parseInt(value, 10);
     const { id } = this.state.copy;
 

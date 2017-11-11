@@ -72,10 +72,11 @@ export const SearchColumns = {
       dataField: 'author',
       label: I18n.t('TableColumns.search.item.authors'),
       tdStyle: { whiteSpace: 'normal' },
-      dataFormat(authors, item, extra = {}) {
+      dataFormat: (authors, item, extra = {}) => {
         if (!Array.isArray(authors)) {
           return '';
         }
+
         const str = authors.map(author => author.toString()).join(', ');
         return highlightSearchResults(str, extra.highlight);
       },

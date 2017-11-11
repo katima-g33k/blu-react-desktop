@@ -50,7 +50,7 @@ export default class TableLayout extends Component {
         }
 
         if (column.dataFormat) {
-          return `"${column.dataFormat(row[column.dataField], row)}"`;
+          return `"${column.dataFormat(row)}"`;
         }
 
         return `"${row[column.dataField]}"` || '""';

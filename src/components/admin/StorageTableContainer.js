@@ -10,7 +10,7 @@ const actions = [
     bsStyle: 'danger',
     icon: 'trash',
     label: 'Vider',
-    name: 'delete-storage',
+    name: 'remove-storage',
   },
 ];
 
@@ -24,19 +24,17 @@ const columns = [
   {
     dataField: 'content',
     label: 'Contenu',
-    dataFormat(field, storage) {
-      return (
-        <div>
-          {storage.item.map(item => (
-            <div key={`${storage.no}_${item.id}`}>
-              <Link to={{ pathname: `/item/view/${item.id}` }}>
-                {item.name}
-              </Link>
-            </div>
-          ))}
-        </div>
-      );
-    },
+    dataFormat: (field, storage) => (
+      <div>
+        {storage.item.map(item => (
+          <div key={`${storage.no}_${item.id}`}>
+            <Link to={{ pathname: `/item/view/${item.id}` }}>
+              {item.name}
+            </Link>
+          </div>
+        ))}
+      </div>
+    ),
   },
 ];
 
@@ -50,7 +48,7 @@ export default class StorageTableContainer extends Component {
     };
 
     this.actions = actions;
-    actions.find(action => action.name === 'delete-storage').onClick = () => {
+    actions.find(action => action.name === 'remove-storage').onClick = () => {
       this.setState({ showModal: true });
     };
   }

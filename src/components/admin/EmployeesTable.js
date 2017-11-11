@@ -115,7 +115,7 @@ export default class EmployeesTable extends Component {
       showModal: null,
     };
 
-    this.delete = this.delete.bind(this);
+    this.remove = this.remove.bind(this);
     this.insert = this.insert.bind(this);
     this.save = this.save.bind(this);
     this.update = this.update.bind(this);
@@ -150,7 +150,7 @@ export default class EmployeesTable extends Component {
     }
   }
 
-  async delete() {
+  async remove() {
     const { id } = this.state.currentEmployee;
 
     try {
@@ -216,7 +216,7 @@ export default class EmployeesTable extends Component {
         </Button>
         <Button
           bsStyle="danger"
-          onClick={() => this.setState({ currentEmployee: employee, showModal: 'delete' })}
+          onClick={() => this.setState({ currentEmployee: employee, showModal: 'remove' })}
         >
           <Glyphicon glyph="trash" />
         </Button>
@@ -253,12 +253,12 @@ export default class EmployeesTable extends Component {
     }
 
     switch (showModal) {
-      case 'delete':
+      case 'remove':
         return (
           <ConfirmModal
             message={`Êtes-vous certains de vouloir supprimer ${currentEmployee.username} ?`}
             onCancel={() => this.setState({ currentEmployee: null, showModal: null })}
-            onConfirm={this.delete}
+            onConfirm={this.remove}
             title={'Suppression d\'un.e employé.e'}
           />
         );

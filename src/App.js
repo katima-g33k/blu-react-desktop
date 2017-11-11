@@ -9,14 +9,14 @@ import { InformationModal } from './components/general/modals';
 import Login from './components/login/Login';
 import Routes from './routes/Routes';
 import scanner from './lib/Scanner';
-import settings from './lib/Settings';
+import Settings from './lib/Settings';
 import SettingsView from './components/general/SettingsView';
 import Sidebar from './components/general/Sidebar';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.api = new API(settings.apiUrl, settings.apiKey);
+    this.api = new API(Settings.apiUrl, Settings.apiKey);
     this.state = {
       error: null,
       settingsUpdatedAt: null,
@@ -87,7 +87,7 @@ export default class App extends Component {
   }
 
   renderMain = () => {
-    const { apiKey, apiUrl, secretKey } = settings;
+    const { apiKey, apiUrl, secretKey } = Settings;
 
     if (!apiKey || !apiUrl || !secretKey) {
       return (
