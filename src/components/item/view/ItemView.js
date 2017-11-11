@@ -37,13 +37,18 @@ export default class ItemView extends Component {
         <h4>
           <Translate value="ItemView.information.title" />
         </h4>
-        {Object.keys(INFORMATION_FIELDS[type]).map(key => (
-          <AlignedData
-            key={key}
-            label={<Translate value={`ItemView.information.${key}`} />}
-            value={this.props.data[INFORMATION_FIELDS[type][key]] || ''}
-          />
-        ))}
+        {Object.keys(INFORMATION_FIELDS[type]).map((key) => {
+          const { data } = this.props;
+          const value = data[INFORMATION_FIELDS[type][key]] ? `${data[INFORMATION_FIELDS[type][key]]}` : '';
+
+          return (
+            <AlignedData
+              key={key}
+              label={<Translate value={`ItemView.information.${key}`} />}
+              value={value}
+            />
+          );
+        })}
       </section>
     );
   }
@@ -110,7 +115,7 @@ export default class ItemView extends Component {
                 reservations={this.getReservations()}
               />
             )}
-            <CopyTableContainer copies={data.copies} />
+            <CopyTableContainer {...this.props} copies={data.copies} />
           </Panel>
         </Col>
         <Col md={2}>

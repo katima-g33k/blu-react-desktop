@@ -33,9 +33,9 @@ export default class Statistics extends Component {
     api: PropTypes.shape().isRequired,
   }
 
-  componentWillMount() {
-    this.getAmountDue();
-    this.getStatistics();
+  componentWillMount = async () => {
+    await this.getAmountDue();
+    await this.getStatistics();
   }
 
   getStatistics = async () => {
@@ -74,15 +74,15 @@ export default class Statistics extends Component {
     }
   }
 
-  onDateChange = (key, date) => {
-    this.updateDates(key, date, moment.semester('code', date));
+  onDateChange = async (key, date) => {
+    await this.updateDates(key, date, moment.semester('code', date));
   }
 
-  onSemesterChange = (key, semester) => {
-    this.updateDates(key, moment.semester(key, semester), semester);
+  onSemesterChange = async (key, semester) => {
+    await this.updateDates(key, moment.semester(key, semester), semester);
   }
 
-  updateDates = (key, date, semester) => {
+  updateDates = async (key, date, semester) => {
     const data = {};
     data[key] = { date, semester };
 
@@ -93,12 +93,12 @@ export default class Statistics extends Component {
     }
 
     this.setState({ ...data });
-    this.getStatistics();
+    await this.getStatistics();
   }
 
-  updateAmountDue = (date) => {
+  updateAmountDue = async (date) => {
     this.setState({ due: { ...this.state.due, date } });
-    this.getAmountDue();
+    await this.getAmountDue();
   }
 
   render() {

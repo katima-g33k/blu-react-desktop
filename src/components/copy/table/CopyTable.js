@@ -19,8 +19,20 @@ export default class CopyTable extends Component {
     };
 
     this.filterData = this.filterData.bind(this);
-    this.formatRow = this.formatRow.bind(this);
     this.renderFilters = this.renderFilters.bind(this);
+  }
+
+  static formatRow(row, index) {
+    if (row.item && row.item.status && row.item.status.REMOVED) {
+      return 'removed';
+    }
+
+    if ((row.member && !row.member.account.isActive) ||
+      (row.item && row.item.status && row.item.status.OUTDATED)) {
+      return 'archived';
+    }
+
+    return index % 2 === 0 ? 'striped-row' : '';
   }
 
   filterData() {
@@ -45,20 +57,6 @@ export default class CopyTable extends Component {
 
       return true;
     });
-  }
-
-  formatRow(row, index) {
-    if (row.item && row.item.status && row.item.status.REMOVED) {
-      return 'removed';
-    }
-
-    if ((row.member && !row.member.account.isActive) ||
-        (row.item && row.item.status && row.item.status.OUTDATED)) {
-      return 'archived';
-    }
-
-    // Striped
-    return index % 2 === 0 ? 'striped-row' : '';
   }
 
   renderFilters() {
@@ -117,7 +115,7 @@ export default class CopyTable extends Component {
           }}
           placeholder={I18n.t('MemberView.copies.none')}
           sortable
-          rowClass={this.formatRow}
+          rowClass={CopyTable.formatRow}
         />
         {this.props.modal}
       </section>

@@ -14,7 +14,7 @@ const actions = [
     bsStyle: 'danger',
     icon: 'trash',
     label: 'Tout supprimer',
-    name: 'delete-reservations',
+    name: 'remove-reservations',
   },
 ];
 
@@ -27,9 +27,7 @@ const columns = [
   {
     dataField: 'parent',
     label: 'Parent',
-    dataFormat(field, reservation) {
-      return link(`/member/view/${reservation.parent.no}`, reservation.parent.name);
-    },
+    dataFormat: (field, { parent }) => link(`/member/view/${parent.no}`, parent.name),
   },
   {
     dataField: 'item',
@@ -47,8 +45,16 @@ const columns = [
     label: 'Reçu',
     width: '70px',
     dataAlign: 'center',
-    dataFormat(field, reservation) {
-      return reservation.copy ? <Label bsStyle="success"><Glyphicon glyph="ok-sign" /></Label> : '';
+    dataFormat: (field, { copy }) => {
+      if (copy) {
+        return (
+          <Label bsStyle="success">
+            <Glyphicon glyph="ok-sign" />
+          </Label>
+        );
+      }
+
+      return '';
     },
   },
 ];
@@ -65,7 +71,7 @@ export default class ReservationTableContainer extends Component {
     this.getModal = this.getModal.bind(this);
 
     this.actions = actions;
-    actions.find(action => action.name === 'delete-reservations').onClick = () => {
+    actions.find(action => action.name === 'remove-reservations').onClick = () => {
       this.setState({ showModal: true });
     };
   }

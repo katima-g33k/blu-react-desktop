@@ -17,7 +17,7 @@ export default class CopyTableContainer extends Component {
     };
 
     this.cancelReservation = this.cancelReservation.bind(this);
-    this.delete = this.delete.bind(this);
+    this.remove = this.remove.bind(this);
     this.refund = this.refund.bind(this);
     this.reserve = this.reserve.bind(this);
     this.sell = this.sell.bind(this);
@@ -134,7 +134,7 @@ export default class CopyTableContainer extends Component {
           >
             <Button
               bsStyle="danger"
-              onClick={() => this.setState({ activeCopy: copy, showModal: 'delete' })}
+              onClick={() => this.setState({ activeCopy: copy, showModal: 'remove' })}
             >
               <Glyphicon glyph="trash" />
             </Button>
@@ -166,7 +166,7 @@ export default class CopyTableContainer extends Component {
     }
   }
 
-  async delete() {
+  async remove() {
     const { id } = this.state.activeCopy;
 
     try {
@@ -225,7 +225,9 @@ export default class CopyTableContainer extends Component {
     }
   }
 
-  async updatePrice(event, value) {
+  updatePrice = async (event, value) => {
+    event.preventDefault();
+
     const { id } = this.state.activeCopy;
     const price = parseInt(value, 10);
 
@@ -253,12 +255,12 @@ export default class CopyTableContainer extends Component {
     }
 
     switch (showModal) {
-      case 'delete':
+      case 'remove':
         return (
           <ConfirmModal
             message={'Souhaitez-vous vraiment supprimer cet exemplaire ?'}
             title="Supprimer un exemplaire"
-            onConfirm={this.delete}
+            onConfirm={this.remove}
             onCancel={() => this.setState({ activeCopy: null, showModal: null })}
             confirmationStyle="danger"
           />

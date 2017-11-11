@@ -85,7 +85,7 @@ export default class MemberView extends Component {
         </h4>
         <AlignedData
           label={<Translate value="MemberView.general.no" />}
-          value={member.no || ''}
+          value={member.no ? `${member.no}` : ''}
         />
         <AlignedData
           label={<Translate value="MemberView.general.address" />}
@@ -156,7 +156,7 @@ export default class MemberView extends Component {
               <Col sm={12} md={6}>
                 <MemberComments
                   {...this.props}
-                  member={no}
+                  member={`${no}`}
                   comments={account.comment}
                 />
               </Col>
@@ -166,7 +166,7 @@ export default class MemberView extends Component {
               <Col md={12}>
                 <CopyTableContainer
                   {...this.props}
-                  member={no}
+                  member={`${no}`}
                   copies={account.copies.filter(copy => !copy.isDonated)}
                 />
               </Col>

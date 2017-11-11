@@ -44,7 +44,7 @@ export default class MemberComment extends Component {
     comments: [],
   }
 
-  componentWillReceiveProps = (nextProps) => {
+  componentWillReceiveProps(nextProps) {
     this.resetState(nextProps.comments);
   }
 

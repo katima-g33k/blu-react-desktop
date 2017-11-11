@@ -1,7 +1,7 @@
-import settings from './Settings';
+import Settings from './Settings';
 
-let SCAN_FIRST_CHAR = settings.barcodeFirstChar;
-let SCAN_LAST_CHAR = settings.barcodeLastChar;
+let SCAN_FIRST_CHAR = Settings.barcodeFirstChar;
+let SCAN_LAST_CHAR = Settings.barcodeLastChar;
 
 class Scanner {
   constructor() {
@@ -24,10 +24,10 @@ class Scanner {
   }
 
   calibrate = (code) => {
-    SCAN_FIRST_CHAR = code.charAt();
+    SCAN_FIRST_CHAR = code.charAt(0);
     SCAN_LAST_CHAR = code.charAt(code.length - 1);
 
-    settings.set({
+    Settings.set({
       barcodeFirstChar: SCAN_FIRST_CHAR,
       barcodeLastChar: SCAN_LAST_CHAR,
     });

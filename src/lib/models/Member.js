@@ -18,6 +18,8 @@ export default class Member {
     while (this.phone.length < 2) {
       this.phone.push(new Phone());
     }
+
+    this.noNo = false;
   }
 
   get name() {

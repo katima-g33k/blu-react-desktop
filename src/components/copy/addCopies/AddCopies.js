@@ -23,6 +23,7 @@ export default class AddCopies extends Component {
 
     return (
       <ItemFormContainer
+        {...this.props}
         ean13={ean13}
         params={params}
         onCancel={onFormCancel}

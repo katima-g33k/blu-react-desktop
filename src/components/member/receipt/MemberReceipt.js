@@ -80,16 +80,34 @@ const columns = [
   },
 ];
 
+const renderConditions = () => {
+  // eslint-disable-next-line max-len
+  const conditions = 'La Banque de Livres Usagés (BLU) de l\'Association Étudiante du Cégep de Sherbrooke (AÉCS) fait la vente des livres déposés en consigne par les étudiant.e.s, qui choisissent le prix. Les déposant.e.s ont la responsabilité de venir collecter l\'argent de leurs ventes. Si un dossier demeure inactif pour une période consécutive de 12 mois, celui-ci est fermé sans préavis. Les livres et le solde restant deviennent la propriété exclusive de la BLU. Les dons de livres, les livres déposés à la BLU qui ne sont utilisés dans aucun cheminement ou encore qui sont remplacés par des éditions plus récentes seront acheminés sans péavis, s\'ils sont d\'une valeur inféreieure à 40 dollars, vers un programme de récupération de volumes à des fins humanitaires. La BLU n\'est pas responsable des vols et des bris de livres et n\'offre aucun remboursement dans de tels cas.';
+  return (
+    <Row className="conditions">
+      <Col md={12}>
+        {conditions}
+      </Col>
+    </Row>
+  );
+};
+
+const renderNote = () => (
+  <Row className="note">
+    <Col md={12}>
+      {'* Les dates sont inscrites au format (AAAA-MM-JJ)'}
+    </Col>
+  </Row>
+);
+
 export default class MemberReceipt extends Component {
   constructor(props) {
     super(props);
 
     this.renderAccount = this.renderAccount.bind(this);
     this.renderAutorisation = this.renderAutorisation.bind(this);
-    this.renderConditions = this.renderConditions.bind(this);
     this.renderCopies = this.renderCopies.bind(this);
     this.renderPhone = this.renderPhone.bind(this);
-    this.renderNote = this.renderNote.bind(this);
   }
 
   componentDidMount() {
@@ -169,28 +187,6 @@ export default class MemberReceipt extends Component {
     );
   }
 
-  renderConditions() {
-    // eslint-disable-next-line max-len
-    const conditions = 'La Banque de Livres Usagés (BLU) de l\'Association Étudiante du Cégep de Sherbrooke (AÉCS) fait la vente des livres déposés en consigne par les étudiant.e.s, qui choisissent le prix. Les déposant.e.s ont la responsabilité de venir collecter l\'argent de leurs ventes. Si un dossier demeure inactif pour une période consécutive de 12 mois, celui-ci est fermé sans préavis. Les livres et le solde restant deviennent la propriété exclusive de la BLU. Les dons de livres, les livres déposés à la BLU qui ne sont utilisés dans aucun cheminement ou encore qui sont remplacés par des éditions plus récentes seront acheminés sans péavis, s\'ils sont d\'une valeur inféreieure à 40 dollars, vers un programme de récupération de volumes à des fins humanitaires. La BLU n\'est pas responsable des vols et des bris de livres et n\'offre aucun remboursement dans de tels cas.';
-    return (
-      <Row className="conditions">
-        <Col md={12}>
-          {conditions}
-        </Col>
-      </Row>
-    );
-  }
-
-  renderNote() {
-    return (
-      <Row className="note">
-        <Col md={12}>
-          {'* Les dates sont inscrites au format (AAAA-MM-JJ)'}
-        </Col>
-      </Row>
-    );
-  }
-
   render() {
     return (
       <div id="receipt">
@@ -207,9 +203,9 @@ export default class MemberReceipt extends Component {
             {this.renderCopies()}
           </Col>
         </Row>
-        {this.renderNote()}
+        {renderNote()}
         {this.renderAutorisation()}
-        {this.renderConditions()}
+        {renderConditions()}
       </div>
     );
   }

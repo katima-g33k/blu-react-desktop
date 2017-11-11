@@ -33,7 +33,7 @@ export default class ItemViewContainer extends Component {
     };
 
     this.getItem = this.getItem.bind(this);
-    this.delete = this.delete.bind(this);
+    this.remove = this.remove.bind(this);
     this.decreaseStatus = this.decreaseStatus.bind(this);
     this.increaseStatus = this.increaseStatus.bind(this);
     this.reserve = this.reserve.bind(this);
@@ -48,12 +48,12 @@ export default class ItemViewContainer extends Component {
     api: PropTypes.shape().isRequired,
   }
 
-  componentWillMount() {
-    this.getItem(this.props.params.id);
+  async componentWillMount() {
+    await this.getItem(this.props.params.id);
   }
 
-  componentWillReceiveProps(props) {
-    this.getItem(props.params.id);
+  async componentWillReceiveProps(props) {
+    await this.getItem(props.params.id);
   }
 
   async getItem(id) {
@@ -65,7 +65,7 @@ export default class ItemViewContainer extends Component {
     }
   }
 
-  async delete() {
+  async remove() {
     try {
       await this.props.api.item.delete(this.state.item.id);
       this.setState({ showModal: 'deleted' });
@@ -74,9 +74,9 @@ export default class ItemViewContainer extends Component {
     }
   }
 
-  decreaseStatus() {
+  decreaseStatus = async () => {
     const newStatus = this.state.item.isValid ? Item.STATUS.OUTDATED : Item.STATUS.REMOVED;
-    this.updateStatus(newStatus);
+    await this.updateStatus(newStatus);
   }
 
   removeReservation(deletedReservation) {
@@ -91,9 +91,9 @@ export default class ItemViewContainer extends Component {
     this.setState({ item });
   }
 
-  increaseStatus() {
+  increaseStatus = async () => {
     const newStatus = this.state.item.isRemoved ? Item.STATUS.OUTDATED : Item.STATUS.VALID;
-    this.updateStatus(newStatus);
+    await this.updateStatus(newStatus);
   }
 
   async reserve(parent) {
@@ -126,7 +126,9 @@ export default class ItemViewContainer extends Component {
     }
   }
 
-  async updateStorage(event, value) {
+  updateStorage = async (event, value) => {
+    event.preventDefault();
+
     const storage = value.replace(/\D+/g, ' ').split(/\D/).sort((a, b) => a - b);
 
     try {
@@ -184,7 +186,7 @@ export default class ItemViewContainer extends Component {
       style: 'danger',
       onClick: (event) => {
         event.preventDefault();
-        this.setState({ showModal: 'delete' });
+        this.setState({ showModal: 'remove' });
       },
       disabled: this.state.item && this.state.item.copies.length,
     }] : []);
@@ -204,14 +206,14 @@ export default class ItemViewContainer extends Component {
     }
 
     switch (showModal) {
-      case 'delete':
+      case 'remove':
         return (
           <ConfirmModal
             confirmationStyle={'danger'}
             confirmText={'Supprimer'}
             message={'Êtes-vous certain de vouloir supprimer cet ouvrage? Cette action est IRRÉVERSIBLE'}
             onCancel={() => this.setState({ showModal: null })}
-            onConfirm={this.delete}
+            onConfirm={this.remove}
             title={'Suppression d\'un ouvrage'}
           />
         );

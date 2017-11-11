@@ -1,70 +1,9 @@
-/* eslint react/no-multi-comp: 0 */
 import React, { Component, PropTypes } from 'react';
 import { Col, Panel, Row } from 'react-bootstrap';
-import moment from 'moment';
 
+import DuplicateMemberCell from './DuplicateMemberCell';
 import I18n from '../../lib/i18n/i18n';
 import TableLayout from '../general/TableLayout';
-
-class Cell extends Component {
-  static propTypes = {
-    email: PropTypes.string,
-    onNameClick: PropTypes.func,
-    onOriginalClick: PropTypes.func,
-    lastActivity: PropTypes.string,
-    name: PropTypes.string,
-    no: PropTypes.number,
-    registration: PropTypes.string,
-  }
-
-  handleNameClick = () => this.props.onNameClick(this.props.no)
-
-  handleOriginalClick = () => {
-    this.props.onOriginalClick();
-  }
-
-  render() {
-    const {
-      email,
-      lastActivity,
-      name,
-      no,
-      registration,
-    } = this.props;
-
-    return (
-      <Row>
-        <Col md={12}>
-          <Row>
-            <Col md={12}>
-              {name}
-            </Col>
-          </Row>
-          <Row>
-            <Col md={12}>
-              {no}
-            </Col>
-          </Row>
-          <Row>
-            <Col md={12}>
-              {email}
-            </Col>
-          </Row>
-          <Row>
-            <Col md={12}>
-              {`Inscription: ${moment(registration).format('YYYY-MM-DD')}`}
-            </Col>
-          </Row>
-          <Row>
-            <Col md={12}>
-              {`Dernière activité: ${moment(lastActivity).format('YYYY-MM-DD')}`}
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    );
-  }
-}
 
 export default class DuplicateMembers extends Component {
   constructor(props) {
@@ -136,7 +75,7 @@ export default class DuplicateMembers extends Component {
       dataField: 'member1',
       label: 'Membre 1',
       dataFormat: (_, row) => (
-        <Cell
+        <DuplicateMemberCell
           {...row[0]}
           onNameClick={this.openMemberModal}
           onOriginalClick={this.setAsOriginal}
@@ -146,7 +85,7 @@ export default class DuplicateMembers extends Component {
     {
       dataField: 'member2',
       label: 'Membre 2',
-      dataFormat: (_, row) => (<Cell {...row[1]} />),
+      dataFormat: (_, row) => (<DuplicateMemberCell {...row[1]} />),
     },
   ])
 

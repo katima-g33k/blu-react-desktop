@@ -92,8 +92,12 @@ const memberFormSchema = {
           type: 'select',
           label: 'Province',
           default: 'QC',
-          value(value, data = {}) {
-            return data.city ? data.city.state.code : this.default;
+          value: (value, data = {}) => {
+            if (data.city) {
+              return data.city.state.code;
+            }
+
+            return 'QC';
           },
           onChange: (event, data) => ({
             ...data,
@@ -126,8 +130,12 @@ const memberFormSchema = {
               inputWidth: {
                 md: 3,
               },
-              value(value, member) {
-                return member.phone && member.phone[0] ? member.phone[0].number : '';
+              value: (value, member) => {
+                if (member.phone && member.phone[0]) {
+                  return member.phone[0].number;
+                }
+
+                return '';
               },
               onChange(event, data) {
                 const member = data;
@@ -145,8 +153,12 @@ const memberFormSchema = {
               inputWidth: {
                 md: 3,
               },
-              value(value, member) {
-                return member.phone && member.phone[0] ? member.phone[0].note : '';
+              value: (value, member) => {
+                if (member.phone && member.phone[0]) {
+                  return member.phone[0].note;
+                }
+
+                return '';
               },
               onChange(event, data) {
                 const member = data;
@@ -169,8 +181,12 @@ const memberFormSchema = {
               inputWidth: {
                 md: 3,
               },
-              value(value, member) {
-                return member.phone && member.phone[1] ? member.phone[1].number : '';
+              value: (value, member) => {
+                if (member.phone && member.phone[1]) {
+                  return member.phone[1].number;
+                }
+
+                return '';
               },
               onChange(event, data) {
                 const member = data;
@@ -195,8 +211,12 @@ const memberFormSchema = {
               inputWidth: {
                 md: 3,
               },
-              value(value, member) {
-                return member.phone && member.phone[1] ? member.phone[1].note : '';
+              value: (value, member) => {
+                if (member.phone && member.phone[1]) {
+                  return member.phone[1].note;
+                }
+
+                return '';
               },
               onChange(event, data) {
                 const member = data;

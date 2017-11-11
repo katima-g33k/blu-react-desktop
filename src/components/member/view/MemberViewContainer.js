@@ -25,12 +25,12 @@ export default class MemberViewContainer extends Component {
     this.transferAccount = this.transferAccount.bind(this);
   }
 
-  componentWillMount() {
-    this.getMember(this.props.params.no);
+  async componentWillMount() {
+    await this.getMember(this.props.params.no);
   }
 
-  componentWillReceiveProps(props) {
-    this.getMember(props.params.no);
+  async componentWillReceiveProps(props) {
+    await this.getMember(props.params.no);
   }
 
   async getMember(no) {
@@ -58,9 +58,9 @@ export default class MemberViewContainer extends Component {
       {
         label: 'Renouveler le compte',
         style: 'primary',
-        onClick: (event) => {
+        onClick: async (event) => {
           event.preventDefault();
-          this.renewAccount();
+          await this.renewAccount();
         },
       },
       {
@@ -114,7 +114,7 @@ export default class MemberViewContainer extends Component {
         style: 'danger',
         onClick: (event) => {
           event.preventDefault();
-          this.setState({ showModal: 'delete' });
+          this.setState({ showModal: 'remove' });
         },
         disabled: this.state.member && this.state.member.account.copies.length,
       },
@@ -135,7 +135,7 @@ export default class MemberViewContainer extends Component {
     this.setState({ error: null, showModal: null });
   }
 
-  delete = async () => {
+  remove = async () => {
     try {
       await this.props.api.member.delete(this.state.member.no);
       this.setState({ showModal: 'deleted' });
@@ -151,7 +151,7 @@ export default class MemberViewContainer extends Component {
     try {
       await this.props.api.member.pay(member.no);
 
-      this.renewAccount();
+      await this.renewAccount();
       member.account.copies.forEach((copy) => {
         if (copy.isSold) {
           amount += +copy.price;
@@ -172,9 +172,9 @@ export default class MemberViewContainer extends Component {
     try {
       await this.props.api.member.renew(member.no);
       member.account.lastActivity = new Date();
-      this.setState({ member });
+      this.setState({ member, showModal: null });
     } catch (error) {
-      this.setState({ error });
+      this.setState({ error, showModal: null });
     }
   }
 
@@ -204,14 +204,14 @@ export default class MemberViewContainer extends Component {
     }
 
     switch (showModal) {
-      case 'delete':
+      case 'remove':
         return (
           <ConfirmModal
             confirmationStyle={'danger'}
             confirmText={'Supprimer'}
             message={'Êtes-vous certain de vouloir supprimer ce compte? Cette action est IRRÉVERSIBLE'}
             onCancel={this.closeModal}
-            onConfirm={this.delete}
+            onConfirm={this.remove}
             title={'Suppression d\'un compte'}
           />
         );
@@ -233,8 +233,8 @@ export default class MemberViewContainer extends Component {
               },
               {
                 label: 'Imprimer un reçu',
-                onClick: () => {
-                  this.pay(() => this.setState({ printReceipt: true }));
+                onClick: async () => {
+                  await this.pay(() => this.setState({ printReceipt: true }));
                 },
               },
               {
@@ -265,9 +265,9 @@ export default class MemberViewContainer extends Component {
               {
                 bsStyle: 'danger',
                 label: 'Transférer et Réactiver',
-                onClick: () => {
+                onClick: async () => {
                   this.transferAccount();
-                  this.renewAccount();
+                  await this.renewAccount();
                 },
               },
               {

@@ -19,6 +19,8 @@ export default class Item {
     this.reservation = (item.reservation || []).map(reservation => new Reservation(reservation));
     this.comment = item.comment || '';
     this.stats = item.stats || {};
+
+    this.noEan13 = false;
   }
 
   getStatus() {
@@ -47,9 +49,14 @@ export default class Item {
     switch (status) {
       case Item.STATUS.VALID:
         delete this.status[Item.STATUS.OUTDATED];
-      case Item.STATUS.OUTDATED:                    // eslint-disable-line
         delete this.status[Item.STATUS.REMOVED];
-      default:                                      // eslint-disable-line
+        this.status[status] = new Date();
+        break;
+      case Item.STATUS.OUTDATED:
+        delete this.status[Item.STATUS.REMOVED];
+        this.status[status] = new Date();
+        break;
+      default:
         this.status[status] = new Date();
         break;
     }
