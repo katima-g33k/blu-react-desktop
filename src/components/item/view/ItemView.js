@@ -111,6 +111,7 @@ export default class ItemView extends Component {
             {data.reservation.length > 0 && (
               <ReservationList
                 {...this.props}
+                api={this.props.api}
                 onReservationDeleted={onReservationDeleted}
                 reservations={this.getReservations()}
               />
@@ -129,6 +130,7 @@ export default class ItemView extends Component {
 
 ItemView.propTypes = {
   actions: React.PropTypes.array,
+  api: React.PropTypes.shape(),
   data: React.PropTypes.shape(),
   modal: React.PropTypes.shape(),
   onReservationDeleted: React.PropTypes.func,

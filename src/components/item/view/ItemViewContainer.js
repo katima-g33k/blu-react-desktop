@@ -262,6 +262,7 @@ export default class ItemViewContainer extends Component {
   render() {
     return this.state.item ? (
       <ItemView
+        api={this.props.api}
         data={this.state.item}
         actions={this.getActions()}
         modal={this.getModal()}
