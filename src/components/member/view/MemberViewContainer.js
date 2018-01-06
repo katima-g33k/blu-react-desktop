@@ -239,7 +239,7 @@ export default class MemberViewContainer extends Component {
               },
               {
                 label: 'Remettre l\'argent',
-                onClick: this.pay,
+                onClick: () => this.pay(),
               },
             ]}
             message="Souhaitez-vous imprimer un reçu lors de la remise d'argent ?"
