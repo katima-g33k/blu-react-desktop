@@ -96,7 +96,6 @@ export default class ReservationList extends Component {
 
   getModal() {
     const { activeReservation, error, showModal } = this.state;
-    const { name } = activeReservation.parent;
 
     if (error) {
       return (
@@ -112,7 +111,7 @@ export default class ReservationList extends Component {
       case 'delete':
         return (
           <ConfirmModal
-            message={`Êtes vous certain.e.s de vouloir supprimer la réservation de  ${name} ?`}
+            message={`Êtes vous certain.e.s de vouloir supprimer la réservation de  ${activeReservation.parent.name} ?`}
             onCancel={this.closeModal}
             onConfirm={this.deleteReservation}
             title={'Supprimer une réservation'}
