@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
-import API from 'blu-api';
 import moment from 'moment';
+
+import API from './lib/api';
 
 import Header from './components/general/Header';
 import { InformationModal } from './components/general/modals';

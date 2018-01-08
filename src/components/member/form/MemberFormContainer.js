@@ -112,7 +112,7 @@ export default class MemberFormContainer extends Component {
 
   insert = async (data) => {
     try {
-      const { no } = this.props.api.member.insert(data);
+      const { no } = await this.props.api.member.insert(data);
       this.goToMember(no);
     } catch (error) {
       this.setState({ error });

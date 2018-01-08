@@ -1,10 +1,10 @@
 require('babel-register');
 
 const electron = require('electron');
-const { app, BrowserWindow } = electron;
 
+const { app, BrowserWindow } = electron;
 const options = {
-  // show: false,
+  debug: false,
 };
 
 let mainWindow;
@@ -18,10 +18,11 @@ function createWindow() {
   mainWindow.loadURL(`file://${__dirname}/src/index.html`);
   mainWindow.maximize();
 
-  // mainWindow.once('ready-to-show', mainWindow.maximize);
   mainWindow.on('closed', resetMainWindow);
 
-  // mainWindow.webContents.openDevTools();
+  if (options.debug) {
+    mainWindow.webContents.openDevTools();
+  }
 }
 
 app.on('ready', createWindow);
