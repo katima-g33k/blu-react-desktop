@@ -100,7 +100,7 @@ export default class Search extends Component {
               <Table
                 columns={this.props.columns}
                 data={this.props.data}
-                highlight={this.props.search}
+                highlight={this.props.value}
                 placeholder={'Aucune donnée'}
                 options={this.props.tableOptions}
                 striped
@@ -120,15 +120,15 @@ Search.propTypes = {
   cancelSearch: React.PropTypes.func,
   columns: React.PropTypes.array,
   data: React.PropTypes.array,
-  disableArchive: React.PropTypes.bool,
-  disableTypeSelection: React.PropTypes.bool,
+  disableArchive: React.PropTypes.bool, // ownProps
+  disableTypeSelection: React.PropTypes.bool,  // ownProps
   handleArchive: React.PropTypes.func,
   handleInput: React.PropTypes.func,
   handleSearch: React.PropTypes.func,
   handleType: React.PropTypes.func,
   isLoading: React.PropTypes.bool,
   modal: React.PropTypes.shape(),
-  noHeader: React.PropTypes.bool,
+  noHeader: React.PropTypes.bool, // ownProps
   onAddButton: React.PropTypes.func,
   // onRowClick: React.PropTypes.func,
   search: React.PropTypes.string,

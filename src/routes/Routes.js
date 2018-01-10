@@ -10,7 +10,7 @@ import ItemViewContainer from '../components/item/view/ItemViewContainer';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
 import MemberViewContainer from '../components/member/view/MemberViewContainer';
 import ReservationTableView from '../components/admin/ReservationTableView';
-import SearchContainer from '../components/search/SearchContainer';
+import SearchContainer from '../containers/SearchContainer';
 import SettingsView from '../components/general/SettingsView';
 import Statistics from '../components/admin/Statistics';
 import StorageTableView from '../components/admin/StorageTableView';

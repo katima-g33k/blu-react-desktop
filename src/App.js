@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
+import { Provider } from 'react-redux';
 import moment from 'moment';
 
 import API from './lib/api';
@@ -13,6 +14,7 @@ import scanner from './lib/Scanner';
 import Settings from './lib/Settings';
 import SettingsView from './components/general/SettingsView';
 import Sidebar from './components/general/Sidebar';
+import store from './reducers/store';
 
 export default class App extends Component {
   constructor(props) {
@@ -154,20 +156,22 @@ export default class App extends Component {
 
   render() {
     return (
-      <Row>
-        <Col md={12}>
-          <Row>
-            <Col md={12}>
-              <Header />
-            </Col>
-          </Row>
-          <Row>
-            <Col md={12}>
-              {this.renderMain()}
-            </Col>
-          </Row>
-        </Col>
-      </Row>
+      <Provider store={store}>
+        <Row>
+          <Col md={12}>
+            <Row>
+              <Col md={12}>
+                <Header />
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                {this.renderMain()}
+              </Col>
+            </Row>
+          </Col>
+        </Row>
+      </Provider>
     );
   }
 }
