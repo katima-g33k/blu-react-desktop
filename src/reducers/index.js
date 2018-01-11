@@ -1,5 +1,7 @@
-import search from './search';
+import modalStore from './modal';
+import searchStore from './search';
 
 export {
-  search,
+  modalStore,
+  searchStore,
 };

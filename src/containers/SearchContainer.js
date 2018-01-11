@@ -1,28 +1,37 @@
 import { connect } from 'react-redux';
 
-import { SearchColumns } from '../lib/TableColumns';
 import Search from '../components/search/Search';
-import { updateSearchValue, updateType, updateArchives, search } from '../actions/searchActions';
+import {
+  cancelSearch,
+  search,
+  updateArchives,
+  updateSearchValue,
+  updateType,
+} from '../actions/searchActions';
 
-const mapStateToProps = ({ search }) => ({
-  ...search,
-  columns: SearchColumns[search.type],
-  modal: null,
+const mapStateToProps = ({ searchStore }) => ({
+  archives: searchStore.archives,
+  isLoading: searchStore.isLoading,
+  type: searchStore.type,
+  value: searchStore.value,
 });
 
 const mapDispatchToProps = dispatch => ({
-  cancelSearch: () => dispatch({}),
+  cancelSearch: () => dispatch(cancelSearch()),
   handleArchive: () => dispatch(updateArchives()),
   handleInput: event => dispatch(updateSearchValue(event.target.value)),
   handleSearch: (value, type, archives) => dispatch(search(value, type, archives)),
   handleType: event => dispatch(updateType(event.target.value)),
-  onAddButton: () => dispatch({}),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   ...stateProps,
   ...dispatchProps,
   ...ownProps,
+  cancelSearch: (event) => {
+    event.preventDefault();
+    dispatchProps.cancelSearch();
+  },
   handleSearch: (event) => {
     event.preventDefault();
     dispatchProps.handleSearch(stateProps.value, stateProps.type, stateProps.archives);

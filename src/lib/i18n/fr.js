@@ -116,7 +116,8 @@ const fr = {
     },
     cancel: 'Annuler',
     results: {
-      title: 'Résultats',
+      title: 'Résultats (%{num})',
+      addButton: 'Ajouter',
       none: 'Aucun résultat',
     },
   },

@@ -1,4 +1,5 @@
 import {
+  CANCEL_SEARCH,
   SEARCH_FAIL,
   SEARCH_PENDING,
   SEARCH_SUCCESS,
@@ -10,17 +11,27 @@ import {
 const initialState = {
   archives: false,
   data: [],
+  isCancelled: false,
   isLoading: false,
   type: 'member',
   value: '',
 };
 
 export default function searchReducer(state = initialState, action = {}) {
+  const { Instance } = action;
+
   switch (action.type) {
+    case CANCEL_SEARCH:
+      return {
+        ...state,
+        data: [],
+        isCancelled: true,
+        isLoading: false,
+      };
     case SEARCH_FAIL:
       return {
         ...state,
-        error: action.error,
+        isCancelled: false,
         isLoading: false,
       };
     case SEARCH_PENDING:
@@ -32,9 +43,9 @@ export default function searchReducer(state = initialState, action = {}) {
     case SEARCH_SUCCESS:
       return {
         ...state,
+        isCancelled: false,
         isLoading: false,
-        error: '',
-        data: action.data,
+        data: state.isCancelled ? [] : action.data.map(row => new Instance(row)),
       };
     case UPDATE_ARCHIVES:
       return {

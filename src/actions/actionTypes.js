@@ -1,3 +1,6 @@
+export const CANCEL_SEARCH = 'CANCEL_SEARCH';
+export const CLOSE_MODAL = 'CLOSE_MODAL';
+export const OPEN_RESULT = 'OPEN_RESULT';
 export const SEARCH_FAIL = 'SEARCH_FAIL';
 export const SEARCH_PENDING = 'SEARCH_PENDING';
 export const SEARCH_SUCCESS = 'SEARCH_SUCCESS';
