@@ -9,6 +9,7 @@ import API from './lib/api';
 import Header from './components/general/Header';
 import { InformationModal } from './components/general/modals';
 import Login from './components/login/Login';
+import Modal from './containers/ModalContainer';
 import Routes from './routes/Routes';
 import scanner from './lib/Scanner';
 import Settings from './lib/Settings';
@@ -170,6 +171,7 @@ export default class App extends Component {
               </Col>
             </Row>
           </Col>
+          <Modal />
         </Row>
       </Provider>
     );

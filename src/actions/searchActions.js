@@ -1,4 +1,8 @@
+import { browserHistory } from 'react-router';
+
 import {
+  CANCEL_SEARCH,
+  OPEN_RESULT,
   SEARCH_FAIL,
   SEARCH_PENDING,
   SEARCH_SUCCESS,
@@ -14,6 +18,19 @@ const apiUrl = localStorage.getItem('apiUrl');
 const apiKey = localStorage.getItem('apiKey');
 const apiClient = new API(apiUrl, apiKey);
 
+export const cancelSearch = () => ({
+  type: CANCEL_SEARCH,
+});
+
+export const openResult = (data) => {
+  browserHistory.push(data.no ? `member/view/${data.no}` : `item/view/${data.id}`);
+
+  return {
+    result: data,
+    type: OPEN_RESULT,
+  };
+};
+
 export const updateSearchValue = value => ({
   type: UPDATE_SEARCH_VALUE,
   value,
@@ -27,7 +44,8 @@ export const updateType = searchType => ({
 export const updateArchives = () => ({ type: UPDATE_ARCHIVES });
 
 const searchFail = error => ({
-  error,
+  message: error.message,
+  title: `Erreur ${error.code}`,
   type: SEARCH_FAIL,
 });
 
@@ -35,7 +53,8 @@ const searchPending = () => ({
   type: SEARCH_PENDING,
 });
 
-const searchSuccess = data => ({
+const searchSuccess = (data, Instance) => ({
+  Instance,
   data,
   type: SEARCH_SUCCESS,
 });
@@ -48,29 +67,8 @@ export const search = (value, type, archives) => async (dispatch) => {
 
   try {
     const res = await apiClient[searchType].search(value, archives, type === 'parent');
-    const data = res.map(row => new Instance(row));
-
-    dispatch(searchSuccess(data));
+    dispatch(searchSuccess(res, Instance));
   } catch (error) {
     dispatch(searchFail(error));
   }
 };
-
-// event.preventDefault();
-// this.logger.trace('search()');
-//
-// this.setState({ isLoading: true, search: this.state.search.trim() });
-// const { archives, search, type } = this.state;
-// const searchType = type === 'item' ? 'item' : 'member';
-
-// try {
-//   const res = await this.props.api[searchType].search(search, archives, type === 'parent');
-//   const Instance = searchType === 'item' ? Item : Member;
-//
-//   this.setState({
-//     data: res.map(row => new Instance(row)),
-//     isLoading: false,
-//   });
-// } catch (error) {
-//   this.setState({ error, isLoading: false });
-// }
