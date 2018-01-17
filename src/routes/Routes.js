@@ -8,7 +8,7 @@ import ItemFormContainer from '../components/item/form/ItemFormContainer';
 import ItemList from '../components/admin/ItemList';
 import ItemViewContainer from '../components/item/view/ItemViewContainer';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
-import MemberViewContainer from '../components/member/view/MemberViewContainer';
+import MemberViewContainer from '../containers/MemberViewContainer';
 import ReservationTableView from '../components/admin/ReservationTableView';
 import SearchContainer from '../containers/SearchContainer';
 import SettingsView from '../components/general/SettingsView';

@@ -13,7 +13,7 @@ const mapStateToProps = ({ searchStore }) => ({
 
 const mapDispatchToProps = dispatch => ({
   onAddButton: ({ type }) => browserHistory.push(`${type}/add`),
-  onRowClick: data => dispatch(openResult(data)),
+  onRowClick: (type, id) => dispatch(openResult(type, id)),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
@@ -27,6 +27,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
 
     return dispatchProps.onAddButton(stateProps);
   },
+  onRowClick: data => dispatchProps.onRowClick(stateProps.type, data.id || data.no),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(SearchResults);

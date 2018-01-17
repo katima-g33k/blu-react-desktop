@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 
-import SearchContainer from '../../search/SearchContainer';
+import SearchContainer from '../../../containers/SearchContainer';
 
 export default class SearchModal extends Component {
   render() {

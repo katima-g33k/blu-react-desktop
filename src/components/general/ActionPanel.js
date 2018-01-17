@@ -34,9 +34,12 @@ export default class ActionPanel extends Component {
                 <Link to={action.href || '#'}>
                   <Button
                     block
-                    bsStyle={action.style || 'default'}
+                    bsStyle={action.style || 'primary'}
                     disabled={!!action.disabled}
-                    onClick={action.onClick}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      action.onClick(event);
+                    }}
                   >
                     {action.label}
                   </Button>

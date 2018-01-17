@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 
 import ActionPanel from '../../general/ActionPanel';
 import ItemFormContainer from '../../item/form/ItemFormContainer';
-import SearchContainer from '../../search/SearchContainer';
+import SearchContainer from '../../../containers/SearchContainer';
 import Table from '../../general/Table';
 
 export default class AddCopies extends Component {

@@ -2,7 +2,8 @@ import { browserHistory } from 'react-router';
 
 import {
   CANCEL_SEARCH,
-  OPEN_RESULT,
+  OPEN_ITEM,
+  OPEN_MEMBER,
   SEARCH_FAIL,
   SEARCH_PENDING,
   SEARCH_SUCCESS,
@@ -22,12 +23,12 @@ export const cancelSearch = () => ({
   type: CANCEL_SEARCH,
 });
 
-export const openResult = (data) => {
-  browserHistory.push(data.no ? `member/view/${data.no}` : `item/view/${data.id}`);
+export const openResult = (type, id) => {
+  browserHistory.push(`${type}/view/${id}`);
 
   return {
-    result: data,
-    type: OPEN_RESULT,
+    [type === 'item' ? 'id' : 'no']: id,
+    type: type === 'item' ? OPEN_ITEM : OPEN_MEMBER,
   };
 };
 
