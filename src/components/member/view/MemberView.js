@@ -1,150 +1,178 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Alert, Col, Image, Label, Panel, Row } from 'react-bootstrap';
-import { I18n, Translate } from 'react-i18nify';
 
-import moment from 'moment';
-
-import ActionPanel from '../../general/ActionPanel';
 import AlignedData from '../../general/AlignedData';
 import CopyTableContainer from '../../copy/table/CopyTableContainer';
+import { formatLongDate } from '../../../lib/dateHelper';
+import I18n from '../../../lib/i18n';
+import Member from '../../../lib/models/Member';
+import MemberActionPanel from '../../../containers/MemberActionPanelContainer';
 import MemberComments from './MemberComments';
 import MemberReceipt from '../receipt/MemberReceipt';
 import ProfileStats from '../../general/ProfileStats';
+import Spinner from '../../general/Spinner';
 
 const dir = __dirname;
-const formatDate = (date) => {
-  if (date) {
-    return moment(date).format('LL');
-  }
-
-  return '';
-};
 
 const border = {
   borderRight: '1px #e0e0e0 solid',
 };
 
 export default class MemberView extends Component {
-  constructor(props) {
-    super(props);
-
-    this.renderAccountState = this.renderAccountState.bind(this);
-    this.renderAlert = this.renderAlert.bind(this);
-    this.renderGeneralInformation = this.renderGeneralInformation.bind(this);
-    this.renderPhones = this.renderPhones.bind(this);
-    this.renderStats = this.renderStats.bind(this);
+  static propTypes = {
+    amount: PropTypes.number,
+    fetch: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool,
+    member: PropTypes.instanceOf(Member).isRequired,
+    printing: PropTypes.bool,
+    onAfterPrint: PropTypes.func.isRequired,
   }
 
-  renderAccountState() {
+  static defaultProps = {
+    amount: 0,
+    isLoading: false,
+    printing: false,
+  }
+
+  componentWillMount() {
+    this.props.fetch();
+  }
+
+  renderParentLogo = () => {
+    if (this.props.member.isParent) {
+      return (
+        <Image
+          src={`${dir === '/' ? '' : `${dir}/`}../../assets/images/logo_parents_etudiants.png`}
+          style={{ height: '30px', border: 'none', marginLeft: '10px', marginBottom: '5px' }}
+        />
+      );
+    }
+
+    return null;
+  }
+
+  renderAccountState = () => {
     const account = this.props.member.account;
     return (
       <section>
-        <h4>
-          <Translate value="MemberView.account.title" />
-        </h4>
+        <h4>{I18n('MemberView.account.title')}</h4>
         <AlignedData
-          label={<Translate value="MemberView.account.activation" />}
+          label={I18n('MemberView.account.activation')}
           value={
             <Label bsStyle={account.isActive ? 'success' : 'danger'}>
-              <Translate value={`MemberView.account.${account.isActive ? 'active' : 'deactivated'}`} />
+              {I18n(`MemberView.account.${account.isActive ? 'active' : 'deactivated'}`)}
             </Label>
           }
         />
         <AlignedData
-          label={<Translate value="MemberView.account.registration" />}
-          value={formatDate(account.registration)}
+          label={I18n('MemberView.account.registration')}
+          value={formatLongDate(account.registration)}
         />
         <AlignedData
-          label={<Translate value="MemberView.account.lastActivity" />}
-          value={formatDate(account.lastActivity)}
+          label={I18n('MemberView.account.lastActivity')}
+          value={formatLongDate(account.lastActivity)}
         />
         <AlignedData
-          label={<Translate value="MemberView.account.deactivation" />}
-          value={formatDate(account.deactivationDate)}
+          label={I18n('MemberView.account.deactivation')}
+          value={formatLongDate(account.deactivationDate)}
         />
       </section>
     );
   }
 
-  renderAlert() {
-    const transfers = this.props.member.account.transfers;
-    const dates = transfers.map(date => moment(date).format('LL')).join('');
-    return transfers.length > 0 && (
-      <Alert bsStyle="warning">
-        {`Ce compte a été transféré à la BLU ${transfers.length === 1 ? 'le' : 'les'} ${dates}`}
-      </Alert>
-    );
+  renderAlert = () => {
+    const { transfers } = this.props.member.account;
+    const dates = transfers.map(date => formatLongDate(date)).join(', ');
+
+    if (transfers.length) {
+      return (
+        <Alert bsStyle="warning">
+          {I18n('MemberView.transferAlert', { dates })}
+        </Alert>
+      );
+    }
+
+    return null;
   }
 
-  renderGeneralInformation() {
-    const member = this.props.member;
-    return (
-      <section>
-        <h4>
-          <Translate value="MemberView.general.title" />
-        </h4>
+  renderPhone = (phone, index) => {
+    if (phone.id) {
+      return (
         <AlignedData
-          label={<Translate value="MemberView.general.no" />}
-          value={member.no ? `${member.no}` : ''}
+          key={`phone-${phone.id}`}
+          label={I18n('MemberView.general.phone', { index: index + 1 })}
+          value={phone.toString()}
         />
-        <AlignedData
-          label={<Translate value="MemberView.general.address" />}
-          value={member.addressString}
-        />
-        <AlignedData
-          label={<Translate value="MemberView.general.email" />}
-          value={member.email || ''}
-        />
-        {this.renderPhones()}
-      </section>
-    );
+      );
+    }
+
+    return null;
   }
 
-  renderPhones() {
-    return this.props.member.phone.map((phone, index) => (
+  renderPhones = () => this.props.member.phone.map(this.renderPhone)
+
+  renderGeneralInformation = () => (
+    <section>
+      <h4>{I18n('MemberView.general.title')}</h4>
       <AlignedData
-        key={index}
-        label={
-          <span>
-            <Translate value="MemberView.general.phone" /> {index + 1}
-          </span>
-          }
-        value={phone.toString()}
+        label={I18n('MemberView.general.no')}
+        value={`${this.props.member.no}`}
       />
-      ));
-  }
+      <AlignedData
+        label={I18n('MemberView.general.address')}
+        value={this.props.member.addressString}
+      />
+      <AlignedData
+        label={I18n('MemberView.general.email')}
+        value={this.props.member.email}
+      />
+      {this.renderPhones()}
+    </section>
+  )
 
-  renderStats() {
-    return (
-      <section>
-        <h4>
-          <Translate value="MemberView.stats.title" />
-        </h4>
-        <ProfileStats copies={this.props.member.account.copies} />
-      </section>
-    );
+  renderStats = () => (
+    <section>
+      <h4>{I18n('MemberView.stats.title')}</h4>
+      <ProfileStats copies={this.props.member.account.copies} />
+    </section>
+  )
+
+  renderReceipt = () => {
+    if (this.props.printing) {
+      return (
+        <MemberReceipt
+          amount={this.props.amount}
+          member={this.props.member}
+          onAfterPrint={this.props.onAfterPrint}
+        />
+      );
+    }
+
+    return null;
   }
 
   render() {
-    const { actions, amount, member, modal, printReceipt, onAfterPrint } = this.props;
-    const { account, name, no, isParent } = member;
+    const {
+      isLoading,
+      member: {
+        account: { comment, copies, isActive },
+        name,
+        no,
+      },
+    } = this.props;
 
-    return (
+    return !isLoading ? (
       <Row>
         <Col md={10}>
           <Panel
-            header={I18n.t('MemberView.title')}
-            bsStyle={account.isActive ? 'default' : 'danger'}
+            header={I18n('MemberView.title')}
+            bsStyle={isActive ? 'default' : 'danger'}
           >
             {this.renderAlert()}
             <h3>
               {name}
-              {isParent && (
-                <Image
-                  src={`${dir === '/' ? '' : `${dir}/`}../../assets/images/logo_parents_etudiants.png`}
-                  style={{ height: '30px', border: 'none', marginLeft: '10px', marginBottom: '5px' }}
-                />
-              )}
+              {this.renderParentLogo()}
             </h3>
             <Row>
               <Col sm={12} md={6} style={border}>{this.renderGeneralInformation()}</Col>
@@ -155,9 +183,9 @@ export default class MemberView extends Component {
               <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
               <Col sm={12} md={6}>
                 <MemberComments
-                  {...this.props}
+                  api={{}}
                   member={`${no}`}
-                  comments={account.comment}
+                  comments={comment}
                 />
               </Col>
             </Row>
@@ -165,35 +193,19 @@ export default class MemberView extends Component {
             <Row>
               <Col md={12}>
                 <CopyTableContainer
-                  {...this.props}
+                  api={{}}
                   member={`${no}`}
-                  copies={account.copies.filter(copy => !copy.isDonated)}
+                  copies={copies.filter(copy => !copy.isDonated)}
                 />
               </Col>
             </Row>
           </Panel>
         </Col>
         <Col md={2}>
-          <ActionPanel actions={actions} />
+          <MemberActionPanel />
         </Col>
-        {modal}
-        {printReceipt && (
-          <MemberReceipt
-            amount={amount}
-            member={member}
-            onAfterPrint={onAfterPrint}
-          />
-        )}
+        {this.renderReceipt()}
       </Row>
-    );
+    ) : (<Spinner />);
   }
 }
-
-MemberView.propTypes = {
-  actions: React.PropTypes.array,
-  amount: React.PropTypes.number,
-  member: React.PropTypes.shape(),
-  modal: React.PropTypes.shape(),
-  printReceipt: React.PropTypes.bool.isRequired,
-  onAfterPrint: React.PropTypes.func,
-};

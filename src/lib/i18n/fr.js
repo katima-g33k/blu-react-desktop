@@ -67,12 +67,52 @@ const fr = {
   },
   MemberView: {
     title: 'Membre',
+    transferAlert: 'Ce compte a été transféré à la BLU le(s) %{dates}',
+    actions: {
+      addCopies: 'Ajouter des livres',
+      delete: 'Supprimer',
+      modify: 'Modifier',
+      pay: 'Remettre l\'argent',
+      printAccount: 'Imprimer l\'état du compte',
+      printReceipt: 'Imprimer un reçu',
+      reactivate: 'Réactiver le compte',
+      renew: 'Renouveler le compter',
+      transfer: 'Transférer à la BLU',
+    },
+    modal: {
+      delete: {
+        title: 'Suppression d\'un compte',
+        message: 'Êtes-vous certain de vouloir supprimer ce compte? Cette action est IRRÉVERSIBLE',
+        action: 'Supprimer',
+      },
+      payConfirmation: {
+        title: 'Remise d\'argent',
+        message: 'Souhaitez-vous imprimer un reçu lors de la remise d\'argent ?',
+      },
+      paySuccessful: {
+        title: 'Argent Remis',
+        message: 'Le montant de %{amount} a été remis avec succès',
+      },
+      reactivate: {
+        title: 'Réactivation du compte',
+        message: 'Attention, vous êtes sur le point de réactiver le compte. Souhaitez-vous transférer son contenu à la BLU avant la réactivation ?',
+        actions: {
+          transfer: 'Transférer et Réactiver',
+          reactivate: 'Réactiver',
+        },
+      },
+      transfer: {
+        title: 'Transfert à la BLU',
+        message: 'Souhaitez-vous transférer le contenu du compte à la BLU ?',
+        action: 'Transférer',
+      },
+    },
     general: {
       title: 'Informations générales',
       no: 'Numéro de compte',
       email: 'Courriel',
       address: 'Addresse',
-      phone: 'Téléphone',
+      phone: 'Téléphone %{index}',
     },
     account: {
       title: 'État du compte',
@@ -177,6 +217,11 @@ const fr = {
       paid: 'Argent remis',
       price: 'Prix',
     },
+  },
+  modal: {
+    cancel: 'Annuler',
+    error: 'Erreur %{code}',
+    ok: 'Ok',
   },
 };
 

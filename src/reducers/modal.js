@@ -1,9 +1,15 @@
 import {
   CLOSE_MODAL,
+  FETCH_MEMBER_FAIL,
+  RENEW_MEMBER_FAIL,
   SEARCH_FAIL,
+  OPEN_MODAL,
+  PAY_MEMBER_SUCCESS,
 } from '../actions/actionTypes';
 
 const initialState = {
+  actions: [],
+  cancelable: false,
   display: false,
   message: '',
   title: '',
@@ -18,6 +24,17 @@ export default function modalReducer(state = initialState, action = {}) {
         message: '',
         title: '',
       };
+    case OPEN_MODAL:
+      return {
+        ...state,
+        actions: action.actions,
+        cancelable: action.cancelable,
+        display: true,
+        message: action.message,
+        title: action.title,
+      };
+    case FETCH_MEMBER_FAIL:
+    case RENEW_MEMBER_FAIL:
     case SEARCH_FAIL:
       return {
         ...state,
@@ -26,6 +43,6 @@ export default function modalReducer(state = initialState, action = {}) {
         title: action.title,
       };
     default:
-      return state;
+      return initialState;
   }
 }
