@@ -8,7 +8,7 @@ import { formatLongDate } from '../../../lib/dateHelper';
 import I18n from '../../../lib/i18n';
 import Member from '../../../lib/models/Member';
 import MemberActionPanel from '../../../containers/MemberActionPanelContainer';
-import MemberComments from './MemberComments';
+import MemberComments from '../../../containers/MemberCommentContainer';
 import MemberReceipt from '../receipt/MemberReceipt';
 import ProfileStats from '../../general/ProfileStats';
 import Spinner from '../../general/Spinner';
@@ -182,11 +182,7 @@ export default class MemberView extends Component {
             <Row>
               <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
               <Col sm={12} md={6}>
-                <MemberComments
-                  api={{}}
-                  member={`${no}`}
-                  comments={comment}
-                />
+                <MemberComments />
               </Col>
             </Row>
             <hr />

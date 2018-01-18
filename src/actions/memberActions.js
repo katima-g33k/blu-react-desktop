@@ -14,8 +14,7 @@ import {
 } from './actionTypes';
 import API from '../lib/api';
 import I18n from '../lib/i18n';
-import Member from '../lib/models/Member'
-import Copy from '../lib/models/Copy'
+import Copy from '../lib/models/Copy';
 
 const apiUrl = localStorage.getItem('apiUrl');
 const apiKey = localStorage.getItem('apiKey');
