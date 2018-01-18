@@ -35,13 +35,13 @@ export default class MemberComment extends Component {
   }
 
   static propTypes = {
-    api: PropTypes.shape().isRequired,
+    api: PropTypes.shape(),
     comments: PropTypes.array.isRequired,
-    member: PropTypes.string,
+    no: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
-    comments: [],
+    api: {},
   }
 
   componentWillReceiveProps(nextProps) {
@@ -86,7 +86,7 @@ export default class MemberComment extends Component {
 
   handleInsert = async (value) => {
     try {
-      const { id } = await this.props.api.member.comment.insert(this.props.member, value);
+      const { id } = await this.props.api.member.comment.insert(this.props.no, value);
       const comments = this.state.comments || [];
 
       comments.push({
