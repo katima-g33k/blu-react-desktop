@@ -1,10 +1,11 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { ButtonGroup, Col, Row } from 'react-bootstrap';
-import { I18n } from 'react-i18nify';
+import moment from 'moment';
 
 import Button from '../../general/Button';
-import CommentColumns from './CommentColumns';
-import { ConfirmModal, InformationModal, InputModal } from '../../general/modals';
+import { ConfirmModal, InputModal } from '../../general/modals';
+import I18n from '../../../lib/i18n';
 import TableLayout from '../../general/TableLayout';
 
 export default class MemberComment extends Component {
@@ -12,20 +13,20 @@ export default class MemberComment extends Component {
     super(props);
     this.state = {
       activeComment: null,
-      comments: props.comments,
-      error: null,
       showModal: null,
     };
+  }
 
-    this.columns = CommentColumns.concat([{
-      dataField: 'action',
-      label: 'Actions',
-      dataAlign: 'center',
-      width: '100px',
-      dataFormat: this.renderRowActions,
-    }]);
+  static propTypes = {
+    comments: PropTypes.array.isRequired,
+    delete: PropTypes.func.isRequired,
+    insert: PropTypes.func.isRequired,
+    no: PropTypes.number.isRequired,
+    update: PropTypes.func.isRequired,
+  }
 
-    this.actions = [{
+  get actions() {
+    return [{
       name: 'add',
       bsStyle: 'success',
       icon: 'plus',
@@ -34,28 +35,38 @@ export default class MemberComment extends Component {
     }];
   }
 
-  static propTypes = {
-    api: PropTypes.shape(),
-    comments: PropTypes.array.isRequired,
-    no: PropTypes.string.isRequired,
+  get columns() {
+    return [
+      {
+        dataField: 'id',
+        isKey: true,
+        hidden: true,
+      },
+      {
+        dataField: 'comment',
+        label: I18n('TableColumns.comment.comment'),
+        tdStyle: { whiteSpace: 'normal' },
+      },
+      {
+        dataField: 'updatedAt',
+        label: I18n('TableColumns.comment.date'),
+        dataFormat: date => moment(date).format('LL'),
+        width: '130px',
+      },
+      {
+        dataField: 'action',
+        label: 'Actions',
+        dataAlign: 'center',
+        width: '100px',
+        dataFormat: this.renderRowActions,
+      },
+    ];
   }
 
-  static defaultProps = {
-    api: {},
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.resetState(nextProps.comments);
-  }
-
-  resetState = (comments = this.state.comments) => {
-    this.setState({
-      activeComment: null,
-      comments,
-      error: null,
-      showModal: null,
-    });
-  }
+  resetState = () => this.setState({
+    activeComment: null,
+    showModal: null,
+  });
 
   handleCancel = () => {
     this.resetState();
@@ -69,77 +80,23 @@ export default class MemberComment extends Component {
     this.setState({ showModal: 'input' });
   }
 
-  handleDelete = async () => {
-    const { id } = this.state.activeComment;
-
-    try {
-      await this.props.api.member.comment.delete(id);
-      this.setState({
-        activeComment: null,
-        comments: this.state.comments.filter(comment => comment.id !== id),
-        showModal: null,
-      });
-    } catch (error) {
-      this.setState({ error, activeComment: null, showModal: null });
-    }
+  handleDelete = () => {
+    this.props.delete(this.state.activeComment);
+    this.resetState();
   }
 
-  handleInsert = async (value) => {
-    try {
-      const { id } = await this.props.api.member.comment.insert(this.props.no, value);
-      const comments = this.state.comments || [];
-
-      comments.push({
-        id,
-        updatedAt: new Date(),
-        comment: value,
-      });
-
-      this.resetState(comments);
-    } catch (error) {
-      this.setState({ error, activeComment: null, showModal: null });
-    }
-  }
-
-  handleSave = (event, value) => {
+  handleSave = (event, comment) => {
     if (this.state.activeComment) {
-      return this.handleUpdate(value);
+      this.props.update(this.state.activeComment.id, comment);
+    } else {
+      this.props.insert(this.props.no, comment);
     }
 
-    return this.handleInsert(value);
+    this.resetState();
   };
 
-  handleUpdate = async (value) => {
-    try {
-      await this.props.api.member.comment.update(this.state.activeComment.id, value);
-      const comments = this.state.comments;
-      const currentComment = comments.find(comment => comment.id === this.state.activeComment.id);
-
-      currentComment.comment = value;
-      currentComment.updatedAt = new Date();
-
-      this.setState({
-        comments,
-        activeComment: null,
-        showModal: null,
-      });
-    } catch (error) {
-      this.setState({ error, activeComment: null, showModal: null });
-    }
-  }
-
   renderModal = () => {
-    const { activeComment, error, showModal } = this.state;
-
-    if (error) {
-      return (
-        <InformationModal
-          message={error.message}
-          onClick={this.resetState}
-          title={`Erreur ${error.code}`}
-        />
-      );
-    }
+    const { activeComment, showModal } = this.state;
 
     switch (showModal) {
       case 'input':
@@ -182,7 +139,7 @@ export default class MemberComment extends Component {
         onClick={this.handleButtonClick}
       />
     </ButtonGroup>
-    )
+  )
 
   render() {
     return (
@@ -191,10 +148,9 @@ export default class MemberComment extends Component {
           <TableLayout
             actions={this.actions}
             columns={this.columns}
-            data={this.state.comments}
-            placeholder={I18n.t('MemberView.comment.none')}
-            striped
-            title={I18n.t('MemberView.comment.title')}
+            data={this.props.comments}
+            placeholder={I18n('MemberView.comment.none')}
+            title={I18n('MemberView.comment.title')}
           />
         </Col>
         {this.renderModal()}
