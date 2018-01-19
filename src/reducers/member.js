@@ -1,12 +1,15 @@
 import {
+  DELETE_COMMENT_SUCCESS,
   FETCH_MEMBER_FAIL,
   FETCH_MEMBER_PENDING,
   FETCH_MEMBER_SUCCESS,
+  INSERT_COMMENT_SUCCESS,
   OPEN_MEMBER,
   PAY_MEMBER_SUCCESS,
   RENEW_MEMBER_SUCCESS,
   PRINT_END,
   PRINT_START,
+  UPDATE_COMMENT_SUCCESS,
 } from '../actions/actionTypes';
 import Member from '../lib/models/Member';
 
@@ -20,6 +23,17 @@ const initialState = {
 
 export default function memberReducer(state = initialState, action = {}) {
   switch (action.type) {
+    case DELETE_COMMENT_SUCCESS:
+      return {
+        ...state,
+        member: new Member({
+          ...state.member,
+          account: {
+            ...state.member.account,
+            comment: state.member.account.comment.filter(comment => comment.id !== action.comment.id),
+          },
+        }),
+      };
     case FETCH_MEMBER_FAIL:
       return {
         ...state,
@@ -36,6 +50,20 @@ export default function memberReducer(state = initialState, action = {}) {
         ...state,
         isLoading: false,
         member: new Member(action.member),
+      };
+    case INSERT_COMMENT_SUCCESS:
+      return {
+        ...state,
+        member: new Member({
+          ...state.member,
+          account: {
+            ...state.member.account,
+            comment: [
+              ...state.member.account.comment,
+              action.comment,
+            ],
+          },
+        }),
       };
     case OPEN_MEMBER:
       return {
@@ -72,6 +100,23 @@ export default function memberReducer(state = initialState, action = {}) {
           account: {
             ...state.member.account,
             lastActivity: new Date(),
+          },
+        }),
+      };
+    case UPDATE_COMMENT_SUCCESS:
+      return {
+        ...state,
+        member: new Member({
+          ...state.member,
+          account: {
+            ...state.member.account,
+            comment: state.member.account.comment.map((comment) => {
+              if (comment.id === action.comment.id) {
+                return action.comment;
+              }
+
+              return comment;
+            }),
           },
         }),
       };

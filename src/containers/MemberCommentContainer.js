@@ -1,9 +1,15 @@
 import { connect } from 'react-redux';
 
-import { openCommentModal } from '../actions/commentActions';
+import {
+  deleteComment,
+  insertComment,
+  openCommentModal,
+  updateComment,
+} from '../actions/commentActions';
 import MemberComments from '../components/member/view/MemberComments';
 
-const mapStateToProps = ({ memberStore: { member } }) => ({
+const mapStateToProps = ({ commentStore: { comment }, memberStore: { member } }) => ({
+  activeComment: comment,
   comments: member.account.comment,
   no: member.no,
 });
@@ -11,6 +17,9 @@ const mapStateToProps = ({ memberStore: { member } }) => ({
 const mapDispatchToProps = dispatch => ({
   openCommentModal: () => dispatch(openCommentModal()),
   openDeleteConfirmation: () => dispatch({}),
+  delete: comment => dispatch(deleteComment(comment)),
+  insert: (no, comment) => dispatch(insertComment(no, comment)),
+  update: (id, comment) => dispatch(updateComment(id, comment)),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
