@@ -37,7 +37,10 @@ const formatData = (member) => {
     data.address = capitalize(data.address);
   }
 
-  data.phone = data.phone.filter(phone => phone.number);
+  data.phone = data.phone.filter(phone => phone.number).map(phone => ({
+    note: phone.note,
+    number: phone.number.replace(/\D/g, ''),
+  }));
 
   return data;
 };
