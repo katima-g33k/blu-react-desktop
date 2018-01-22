@@ -142,7 +142,7 @@ export default class AddCopiesContainer extends Component {
       const { id } = await this.props.api.item.exists(ean13);
 
       if (id) {
-        const res = this.props.api.item.get(id, { forCopy: true });
+        const res = await this.props.api.item.get(id, { forCopy: true });
         this.setState({ item: new Item(res), showModal: 'input', isSearch: true });
       } else {
         this.setState({ ean13, isSearch: false });

@@ -178,11 +178,11 @@ export default class MemberViewContainer extends Component {
     }
   }
 
-  transferAccount() {
+  async transferAccount() {
     const { member } = this.state;
 
     try {
-      this.props.api.member.transfer(member.no);
+      await this.props.api.member.transfer(member.no);
       member.account.donateAll();
       this.setState({ member, showModal: null });
     } catch (error) {
