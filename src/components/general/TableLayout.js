@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   Checkbox,
   Col,
@@ -30,16 +31,20 @@ const renderOptgroups = optgroups => optgroups.map((optgroup, index) => (
   ));
 
 export default class TableLayout extends Component {
-  constructor(props) {
-    super(props);
+  static propTypes = {
+    actions: PropTypes.array,
+    columns: PropTypes.array.isRequired,
+    data: PropTypes.array.isRequired,
+    filters: PropTypes.arrayOf(PropTypes.shape()),
+    exportable: PropTypes.bool,
+    exportTitle: PropTypes.string,
+    modal: PropTypes.shape(),
+    placeholder: PropTypes.string,
+    rowActions: PropTypes.arrayOf(PropTypes.shape()),
+    title: PropTypes.string.isRequired,
+  };
 
-    this.createCSV = this.createCSV.bind(this);
-    this.saveFile = this.saveFile.bind(this);
-    this.renderExportButton = this.renderExportButton.bind(this);
-    this.renderActions = this.renderActions.bind(this);
-  }
-
-  createCSV() {
+  createCSV = () => {
     const { columns, data } = this.props;
     const csvColumns = columns.filter(({ hidden }) => !hidden);
     const header = `${csvColumns.map(column => `"${column.label}"`).join(',')}\r\n`;
@@ -60,11 +65,11 @@ export default class TableLayout extends Component {
     return new Blob([`${header}${body}`], { type: 'csv' });
   }
 
-  saveFile() {
+  saveFile = () => {
     FileSaver.saveAs(this.createCSV(), `${this.props.exportTitle || 'data'}.csv`);
   }
 
-  renderExportButton() {
+  renderExportButton = () => {
     return (
       <Button
         bsStyle="primary"
@@ -75,7 +80,7 @@ export default class TableLayout extends Component {
     );
   }
 
-  renderActions() {
+  renderActions = () => {
     const { actions = [] } = this.props;
 
     return actions.map(action => (
@@ -89,7 +94,7 @@ export default class TableLayout extends Component {
     ));
   }
 
-  renderFilters() {
+  renderFilters = () => {
     const { filters = [] } = this.props;
 
     return filters.map((filter) => {
@@ -166,6 +171,7 @@ export default class TableLayout extends Component {
                 columns={columns}
                 data={data}
                 placeholder={placeholder || 'Aucune donnée'}
+                rowActions={this.props.rowActions}
                 striped
               />
             </Col>
@@ -176,15 +182,3 @@ export default class TableLayout extends Component {
     );
   }
 }
-
-TableLayout.propTypes = {
-  actions: PropTypes.array,
-  columns: PropTypes.array.isRequired,
-  data: PropTypes.array.isRequired,
-  filters: PropTypes.arrayOf(PropTypes.shape()),
-  exportable: PropTypes.bool,
-  exportTitle: PropTypes.string,
-  modal: PropTypes.shape(),
-  placeholder: PropTypes.string,
-  title: PropTypes.string.isRequired,
-};

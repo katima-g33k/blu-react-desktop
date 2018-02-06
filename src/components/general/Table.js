@@ -1,66 +1,92 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { ButtonGroup } from 'react-bootstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
-import Logger from '../../lib/Logger';
+import { Button } from '../general';
 
 export default class Table extends Component {
-  constructor(props) {
-    super(props);
-    this.logger = new Logger(this.constructor.name);
-    this.logger.trace('constructor()');
+  static propTypes = {
+    data: PropTypes.array,
+    columns: PropTypes.array,
+    highlight: PropTypes.string,
+    placeholder: PropTypes.string,
+    options: PropTypes.shape(),
+    rowClass: PropTypes.func,
+    rowActions: PropTypes.arrayOf(PropTypes.shape({
+      bsStyle: PropTypes.string,
+      glyph: PropTypes.string,
+      onClick: PropTypes.func,
+    })),
+    striped: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    rowActions: [],
+  };
+
+  renderColumn = (column) => {
+    const formatExtraData = column.formatExtraData;
+
+    if (formatExtraData && formatExtraData.props) {
+      formatExtraData.props.forEach((key) => {
+        formatExtraData[key] = this.props[key];
+      });
+    }
+
+    return (
+      <TableHeaderColumn
+        {...column}
+        key={column.dataField}
+      >
+        {column.label}
+      </TableHeaderColumn>
+    );
   }
 
   renderColumns = () => {
-    this.logger.trace('renderColumns()');
-    return this.props.columns.map((column, index) => {
-      const formatExtraData = column.formatExtraData;
+    const columns = this.props.columns.map(this.renderColumn);
 
-      if (formatExtraData && formatExtraData.props) {
-        formatExtraData.props.forEach((key) => {
-          formatExtraData[key] = this.props[key];
-        });
-      }
+    if (this.props.rowActions.length) {
+      columns.push(this.renderActionColumn());
+    }
 
-      return (
-        <TableHeaderColumn
-          {...column}
-          key={`${column.dataField}${index}`}
-        >
-          {column.label}
-        </TableHeaderColumn>
-      );
-    });
+    return columns;
   }
 
-  render() {
-    this.logger.trace('render()');
-    const { data, options, placeholder, rowClass, striped } = this.props;
-    const columns = this.renderColumns();
+  renderActionColumn = () => this.renderColumn({
+    dataAlign: 'center',
+    dataField: 'action',
+    dataFormat: (column, row) => (
+      <ButtonGroup>
+        {this.props.rowActions.map(action => (
+          <Button
+            {...action}
+            actionData={row}
+            key={action.onClick}
+          />
+        ))}
+      </ButtonGroup>
+    ),
+    label: '',
+    width: `${this.props.rowActions.length * 50}px`,
+  })
 
+  render() {
     return (
       <BootstrapTable
         condensed
-        data={data}
+        data={this.props.data}
         hover
         options={{
-          ...options,
-          noDataText: placeholder,
+          ...this.props.options,
+          noDataText: this.props.placeholder,
         }}
-        striped={striped}
-        trClassName={rowClass}
+        striped={this.props.striped}
+        trClassName={this.props.rowClass}
       >
-        {columns}
+        {this.renderColumns()}
       </BootstrapTable>
     );
   }
 }
-
-Table.propTypes = {
-  data: React.PropTypes.array,
-  columns: React.PropTypes.array,
-  highlight: React.PropTypes.string,
-  placeholder: React.PropTypes.string,
-  options: React.PropTypes.shape(),
-  rowClass: React.PropTypes.func,
-  striped: React.PropTypes.bool,
-};

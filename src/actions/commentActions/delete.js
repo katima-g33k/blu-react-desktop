@@ -2,9 +2,10 @@ import API from '../../lib/api/index';
 import {
   DELETE_COMMENT_FAIL,
   DELETE_COMMENT_PENDING,
-  DELETE_COMMENT_SUCCESS,
-} from '../actionTypes';
+  DELETE_COMMENT_SUCCESS, OPEN_MODAL,
+} from '../actionTypes'
 import { generateFailAction } from '../failedActionFactory';
+import I18n from '../../lib/i18n';
 
 const apiUrl = localStorage.getItem('apiUrl');
 const apiKey = localStorage.getItem('apiKey');
@@ -30,4 +31,22 @@ export const deleteComment = comment => async (dispatch) => {
   } catch (error) {
     dispatch(deleteCommentFail(error));
   }
+};
+
+export const confirmDelete = comment => (dispatch) => {
+  dispatch({
+    actions: [
+      {
+        label: I18n('MemberView.modal.comment.delete.action'),
+        onClick: async () => {
+          await dispatch(deleteComment(comment));
+        },
+        style: 'danger',
+      },
+    ],
+    cancelable: true,
+    message: I18n('MemberView.modal.comment.delete.message', { comment }),
+    title: I18n('MemberView.modal.comment.delete.title'),
+    type: OPEN_MODAL,
+  });
 };

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal as RBModal } from 'react-bootstrap';
+import { Button, FormControl, Modal as RBModal } from 'react-bootstrap';
 
 import I18n from '../../../lib/i18n';
 
@@ -14,14 +14,38 @@ export default class Modal extends Component {
     cancelable: PropTypes.bool,
     closeModal: PropTypes.func.isRequired,
     display: PropTypes.bool.isRequired,
+    inputValue: PropTypes.string,
+    onInput: PropTypes.func.isRequired,
     message: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
+    type: PropTypes.string,
   }
 
   static defaultProps = {
     actions: [],
     cancelable: false,
+    inputValue: '',
+    type: 'info',
+  }
+
+  renderBody = () => {
+    switch (this.props.type) {
+      case 'input':
+        return (
+          <div>
+            <p>{this.props.message}</p>
+            <FormControl
+              componentClass="textarea"
+              id="inputModalField"
+              onChange={this.props.onInput}
+              value={this.props.inputValue}
+            />
+          </div>
+        );
+      default:
+        return this.props.message;
+    }
   }
 
   renderButton = action => (
@@ -30,7 +54,7 @@ export default class Modal extends Component {
       key={action.label}
       onClick={(event) => {
         event.preventDefault();
-        action.onClick();
+        action.onClick(this.props);
       }}
     >
       {action.label}
@@ -69,7 +93,7 @@ export default class Modal extends Component {
           </RBModal.Title>
         </RBModal.Header>
         <RBModal.Body>
-          {this.props.message}
+          {this.renderBody()}
         </RBModal.Body>
         <RBModal.Footer>
           {this.renderCancelButton()}

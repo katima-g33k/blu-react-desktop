@@ -1,31 +1,27 @@
 import { connect } from 'react-redux';
 
 import {
-  deleteComment,
-  insertComment,
-  openCommentModal,
-  updateComment,
+  confirmDelete,
+  openInsertCommentModal,
+  openUpdateCommentModal,
 } from '../actions/commentActions';
 import MemberComments from '../components/member/view/MemberComments';
 
-const mapStateToProps = ({ commentStore: { comment }, memberStore: { member } }) => ({
-  activeComment: comment,
-  comments: member.account.comment,
-  no: member.no,
+const mapStateToProps = ({ memberStore }) => ({
+  comments: memberStore.member.account.comment,
+  no: memberStore.member.no,
 });
 
 const mapDispatchToProps = dispatch => ({
-  openCommentModal: () => dispatch(openCommentModal()),
-  openDeleteConfirmation: () => dispatch({}),
-  delete: comment => dispatch(deleteComment(comment)),
-  insert: (no, comment) => dispatch(insertComment(no, comment)),
-  update: (id, comment) => dispatch(updateComment(id, comment)),
+  onInsert: no => dispatch(openInsertCommentModal(no)),
+  onUpdate: comment => dispatch(openUpdateCommentModal(comment.id, `${comment}`)),
+  onDelete: comment => dispatch(confirmDelete(comment)),
 });
 
-const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps,
+const mergeProps = (stateProps, dispatchProps) => ({
   ...dispatchProps,
-  ...ownProps,
+  comments: stateProps.comments,
+  onInsert: () => dispatchProps.onInsert(stateProps.no),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(MemberComments);

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { closeModal } from '../actions/modalActions';
+import { closeModal, updateInputValue } from '../actions/modalActions';
 import Modal from '../components/general/modals/Modal';
 
 const mapStateToProps = ({ modalStore }) => ({
@@ -10,6 +10,17 @@ const mapStateToProps = ({ modalStore }) => ({
 const mapDispatchToProps = dispatch => ({
   closeModal: () => dispatch(closeModal()),
   onClick: () => dispatch(closeModal()),
+  onInput: value => dispatch(updateInputValue(value)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Modal);
+const mergeProps = (stateProps, dispatchProps, ownProps) => ({
+  ...stateProps,
+  ...dispatchProps,
+  ...ownProps,
+  onInput: (event) => {
+    event.preventDefault();
+    dispatchProps.onInput(event.target.value);
+  },
+});
+
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(Modal);

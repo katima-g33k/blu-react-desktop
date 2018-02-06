@@ -1,4 +1,7 @@
 const fr = {
+  actions: {
+    add: 'Ajouter',
+  },
   Admin: {
     statistics: {
       title: 'Adminnistraton - Statistiques',
@@ -80,6 +83,23 @@ const fr = {
       transfer: 'Transférer à la BLU',
     },
     modal: {
+      comment: {
+        delete: {
+          title: 'Supprimer un commentaire',
+          message: 'Souhaitez-vous vraiment supprimer ce commentaire : "%{comment}"',
+          action: 'Supprimer',
+        },
+        insert: {
+          title: 'Ajouter un commentaire',
+          message: 'Saisissez le commentaire',
+          action: 'Enregistrer',
+        },
+        update: {
+          title: 'Modifier un commentaire',
+          message: 'Saisissez le commentaire',
+          action: 'Enregistrer',
+        },
+      },
       delete: {
         title: 'Suppression d\'un compte',
         message: 'Êtes-vous certain de vouloir supprimer ce compte? Cette action est IRRÉVERSIBLE',

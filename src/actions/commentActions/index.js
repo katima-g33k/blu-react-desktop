@@ -1,11 +1,9 @@
-import { deleteComment } from './delete';
-import { insertComment } from './insert';
-import { openCommentModal } from './openModal';
-import { updateComment } from './update';
+import { confirmDelete } from './delete';
+import { openInsertCommentModal } from './insert';
+import { openUpdateCommentModal } from './update';
 
 export {
-  deleteComment,
-  insertComment,
-  openCommentModal,
-  updateComment,
+  confirmDelete,
+  openInsertCommentModal,
+  openUpdateCommentModal,
 };

@@ -1,28 +1,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ButtonGroup, Col, Row } from 'react-bootstrap';
 import moment from 'moment';
 
-import Button from '../../general/Button';
-import { ConfirmModal, InputModal } from '../../general/modals';
+import { TableLayout } from '../../general';
+import { Comment } from '../../../lib/models';
 import I18n from '../../../lib/i18n';
-import TableLayout from '../../general/TableLayout';
 
 export default class MemberComment extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeComment: null,
-      showModal: null,
-    };
+  static propTypes = {
+    comments: PropTypes.arrayOf(PropTypes.instanceOf(Comment)),
+    onDelete: PropTypes.func.isRequired,
+    onInsert: PropTypes.func.isRequired,
+    onUpdate: PropTypes.func.isRequired,
   }
 
-  static propTypes = {
-    comments: PropTypes.array.isRequired,
-    delete: PropTypes.func.isRequired,
-    insert: PropTypes.func.isRequired,
-    no: PropTypes.number.isRequired,
-    update: PropTypes.func.isRequired,
+  static defaultProps = {
+    comments: [],
   }
 
   get actions() {
@@ -30,8 +23,8 @@ export default class MemberComment extends Component {
       name: 'add',
       bsStyle: 'success',
       icon: 'plus',
-      label: 'Ajouter',
-      onClick: this.handleNewComment,
+      label: I18n('actions.add'),
+      onClick: this.props.onInsert,
     }];
   }
 
@@ -39,8 +32,8 @@ export default class MemberComment extends Component {
     return [
       {
         dataField: 'id',
-        isKey: true,
         hidden: true,
+        isKey: true,
       },
       {
         dataField: 'comment',
@@ -49,112 +42,37 @@ export default class MemberComment extends Component {
       },
       {
         dataField: 'updatedAt',
-        label: I18n('TableColumns.comment.date'),
         dataFormat: date => moment(date).format('LL'),
+        label: I18n('TableColumns.comment.date'),
         width: '130px',
-      },
-      {
-        dataField: 'action',
-        label: 'Actions',
-        dataAlign: 'center',
-        width: '100px',
-        dataFormat: this.renderRowActions,
       },
     ];
   }
 
-  resetState = () => this.setState({
-    activeComment: null,
-    showModal: null,
-  });
-
-  handleCancel = () => {
-    this.resetState();
+  get rowActions() {
+    return [
+      {
+        glyph: 'pencil',
+        onClick: this.props.onUpdate,
+      },
+      {
+        bsStyle: 'danger',
+        glyph: 'trash',
+        onClick: this.props.onDelete,
+      },
+    ];
   }
-
-  handleButtonClick = (actionData) => {
-    this.setState(actionData);
-  }
-
-  handleNewComment = () => {
-    this.setState({ showModal: 'input' });
-  }
-
-  handleDelete = () => {
-    this.props.delete(this.state.activeComment);
-    this.resetState();
-  }
-
-  handleSave = (event, comment) => {
-    if (this.state.activeComment) {
-      this.props.update(this.state.activeComment.id, comment);
-    } else {
-      this.props.insert(this.props.no, comment);
-    }
-
-    this.resetState();
-  };
-
-  renderModal = () => {
-    const { activeComment, showModal } = this.state;
-
-    switch (showModal) {
-      case 'input':
-        return (
-          <InputModal
-            message="Entrer le commentaire"
-            title={activeComment ? 'Modifier un commentaire' : 'Ajouter un commentaire'}
-            textarea
-            value={activeComment ? activeComment.comment : ''}
-            onSave={this.handleSave}
-            onCancel={this.handleCancel}
-          />
-        );
-      case 'confirm':
-        return (
-          <ConfirmModal
-            message={`Souhaitez-vous vraiment supprimer ce commentaire : "${activeComment.comment}"`}
-            title="Supprimer un commentaire"
-            onConfirm={this.handleDelete}
-            onCancel={this.handleCancel}
-            confirmationStyle="danger"
-          />
-        );
-      default:
-        return null;
-    }
-  }
-
-  renderRowActions = (actions, activeComment) => (
-    <ButtonGroup>
-      <Button
-        actionData={{ activeComment, showModal: 'input' }}
-        glyph="pencil"
-        onClick={this.handleButtonClick}
-      />
-      <Button
-        actionData={{ activeComment, showModal: 'confirm' }}
-        bsStyle="danger"
-        glyph="trash"
-        onClick={this.handleButtonClick}
-      />
-    </ButtonGroup>
-  )
 
   render() {
     return (
-      <Row>
-        <Col>
-          <TableLayout
-            actions={this.actions}
-            columns={this.columns}
-            data={this.props.comments}
-            placeholder={I18n('MemberView.comment.none')}
-            title={I18n('MemberView.comment.title')}
-          />
-        </Col>
-        {this.renderModal()}
-      </Row>
+      <TableLayout
+        actions={this.actions}
+        columns={this.columns}
+        data={this.props.comments}
+        placeholder={I18n('MemberView.comment.none')}
+        rowActions={this.rowActions}
+        title={I18n('MemberView.comment.title')}
+      />
     );
   }
 }
