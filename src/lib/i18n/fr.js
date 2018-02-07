@@ -238,6 +238,15 @@ const fr = {
       price: 'Prix',
     },
   },
+  CopyTable: {
+    filters: {
+      added: 'En Stock',
+      sold: 'Vendu',
+      paid: 'Argent Remis',
+      reserved: 'Réservé',
+      search: 'Recherche',
+    },
+  },
   modal: {
     cancel: 'Annuler',
     error: 'Erreur %{code}',

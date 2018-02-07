@@ -6,6 +6,7 @@ import DatePicker from './DatePicker';
 import ProfileStats from './ProfileStats';
 import Select from './Select';
 import Spinner from './Spinner';
+import Table from './Table';
 import TableLayout from './TableLayout';
 
 export {
@@ -17,5 +18,6 @@ export {
   ProfileStats,
   Select,
   Spinner,
+  Table,
   TableLayout,
 };

@@ -39,10 +39,18 @@ export default class TableLayout extends Component {
     exportable: PropTypes.bool,
     exportTitle: PropTypes.string,
     modal: PropTypes.shape(),
+    noStrip: PropTypes.bool,
     placeholder: PropTypes.string,
     rowActions: PropTypes.arrayOf(PropTypes.shape()),
+    rowClass: PropTypes.func,
     title: PropTypes.string.isRequired,
   };
+
+  static defaultProps = {
+    actions: [],
+    noStrip: false,
+    rowClass: () => {},
+  }
 
   createCSV = () => {
     const { columns, data } = this.props;
@@ -69,30 +77,26 @@ export default class TableLayout extends Component {
     FileSaver.saveAs(this.createCSV(), `${this.props.exportTitle || 'data'}.csv`);
   }
 
-  renderExportButton = () => {
-    return (
-      <Button
-        bsStyle="primary"
-        onClick={this.saveFile}
-        glyph="new-window"
-        label={'Exporter sélection'}
-      />
-    );
-  }
+  renderExportButton = () => (
+    <Button
+      bsStyle="primary"
+      onClick={this.saveFile}
+      glyph="new-window"
+      label={'Exporter sélection'}
+    />
+  )
 
-  renderActions = () => {
-    const { actions = [] } = this.props;
+  renderAction = action => (
+    <Button
+      bsStyle={action.bsStyle}
+      key={action.name}
+      glyph={action.icon}
+      label={action.label}
+      onClick={action.onClick}
+    />
+  )
 
-    return actions.map(action => (
-      <Button
-        bsStyle={action.bsStyle}
-        key={action.name}
-        glyph={action.icon}
-        label={action.label}
-        onClick={action.onClick}
-      />
-    ));
-  }
+  renderActions = () => this.props.actions.map(this.renderAction)
 
   renderFilters = () => {
     const { filters = [] } = this.props;
@@ -101,11 +105,10 @@ export default class TableLayout extends Component {
       switch (filter.type) {
         case 'checkbox':
           return (
-            <Col md={1}>
+            <Col key={filter.label} md={1}>
               <Checkbox
-                key={filter.key}
                 onChange={filter.onChange}
-                checked={filter.checked}
+                checked={filter.value}
               >
                 {filter.label}
               </Checkbox>
@@ -113,7 +116,7 @@ export default class TableLayout extends Component {
           );
         case 'select':
           return (
-            <Col md={2} key={`select${filter.key}`}>
+            <Col md={2} key={`select${filter.label}`}>
               <Row>
                 <Col componentClass={ControlLabel} md={3} style={{ marginTop: '6px' }}>
                   {filter.label}
@@ -131,6 +134,17 @@ export default class TableLayout extends Component {
                   </FormControl>
                 </Col>
               </Row>
+            </Col>
+          );
+        case 'input':
+          return (
+            <Col key={filter.label} md={2}>
+              <FormControl
+                type="text"
+                placeholder={filter.label}
+                onChange={filter.onChange}
+                value={filter.value}
+              />
             </Col>
           );
         default:
@@ -172,7 +186,8 @@ export default class TableLayout extends Component {
                 data={data}
                 placeholder={placeholder || 'Aucune donnée'}
                 rowActions={this.props.rowActions}
-                striped
+                rowClass={this.props.rowClass}
+                striped={!this.props.noStrip}
               />
             </Col>
           </Row>

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Col, Image, Label, Panel, Row } from 'react-bootstrap';
+import { Alert, Col, Label, Panel, Row } from 'react-bootstrap';
 
 import AlignedData from '../../general/AlignedData';
 import CopyTableContainer from '../../copy/table/CopyTableContainer';
@@ -10,10 +10,9 @@ import Member from '../../../lib/models/Member';
 import MemberActionPanel from '../../../containers/MemberActionPanelContainer';
 import MemberComments from '../../../containers/MemberCommentContainer';
 import MemberReceipt from '../receipt/MemberReceipt';
+import ParentLogo from './ParentLogo';
 import ProfileStats from '../../general/ProfileStats';
 import Spinner from '../../general/Spinner';
-
-const dir = __dirname;
 
 const border = {
   borderRight: '1px #e0e0e0 solid',
@@ -41,12 +40,7 @@ export default class MemberView extends Component {
 
   renderParentLogo = () => {
     if (this.props.member.isParent) {
-      return (
-        <Image
-          src={`${dir === '/' ? '' : `${dir}/`}../../assets/images/logo_parents_etudiants.png`}
-          style={{ height: '30px', border: 'none', marginLeft: '10px', marginBottom: '5px' }}
-        />
-      );
+      return (<ParentLogo />);
     }
 
     return null;
@@ -156,7 +150,7 @@ export default class MemberView extends Component {
     const {
       isLoading,
       member: {
-        account: { comment, copies, isActive },
+        account: { copies, isActive },
         name,
         no,
       },

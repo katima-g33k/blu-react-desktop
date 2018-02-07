@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { Checkbox, Col, FormControl, Row } from 'react-bootstrap';
-import { I18n, Translate } from 'react-i18nify';
+import PropTypes from 'prop-types';
 
-import Table from '../../general/Table';
+import I18n from '../../../lib/i18n';
+import TableLayout from '../../general/TableLayout';
+
+const FILTERS = ['search', 'added', 'sold', 'paid', 'reserved'];
 
 export default class CopyTable extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       filters: {
         added: true,
@@ -17,25 +18,39 @@ export default class CopyTable extends Component {
         search: '',
       },
     };
-
-    this.filterData = this.filterData.bind(this);
-    this.renderFilters = this.renderFilters.bind(this);
   }
 
-  static formatRow(row, index) {
-    if (row.item && row.item.status && row.item.status.REMOVED) {
-      return 'removed';
-    }
+  static propTypes = {
+    columns: PropTypes.array.isRequired,
+    data: PropTypes.array.isRequired,
+    filters: PropTypes.shape({
+      added: PropTypes.bool,
+      sold: PropTypes.bool,
+      paid: PropTypes.bool,
+      reserved: PropTypes.bool,
+      search: PropTypes.string,
+    }),
+    formatRow: PropTypes.func,
+  };
 
-    if ((row.member && !row.member.account.isActive) ||
-      (row.item && row.item.status && row.item.status.OUTDATED)) {
-      return 'archived';
-    }
+  static defaultProps = {
+    formatRow: (row, index) => {
+      if (row.item && row.item.status && row.item.status.REMOVED) {
+        return 'removed';
+      }
 
-    return index % 2 === 0 ? 'striped-row' : '';
+      if ((row.member && !row.member.account.isActive) ||
+        (row.item && row.item.status && row.item.status.OUTDATED)) {
+        return 'archived';
+      }
+
+
+      return index % 2 === 0 ? 'striped-row' : '';
+    },
   }
 
-  filterData() {
+
+  filterData = () => {
     const { added, paid, reserved, search, sold } = this.state.filters;
 
     return this.props.data.filter((copy) => {
@@ -59,72 +74,30 @@ export default class CopyTable extends Component {
     });
   }
 
-  renderFilters() {
-    const { filters } = this.state;
-    const checkboxes = [
-      { key: 'added', label: 'En stock' },
-      { key: 'sold', label: 'Vendu' },
-      { key: 'paid', label: 'Argent remis' },
-      { key: 'reserved', label: 'Réservé' },
-    ];
-
-    return (
-      <Row>
-        <Col md={2}>
-          <FormControl
-            type="text"
-            placeholder={'Recherche'}
-            onChange={(event) => {
-              filters.search = event.target.value;
-              this.setState({ filters });
-            }}
-            value={filters.search}
-          />
-        </Col>
-        {checkboxes.map(({ key, label }) => (
-          <Col key={key} md={2}>
-            <Checkbox
-              onChange={(event) => {
-                filters[key] = event.target.checked;
-                this.setState({ filters });
-              }}
-              checked={filters[key]}
-            >
-              {label}
-            </Checkbox>
-          </Col>
-        ))}
-      </Row>
-    );
+  get filters() {
+    return FILTERS.map(filter => ({
+      label: I18n(`CopyTable.filters.${filter}`),
+      onChange: event => this.setState({
+        filters: {
+          ...this.state.filters,
+          [filter]: filter === 'search' ? event.target.value : event.target.checked,
+        },
+      }),
+      value: this.state.filters[filter],
+      type: filter === 'search' ? 'input' : 'checkbox',
+    }));
   }
 
   render() {
     return (
-      <section>
-        <h4>
-          <Translate value="MemberView.copies.title" />
-        </h4>
-        {this.renderFilters()}
-        <Table
-          columns={this.props.columns}
-          data={this.filterData()}
-          highlight={this.state.filters.search}
-          options={{
-            defaultSortName: this.props.columns.find(column => column.defaultSort).dataField,
-            defaultSortOrder: 'asc',
-          }}
-          placeholder={I18n.t('MemberView.copies.none')}
-          sortable
-          rowClass={CopyTable.formatRow}
-        />
-        {this.props.modal}
-      </section>
+      <TableLayout
+        columns={this.props.columns}
+        data={this.filterData()}
+        filters={this.filters}
+        noStrip
+        rowClass={this.props.formatRow}
+        title={I18n('MemberView.copies.title')}
+      />
     );
   }
 }
-
-CopyTable.propTypes = {
-  columns: React.PropTypes.array.isRequired,
-  data: React.PropTypes.array.isRequired,
-  modal: React.PropTypes.shape(),
-};
