@@ -5,7 +5,7 @@ import {
   UPDATE_COMMENT_FAIL,
   UPDATE_COMMENT_PENDING,
   UPDATE_COMMENT_SUCCESS,
-} from '../actionTypes'
+} from '../actionTypes';
 import { generateFailAction } from '../failedActionFactory';
 import I18n from '../../lib/i18n';
 

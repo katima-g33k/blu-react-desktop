@@ -4,10 +4,10 @@ import {
   INSERT_COMMENT_FAIL,
   INSERT_COMMENT_PENDING,
   INSERT_COMMENT_SUCCESS, OPEN_COMMENT, OPEN_MODAL,
-} from '../actionTypes'
+} from '../actionTypes';
 import { generateFailAction } from '../failedActionFactory';
-import { updateComment } from './update'
-import I18n from '../../lib/i18n'
+import { updateComment } from './update';
+import I18n from '../../lib/i18n';
 
 const apiUrl = localStorage.getItem('apiUrl');
 const apiKey = localStorage.getItem('apiKey');

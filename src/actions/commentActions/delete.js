@@ -3,7 +3,7 @@ import {
   DELETE_COMMENT_FAIL,
   DELETE_COMMENT_PENDING,
   DELETE_COMMENT_SUCCESS, OPEN_MODAL,
-} from '../actionTypes'
+} from '../actionTypes';
 import { generateFailAction } from '../failedActionFactory';
 import I18n from '../../lib/i18n';
 
