@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Alert, Col, Label, Panel, Row } from 'react-bootstrap';
 
 import AlignedData from '../../general/AlignedData';
-import CopyTableContainer from '../../copy/table/CopyTableContainer';
+import CopyTable from './MemberCopyTable';
 import { formatLongDate } from '../../../lib/dateHelper';
 import I18n from '../../../lib/i18n';
 import Member from '../../../lib/models/Member';
@@ -182,10 +182,9 @@ export default class MemberView extends Component {
             <hr />
             <Row>
               <Col md={12}>
-                <CopyTableContainer
-                  api={{}}
+                <CopyTable
+                  data={copies.filter(copy => !copy.isDonated)}
                   member={`${no}`}
-                  copies={copies.filter(copy => !copy.isDonated)}
                 />
               </Col>
             </Row>

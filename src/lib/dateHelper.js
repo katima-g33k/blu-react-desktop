@@ -7,3 +7,11 @@ export const formatLongDate = (date) => {
 
   return '';
 };
+
+export const formatShortDate = (date) => {
+  if (date) {
+    return moment(date).format('YYYY-MM-DD');
+  }
+
+  return '';
+};

@@ -1,8 +1,10 @@
 import ActionPanel from './ActionPanel';
 import AlignedData from './AlignedData';
 import Button from './Button';
+import Checkbox from './Checkbox';
 import CustomButton from './CustomButton';
 import DatePicker from './DatePicker';
+import Input from './Input';
 import ProfileStats from './ProfileStats';
 import Select from './Select';
 import Spinner from './Spinner';
@@ -13,8 +15,10 @@ export {
   ActionPanel,
   AlignedData,
   Button,
+  Checkbox,
   CustomButton,
   DatePicker,
+  Input,
   ProfileStats,
   Select,
   Spinner,

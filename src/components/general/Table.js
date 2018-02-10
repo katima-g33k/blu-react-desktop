@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { ButtonGroup } from 'react-bootstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
-import { Button } from '../general';
+import ActionColumn from './ActionColumn';
 
 export default class Table extends Component {
   static propTypes = {
@@ -12,17 +11,21 @@ export default class Table extends Component {
     highlight: PropTypes.string,
     placeholder: PropTypes.string,
     options: PropTypes.shape(),
+    rowActions: ActionColumn.propTypes.rowActions,
     rowClass: PropTypes.func,
-    rowActions: PropTypes.arrayOf(PropTypes.shape({
-      bsStyle: PropTypes.string,
-      glyph: PropTypes.string,
-      onClick: PropTypes.func,
-    })),
     striped: PropTypes.bool,
   };
 
   static defaultProps = {
-    rowActions: [],
+    rowActions: ActionColumn.defaultProps.rowActions,
+  };
+
+  getRowActions = (row) => {
+    try {
+      return this.props.rowActions(row);
+    } catch (error) {
+      return this.props.rowActions;
+    }
   };
 
   renderColumn = (column) => {
@@ -48,29 +51,16 @@ export default class Table extends Component {
     const columns = this.props.columns.map(this.renderColumn);
 
     if (this.props.rowActions.length) {
-      columns.push(this.renderActionColumn());
+      columns.push((
+        <ActionColumn
+          key="actions"
+          rowActions={this.props.rowActions}
+        />
+      ));
     }
 
     return columns;
   }
-
-  renderActionColumn = () => this.renderColumn({
-    dataAlign: 'center',
-    dataField: 'action',
-    dataFormat: (column, row) => (
-      <ButtonGroup>
-        {this.props.rowActions.map(action => (
-          <Button
-            {...action}
-            actionData={row}
-            key={action.onClick}
-          />
-        ))}
-      </ButtonGroup>
-    ),
-    label: '',
-    width: `${this.props.rowActions.length * 50}px`,
-  })
 
   render() {
     return (
