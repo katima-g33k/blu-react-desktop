@@ -6,18 +6,18 @@ import FileSaver from 'file-saver';
 import Button from './Button';
 import Checkbox from './Checkbox';
 import { createCSV } from '../../lib/csv';
+import I18n from '../../lib/i18n';
 import Input from './Input';
 import Table from './Table';
 
 export default class TableLayout extends Component {
   static propTypes = {
-    actions: PropTypes.array,
-    columns: PropTypes.array.isRequired,
-    data: PropTypes.array.isRequired,
+    actions: PropTypes.arrayOf(PropTypes.shape()),
+    columns: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    data: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     filters: PropTypes.arrayOf(PropTypes.shape()),
     exportable: PropTypes.bool,
     exportTitle: PropTypes.string,
-    modal: PropTypes.shape(),
     noStrip: PropTypes.bool,
     placeholder: PropTypes.string,
     rowActions: PropTypes.oneOfType([
@@ -30,22 +30,35 @@ export default class TableLayout extends Component {
 
   static defaultProps = {
     actions: [],
+    filters: [],
+    exportable: false,
+    exportTitle: '',
     noStrip: false,
+    placeholder: I18n('table.placeholder'),
+    rowActions: [],
     rowClass: () => {},
   }
 
+  getFileName = () => `${this.props.exportTitle || I18n('table.defaultFileName')}.csv`
+
   saveFile = () => {
-    FileSaver.saveAs(createCSV(this.props.columns, this.props.data), `${this.props.exportTitle || 'data'}.csv`);
+    FileSaver.saveAs(createCSV(this.props.columns, this.props.data), this.getFileName());
   }
 
-  renderExportButton = () => (
-    <Button
-      bsStyle="primary"
-      onClick={this.saveFile}
-      glyph="new-window"
-      label={'Exporter sélection'}
-    />
-  )
+  renderExportButton = () => {
+    if (this.props.exportable) {
+      return (
+        <Button
+          bsStyle="primary"
+          glyph="new-window"
+          label={I18n('table.export')}
+          onClick={this.saveFile}
+        />
+      );
+    }
+
+    return null;
+  }
 
   renderAction = action => (
     <Button
@@ -84,15 +97,6 @@ export default class TableLayout extends Component {
   }
 
   render() {
-    const {
-      columns,
-      data,
-      exportable,
-      modal,
-      placeholder,
-      title,
-    } = this.props;
-
     return (
       <Row componentClass="section">
         <Col md={12}>
@@ -100,12 +104,12 @@ export default class TableLayout extends Component {
             <Col md={12}>
               <Row>
                 <Col md={12}>
-                  <h4>{title}</h4>
+                  <h4>{this.props.title}</h4>
                 </Col>
               </Row>
               <Row style={{ marginBottom: '10px' }}>
                 <Col md={12}>
-                  {exportable && this.renderExportButton()}
+                  {this.renderExportButton()}
                   {this.renderActions()}
                 </Col>
               </Row>
@@ -119,9 +123,9 @@ export default class TableLayout extends Component {
           <Row>
             <Col md={12}>
               <Table
-                columns={columns}
-                data={data}
-                placeholder={placeholder || 'Aucune donnée'}
+                columns={this.props.columns}
+                data={this.props.data}
+                placeholder={this.props.placeholder}
                 rowActions={this.props.rowActions}
                 rowClass={this.props.rowClass}
                 striped={!this.props.noStrip}
@@ -129,7 +133,6 @@ export default class TableLayout extends Component {
             </Col>
           </Row>
         </Col>
-        {modal}
       </Row>
     );
   }

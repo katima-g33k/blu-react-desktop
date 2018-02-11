@@ -1,3 +1,4 @@
+/* eslint max-len: 0 */
 const fr = {
   actions: {
     add: 'Ajouter',
@@ -246,11 +247,41 @@ const fr = {
       reserved: 'Réservé',
       search: 'Recherche',
     },
+    help: {
+      cancelSell: 'Annuler la vente',
+      cancelReservation: 'Annuler la réservation',
+      delete: 'Supprimer',
+      reserve: 'Réserver',
+      sell: 'Vendre',
+      sellHalfPrice: 'Vendre à moitié prix',
+    },
+    modals: {
+      delete: {
+        action: 'Supprimer',
+        message: 'Souhaitez-vous supprimer cet exemplaire ?',
+        title: 'Supprimer un exemplaire',
+      },
+      update: {
+        action: 'Enregistrer',
+        message: 'Entrer le nouveau montant.',
+        title: 'Mettre à jour le prix',
+      },
+      cancelReservation: {
+        action: 'Confirmer',
+        message: 'Souhaitez-vous vraiment annuler cette réservation ?',
+        title: 'Annuler une réservation',
+      },
+    },
   },
   modal: {
     cancel: 'Annuler',
     error: 'Erreur %{code}',
     ok: 'Ok',
+  },
+  table: {
+    defaultFileName: 'data',
+    export: 'Exporter sélection',
+    placeholder: 'Aucune donnée',
   },
 };
 

@@ -1,5 +1,6 @@
 import API from '../../lib/api/index';
 import Comment from '../../lib/models/Comment';
+import Modal from '../../components/general/modals/Modal';
 import {
   OPEN_MODAL,
   UPDATE_COMMENT_FAIL,
@@ -42,6 +43,7 @@ export const openUpdateCommentModal = (id, comment) => (dispatch) => {
       onClick: ({ inputValue }) => updateComment(id, inputValue, dispatch),
     }],
     cancelable: true,
+    inputType: Modal.INPUT_TYPES.TEXTAREA,
     inputValue: comment,
     message: I18n('MemberView.modal.comment.update.message'),
     modalType: 'input',

@@ -2,76 +2,39 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 
+import { Copy } from '../../../lib/models';
 import { formatShortDate } from '../../../lib/dateHelper';
 import I18n from '../../../lib/i18n';
 import { sortDate, sortNumber } from '../../../lib/sort';
-import TableLayout from '../../general/TableLayout';
+import { TableLayout } from '../../general';
 
-const FILTERS = ['search', 'added', 'sold', 'paid', 'reserved'];
+const DEFAULT_FILTER_TYPE = 'checkbox';
+const SEARCH_FILTER_TYPE = 'input';
+const STRIPED_ROW_CLASS = 'striped-row';
 
 export default class CopyTable extends Component {
   static propTypes = {
-    columns: PropTypes.array.isRequired,
-    data: PropTypes.array.isRequired,
-    filters: PropTypes.shape({
-      added: PropTypes.bool,
-      sold: PropTypes.bool,
-      paid: PropTypes.bool,
-      reserved: PropTypes.bool,
-      search: PropTypes.string,
-    }).isRequired,
-    formatRow: PropTypes.func,
+    cancelReservation: PropTypes.func.isRequired,
+    columns: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    data: PropTypes.arrayOf(PropTypes.instanceOf(Copy)).isRequired,
+    deleteCopy: PropTypes.func.isRequired,
+    filters: PropTypes.shape().isRequired,
+    formatRow: PropTypes.func.isRequired,
+    refundCopy: PropTypes.func.isRequired,
+    reserveCopy: PropTypes.func.isRequired,
+    sellCopy: PropTypes.func.isRequired,
+    sellCopyHalfPrice: PropTypes.func.isRequired,
+    updateCopy: PropTypes.func.isRequired,
     updateFilter: PropTypes.func.isRequired,
   };
 
-  static defaultProps = {
-    formatRow: (row, index) => {
-      if (row.item && row.item.status && row.item.status.REMOVED) {
-        return 'removed';
-      }
-
-      if ((row.member && !row.member.account.isActive) ||
-        (row.item && row.item.status && row.item.status.OUTDATED)) {
-        return 'archived';
-      }
-
-
-      return index % 2 === 0 ? 'striped-row' : '';
-    },
-  }
-
-
-  filterData = () => {
-    const { added, paid, reserved, search, sold } = this.props.filters;
-
-    return this.props.data.filter((copy) => {
-      if ((!sold && copy.isSold) || (!reserved && copy.isReserved) ||
-          (!paid && copy.isPaid) || (!added && copy.isAdded)) {
-        return false;
-      }
-
-      if (search) {
-        const regex = new RegExp(search, 'i');
-        if (copy.item) {
-          const { name, editor } = copy.item;
-          return regex.test(name) || regex.test(editor);
-        }
-
-        const { name } = copy.member;
-        return regex.test(name);
-      }
-
-      return true;
-    });
-  }
-
   get filters() {
-    return FILTERS.map(filter => ({
+    return Object.keys(this.props.filters).map(filter => ({
       id: filter,
       label: I18n(`CopyTable.filters.${filter}`),
       onChange: this.props.updateFilter,
       value: this.props.filters[filter],
-      type: filter === 'search' ? 'input' : 'checkbox',
+      type: filter === 'search' ? SEARCH_FILTER_TYPE : DEFAULT_FILTER_TYPE,
     }));
   }
 
@@ -110,7 +73,7 @@ export default class CopyTable extends Component {
         dataFormat: (price, copy) => (
           <Button
             bsStyle="link"
-            onClick={() => this.setState({ activeCopy: copy, showModal: 'update' })}
+            onClick={() => this.props.updateCopy(copy)}
             disabled={copy.isPaid || copy.isSold || copy.isReserved}
           >
             {price}
@@ -130,8 +93,8 @@ export default class CopyTable extends Component {
         {
           bsStyle: 'danger',
           glyph: 'ban-circle',
-          help: 'Annuler la vente',
-          onClick: () => console.log('cancel sell'),
+          help: I18n('CopyTable.help.cancelSell'),
+          onClick: this.props.refundCopy,
         },
       ];
     }
@@ -139,15 +102,15 @@ export default class CopyTable extends Component {
     if (copy.isReserved) {
       return [
         {
-          help: 'Annuler la Réservation',
           bsStyle: 'primary',
-          onClick: () => console.log('cancel reservation'),
           glyph: 'ban-circle',
+          help: I18n('CopyTable.help.cancelReservation'),
+          onClick: this.props.cancelReservation,
         },
         {
-          help: 'Vendre à moitié prix',
+          help: I18n('CopyTable.help.sellHalfPrice'),
           label: '$',
-          onClick: () => console.log('sell parent'),
+          onClick: this.props.sellCopyHalfPrice,
         },
       ];
     }
@@ -156,141 +119,42 @@ export default class CopyTable extends Component {
       {
         bsStyle: 'primary',
         glyph: 'user',
-        help: 'Réserver',
-        onClick: () => console.log('reserve'),
+        help: I18n('CopyTable.help.reserve'),
+        onClick: this.props.reserveCopy,
       },
       {
-        help: 'Vendre à moitié prix',
+        help: I18n('CopyTable.help.sellHalfPrice'),
         label: '$',
-        onClick: () => console.log('sell parent'),
+        onClick: this.props.sellCopyHalfPrice,
       },
       {
         bsStyle: 'success',
-        help: 'Vendre',
+        help: I18n('CopyTable.help.sell'),
         label: '$$',
-        onClick: () => console.log('sell'),
+        onClick: this.props.sellCopy,
       },
       {
         bsStyle: 'danger',
         glyph: 'trash',
-        help: 'Supprimer',
-        onClick: () => console.log('delete'),
+        help: I18n('CopyTable.help.delete'),
+        onClick: this.props.deleteCopy,
       },
     ];
   }
+
+  formatRow = (copy, index) => this.props.formatRow(copy) || (index % 2 ? STRIPED_ROW_CLASS : '')
 
   render() {
     return (
       <TableLayout
         columns={this.columns}
-        data={this.filterData()}
+        data={this.props.data}
         filters={this.filters}
         noStrip
         rowActions={this.getRowActions}
-        rowClass={this.props.formatRow}
+        rowClass={this.formatRow}
         title={I18n('MemberView.copies.title')}
       />
     );
   }
 }
-
-// {
-//   dataField: 'actions',
-//     label: '',
-//   dataAlign: 'center',
-//   width: '175px',
-//   dataFormat: (cell, copy) => {
-//   if (copy.isPaid) {
-//     return '';
-//   }
-//
-//   if (copy.isSold) {
-//     return (
-//       <OverlayTrigger
-//         placement="bottom"
-//         overlay={<Tooltip id="cancel">{'Annuler la vente'}</Tooltip>}
-//       >
-//         <Button bsStyle="danger" onClick={() => this.refund(copy.id)}>
-//           <Glyphicon glyph="ban-circle" />
-//         </Button>
-//       </OverlayTrigger>
-//     );
-//   }
-//
-//   if (copy.isReserved) {
-//     return (
-//       <ButtonGroup>
-//         <OverlayTrigger
-//           placement="bottom"
-//           overlay={<Tooltip id="cancel">{'Annuler la réservation'}</Tooltip>}
-//         >
-//           <Button
-//             bsStyle="primary"
-//             onClick={() => this.setState({ activeCopy: copy, showModal: 'cancelReservation' })}
-//           >
-//             <Glyphicon glyph="ban-circle" />
-//           </Button>
-//         </OverlayTrigger>
-//         <OverlayTrigger
-//           placement="bottom"
-//           overlay={<Tooltip id="sellParent">{'Vendre à moitié prix'}</Tooltip>}
-//         >
-//           <Button
-//             onClick={() => this.sell(copy, true)}
-//           >
-//             {'$'}
-//           </Button>
-//         </OverlayTrigger>
-//       </ButtonGroup>
-//     );
-//   }
-//
-//   return (
-//     <ButtonGroup>
-//       <OverlayTrigger
-//         placement="bottom"
-//         overlay={<Tooltip id="reserve">{'Réserver'}</Tooltip>}
-//       >
-//         <Button
-//           bsStyle="primary"
-//           onClick={() => this.setState({ activeCopy: copy, showModal: 'reserve' })}
-//         >
-//           <Glyphicon glyph="user" />
-//         </Button>
-//       </OverlayTrigger>
-//       <OverlayTrigger
-//         placement="bottom"
-//         overlay={<Tooltip id="sellParent">{'Vendre à moitié prix'}</Tooltip>}
-//       >
-//         <Button
-//           onClick={() => this.sell(copy, true)}
-//         >
-//           {'$'}
-//         </Button>
-//       </OverlayTrigger>
-//       <OverlayTrigger
-//         placement="bottom"
-//         overlay={<Tooltip id="sell">{'Vendre à prix régulier'}</Tooltip>}
-//       >
-//         <Button
-//           onClick={() => this.sell(copy)}
-//           bsStyle="success"
-//         >
-//           {'$$'}
-//         </Button>
-//       </OverlayTrigger>
-//       <OverlayTrigger
-//         placement="bottom"
-//         overlay={<Tooltip id="delete">{'Supprimer de l\'inventaire'}</Tooltip>}
-//       >
-//         <Button
-//           bsStyle="danger"
-//           onClick={() => this.setState({ activeCopy: copy, showModal: 'remove' })}
-//         >
-//           <Glyphicon glyph="trash" />
-//         </Button>
-//       </OverlayTrigger>
-//     </ButtonGroup>
-//   );
-// },
-// },

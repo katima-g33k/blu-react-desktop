@@ -4,6 +4,12 @@ import { Button, FormControl, Modal as RBModal } from 'react-bootstrap';
 
 import I18n from '../../../lib/i18n';
 
+const INPUT_TYPES = {
+  NUMBER: 'number',
+  TEXT: 'text',
+  TEXTAREA: 'textarea',
+};
+
 export default class Modal extends Component {
   static propTypes = {
     actions: PropTypes.arrayOf(PropTypes.shape({
@@ -14,7 +20,11 @@ export default class Modal extends Component {
     cancelable: PropTypes.bool,
     closeModal: PropTypes.func.isRequired,
     display: PropTypes.bool.isRequired,
-    inputValue: PropTypes.string,
+    inputType: PropTypes.oneOf(Object.values(INPUT_TYPES)),
+    inputValue: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string,
+    ]),
     onInput: PropTypes.func.isRequired,
     message: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
@@ -25,9 +35,12 @@ export default class Modal extends Component {
   static defaultProps = {
     actions: [],
     cancelable: false,
+    inputType: INPUT_TYPES.TEXT,
     inputValue: '',
     type: 'info',
   }
+
+  static INPUT_TYPES = INPUT_TYPES
 
   renderBody = () => {
     switch (this.props.type) {
@@ -36,9 +49,10 @@ export default class Modal extends Component {
           <div>
             <p>{this.props.message}</p>
             <FormControl
-              componentClass="textarea"
+              componentClass={this.props.inputType === INPUT_TYPES.TEXTAREA ? 'textarea' : 'input'}
               id="inputModalField"
               onChange={this.props.onInput}
+              type={this.props.inputType}
               value={this.props.inputValue}
             />
           </div>

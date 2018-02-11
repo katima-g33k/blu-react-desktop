@@ -1,8 +1,8 @@
 import {
   UPDATE_COPY_TABLE_FILTER,
-} from './actionTypes';
+} from '../actionTypes';
 
-export const updateFilter = (filter, value) => ({
+export default (filter, value) => ({
   filter,
   value,
   type: UPDATE_COPY_TABLE_FILTER,

@@ -34,7 +34,7 @@ export default class MemberView extends Component {
     printing: false,
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.props.fetch();
   }
 
@@ -150,9 +150,8 @@ export default class MemberView extends Component {
     const {
       isLoading,
       member: {
-        account: { copies, isActive },
+        account: { isActive },
         name,
-        no,
       },
     } = this.props;
 
@@ -182,10 +181,7 @@ export default class MemberView extends Component {
             <hr />
             <Row>
               <Col md={12}>
-                <CopyTable
-                  data={copies.filter(copy => !copy.isDonated)}
-                  member={`${no}`}
-                />
+                <CopyTable />
               </Col>
             </Row>
           </Panel>

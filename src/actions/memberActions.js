@@ -15,6 +15,8 @@ import {
 import API from '../lib/api';
 import I18n from '../lib/i18n';
 import Copy from '../lib/models/Copy';
+import Member from '../lib/models/Member';
+import { setCopies } from './copyActions';
 
 const apiUrl = localStorage.getItem('apiUrl');
 const apiKey = localStorage.getItem('apiKey');
@@ -39,8 +41,9 @@ export const fetchMember = no => async (dispatch) => {
   dispatch(fetchMemberPending());
 
   try {
-    const member = await apiClient.member.get(no);
+    const member = new Member(await apiClient.member.get(no));
     dispatch(fetchMemberSuccess(member));
+    dispatch(setCopies(member.account.copies));
   } catch (error) {
     dispatch(fetchMemberFail(error));
   }

@@ -1,10 +1,10 @@
-import copyTableStore from './copyTable';
+import copyStore from './copy';
 import memberStore from './member';
 import modalStore from './modal';
 import searchStore from './search';
 
 export {
-  copyTableStore,
+  copyStore,
   memberStore,
   modalStore,
   searchStore,
