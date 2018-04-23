@@ -3,11 +3,18 @@ import PropTypes from 'prop-types';
 import { Button, FormControl, Modal as RBModal } from 'react-bootstrap';
 
 import I18n from '../../../lib/i18n';
+import SearchContainer from '../../../containers/SearchContainer';
 
 const INPUT_TYPES = {
   NUMBER: 'number',
   TEXT: 'text',
   TEXTAREA: 'textarea',
+};
+
+const TYPES = {
+  INFO: 'info',
+  INPUT: 'input',
+  SEARCH: 'search',
 };
 
 export default class Modal extends Component {
@@ -26,10 +33,11 @@ export default class Modal extends Component {
       PropTypes.string,
     ]),
     onInput: PropTypes.func.isRequired,
+    onSelect: PropTypes.func,
     message: PropTypes.string.isRequired,
     onClick: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
-    type: PropTypes.string,
+    type: PropTypes.oneOf(Object.values(TYPES)),
   }
 
   static defaultProps = {
@@ -37,14 +45,16 @@ export default class Modal extends Component {
     cancelable: false,
     inputType: INPUT_TYPES.TEXT,
     inputValue: '',
-    type: 'info',
+    onSelect: () => {},
+    type: TYPES.INFO,
   }
 
+  static TYPES = TYPES
   static INPUT_TYPES = INPUT_TYPES
 
   renderBody = () => {
     switch (this.props.type) {
-      case 'input':
+      case TYPES.INPUT:
         return (
           <div>
             <p>{this.props.message}</p>
@@ -56,6 +66,16 @@ export default class Modal extends Component {
               value={this.props.inputValue}
             />
           </div>
+        );
+      case TYPES.SEARCH:
+        return (
+          <SearchContainer
+            {...this.props}
+            disableArchive
+            noHeader
+            onRowClick={this.props.onSelect}
+            type="parent"
+          />
         );
       default:
         return this.props.message;

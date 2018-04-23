@@ -1,50 +1,60 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Col, Label, Panel, Row } from 'react-bootstrap';
 
 import ActionPanel from '../../general/ActionPanel';
 import AlignedData from '../../general/AlignedData';
-import CopyTableContainer from '../../copy/table/CopyTableContainer';
-import I18n, { Translate } from '../../../lib/i18n/i18n';
+import CopyTable from './ItemCopyTable';
+import I18n from '../../../lib/i18n';
 import { INFORMATION_FIELDS, LABEL_STYLE, PANEL_STYLE } from './constant';
 import ProfileStats from '../../general/ProfileStats';
 import Reservation from '../../../lib/models/Reservation';
 import ReservationList from './ReservationList';
+import { Item } from '../../../lib/models';
+import Spinner from '../../general/Spinner';
 
 const border = {
   borderRight: '1px #e0e0e0 solid',
 };
 
 export default class ItemView extends Component {
-  constructor(props) {
-    super(props);
-    this.getReservations = this.getReservations.bind(this);
-    this.renderInformation = this.renderInformation.bind(this);
-    this.renderInternalManagement = this.renderInternalManagement.bind(this);
+  static propTypes = {
+    fetch: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool,
+    item: PropTypes.instanceOf(Item).isRequired,
+    // onReservationDeleted: PropTypes.func,
+  };
+
+  static defaultProps = {
+    isLoading: false,
   }
 
-  getReservations() {
-    const { copies, reservation } = this.props.data;
+  componentDidMount() {
+    this.props.fetch();
+  }
+
+
+  getReservations = () => {
+    const { copies, reservation } = this.props.item;
     const reservedCopies = copies.filter(copy => copy.isReserved);
     const copyReservations = reservedCopies.map(copy => new Reservation({ copy }));
 
     return reservation.concat(copyReservations);
   }
 
-  renderInformation() {
-    const type = this.props.data.isBook ? 'book' : 'item';
+  renderInformation = () => {
+    const type = this.props.item.isBook ? 'book' : 'item';
     return (
       <section>
-        <h4>
-          <Translate value="ItemView.information.title" />
-        </h4>
+        <h4>{I18n('ItemView.information.title')}</h4>
         {Object.keys(INFORMATION_FIELDS[type]).map((key) => {
-          const { data } = this.props;
-          const value = data[INFORMATION_FIELDS[type][key]] ? `${data[INFORMATION_FIELDS[type][key]]}` : '';
+          const { item } = this.props;
+          const value = item[INFORMATION_FIELDS[type][key]] ? `${item[INFORMATION_FIELDS[type][key]]}` : '';
 
           return (
             <AlignedData
               key={key}
-              label={<Translate value={`ItemView.information.${key}`} />}
+              label={I18n(`ItemView.information.${key}`)}
               value={value}
             />
           );
@@ -53,48 +63,62 @@ export default class ItemView extends Component {
     );
   }
 
-  renderInternalManagement() {
-    const status = this.props.data.getStatus().toLowerCase();
+  renderInternalManagement = () => {
+    const { item } = this.props;
+    const status = item.getStatus().toLowerCase();
     return (
       <section>
-        <h4>
-          <Translate value="ItemView.internalManagement.title" />
-        </h4>
+        <h4>{I18n('ItemView.internalManagement.title')}</h4>
         <AlignedData
-          label={<Translate value="ItemView.internalManagement.status" />}
+          label={I18n('ItemView.internalManagement.status')}
           value={
             <Label bsStyle={LABEL_STYLE[status]}>
-              <Translate value={`ItemView.internalManagement.${status}`} />
+              {I18n(`ItemView.internalManagement.${status}`)}
             </Label>
           }
         />
         <AlignedData
-          label={<Translate value="ItemView.internalManagement.category" />}
-          value={this.props.data.subject.category.name}
+          label={I18n('ItemView.internalManagement.category')}
+          value={item.subject.category.name}
         />
         <AlignedData
-          label={<Translate value="ItemView.internalManagement.subject" />}
-          value={this.props.data.subject.name}
+          label={I18n('ItemView.internalManagement.subject')}
+          value={item.subject.name}
         />
         <AlignedData
-          label={<Translate value="ItemView.internalManagement.storage" />}
-          value={this.props.data.storageString}
+          label={I18n('ItemView.internalManagement.storage')}
+          value={item.storageString}
         />
       </section>
     );
   }
 
-  render() {
-    const { actions, data, modal, onReservationDeleted } = this.props;
+  renderReservations = () => {
+    if (this.props.item.reservation.length) {
+      return (
+        <ReservationList
+          {...this.props}
+          api={{}}
+          onReservationDeleted={() => {}}
+          reservations={this.getReservations()}
+        />
+      );
+    }
 
-    return (
+    return null;
+  }
+
+  render() {
+    const { isLoading, item } = this.props;
+
+    return !isLoading && item.id ? (
       <Row>
         <Col md={10}>
           <Panel
-            header={I18n.t('ItemView.title')}
-            bsStyle={PANEL_STYLE[data.getStatus()]}
+            header={I18n('ItemView.title')}
+            bsStyle={PANEL_STYLE[item.getStatus()]}
           >
-            <h3>{data.name}</h3>
+            <h3>{item.name}</h3>
             <Row>
               <Col sm={12} md={6} style={border}>
                 {this.renderInformation()}
@@ -102,36 +126,18 @@ export default class ItemView extends Component {
                 {this.renderInternalManagement()}
               </Col>
               <Col sm={12} md={6}>
-                <h4>
-                  <Translate value="ItemView.stats.title" />
-                </h4>
-                <ProfileStats copies={data.copies} priceStats />
+                <h4>{I18n('ItemView.stats.title')}</h4>
+                <ProfileStats copies={item.copies} priceStats />
               </Col>
             </Row>
-            {data.reservation.length > 0 && (
-              <ReservationList
-                {...this.props}
-                api={this.props.api}
-                onReservationDeleted={onReservationDeleted}
-                reservations={this.getReservations()}
-              />
-            )}
-            <CopyTableContainer {...this.props} copies={data.copies} />
+            {this.renderReservations()}
+            <CopyTable />
           </Panel>
         </Col>
         <Col md={2}>
-          <ActionPanel actions={actions} />
+          <ActionPanel actions={[]} />
         </Col>
-        {modal}
       </Row>
-    );
+    ) : (<Spinner />);
   }
 }
-
-ItemView.propTypes = {
-  actions: React.PropTypes.array,
-  api: React.PropTypes.shape(),
-  data: React.PropTypes.shape(),
-  modal: React.PropTypes.shape(),
-  onReservationDeleted: React.PropTypes.func,
-};

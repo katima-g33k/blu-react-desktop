@@ -6,7 +6,7 @@ import DuplicateMembers from '../components/admin/DuplicateMembers';
 import EmployeesTable from '../components/admin/EmployeesTable';
 import ItemFormContainer from '../components/item/form/ItemFormContainer';
 import ItemList from '../components/admin/ItemList';
-import ItemViewContainer from '../components/item/view/ItemViewContainer';
+import ItemView from '../containers/ItemViewContainer';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
 import MemberViewContainer from '../containers/MemberViewContainer';
 import ReservationTableView from '../components/admin/ReservationTableView';
@@ -68,7 +68,7 @@ export default class Routes extends Component {
         <Route name="Item" path="/item">
           <IndexRedirect to="add" />
           <Route
-            component={props => (<ItemViewContainer {...props} api={api} />)}
+            component={props => (<ItemView {...props} api={api} />)}
             name="ItemView"
             path="view/:id"
           />

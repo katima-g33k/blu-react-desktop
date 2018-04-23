@@ -156,6 +156,7 @@ export const openPayModal = member => (dispatch) => {
   });
 };
 
+// TODO: Complete open delete modal
 export const openDeleteModal = no => (dispatch) => {
   dispatch({
     actions: [{
@@ -170,6 +171,7 @@ export const openDeleteModal = no => (dispatch) => {
   });
 };
 
+// TODO: Complete open reactivation modal
 export const openReactivateModal = member => (dispatch) => {
   dispatch({
     actions: [
@@ -190,6 +192,7 @@ export const openReactivateModal = member => (dispatch) => {
   });
 };
 
+// TODO: Complete open transfer modal
 export const openTransferModal = member => (dispatch) => {
   dispatch({
     actions: [{
