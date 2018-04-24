@@ -93,7 +93,7 @@ export default class MemberFormContainer extends Component {
   cancel = (event) => {
     event.preventDefault();
     const { no } = this.state;
-    browserHistory.push(no ? `/member/view/${no}` : '/search');
+    browserHistory.push(no ? `/member/view/${no}` : '/searchActions');
   }
 
   exists = async (no, data) => {

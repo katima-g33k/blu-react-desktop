@@ -25,7 +25,7 @@ export default class Search extends Component {
     isLoading: false,
   }
 
-  rowClass = () => 'search-result'
+  rowClass = () => 'searchActions-result'
 
   renderResults = () => (
     <Table

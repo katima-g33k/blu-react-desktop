@@ -6,9 +6,9 @@ import {
   INSERT_COMMENT_SUCCESS,
   OPEN_MEMBER,
   PAY_MEMBER_SUCCESS,
-  RENEW_MEMBER_SUCCESS,
   PRINT_END,
   PRINT_START,
+  RENEW_MEMBER_SUCCESS,
   UPDATE_COMMENT_SUCCESS,
 } from '../actions/actionTypes';
 import Member from '../lib/models/Member';
@@ -18,7 +18,7 @@ const initialState = {
   isLoading: false,
   member: new Member(),
   no: 0,
-  printing: false,
+  isPrinting: false,
 };
 
 export default function memberReducer(state = initialState, action = {}) {
@@ -84,13 +84,13 @@ export default function memberReducer(state = initialState, action = {}) {
     case PRINT_END:
       return {
         ...state,
-        printing: false,
+        isPrinting: false,
       };
     case PRINT_START:
       return {
         ...state,
         amount: action.amount,
-        printing: true,
+        isPrinting: true,
       };
     case RENEW_MEMBER_SUCCESS:
       return {

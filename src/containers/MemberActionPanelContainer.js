@@ -7,11 +7,12 @@ import {
   openTransferModal,
   openDeleteModal,
   openPayModal,
-  renewMember,
+  renew,
   startPrinting,
 } from '../actions/memberActions';
 
-const mapStateToProps = ({ memberStore: { member } }) => ({
+const mapStateToProps = ({ memberStore: { member }, appStore }) => ({
+  apiClient: appStore.apiClient,
   canDelete: !!member.account.copies.length,
   isActive: member.account.isActive,
   member,
@@ -25,7 +26,7 @@ const mapDispatchToProps = dispatch => ({
   pay: member => dispatch(openPayModal(member)),
   printReceipt: () => dispatch(startPrinting()),
   reactivate: member => dispatch(openReactivateModal(member)),
-  renew: no => dispatch(renewMember(no)),
+  renew: (apiClient, no) => dispatch(renew(apiClient, no)),
   transfer: member => dispatch(openTransferModal(member)),
 });
 
@@ -38,7 +39,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   modify: () => dispatchProps.modify(stateProps.member.no),
   pay: () => dispatchProps.pay(stateProps.member),
   reactivate: () => dispatchProps.reactivate(stateProps.member),
-  renew: () => dispatchProps.renew(stateProps.member.no),
+  renew: () => dispatchProps.renew(stateProps.apiClient, stateProps.member.no),
   transfer: () => dispatchProps.transfer(stateProps.member),
 });
 

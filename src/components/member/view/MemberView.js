@@ -24,14 +24,14 @@ export default class MemberView extends Component {
     fetch: PropTypes.func.isRequired,
     isLoading: PropTypes.bool,
     member: PropTypes.instanceOf(Member).isRequired,
-    printing: PropTypes.bool,
+    isPrinting: PropTypes.bool,
     onAfterPrint: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     amount: 0,
     isLoading: false,
-    printing: false,
+    isPrinting: false,
   }
 
   componentDidMount() {
@@ -133,7 +133,7 @@ export default class MemberView extends Component {
   )
 
   renderReceipt = () => {
-    if (this.props.printing) {
+    if (this.props.isPrinting) {
       return (
         <MemberReceipt
           amount={this.props.amount}

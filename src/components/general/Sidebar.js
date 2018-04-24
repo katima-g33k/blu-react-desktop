@@ -9,7 +9,7 @@ import SidebarButton from './SidebarButton';
 const menuItems = [
   {
     key: 'search',
-    href: '/search',
+    href: '/searchActions',
   },
   {
     key: 'item',

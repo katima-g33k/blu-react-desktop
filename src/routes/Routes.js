@@ -8,7 +8,7 @@ import ItemFormContainer from '../components/item/form/ItemFormContainer';
 import ItemList from '../components/admin/ItemList';
 import ItemView from '../containers/ItemViewContainer';
 import MemberFormContainer from '../components/member/form/MemberFormContainer';
-import MemberViewContainer from '../containers/MemberViewContainer';
+import MemberView from '../containers/MemberViewContainer';
 import ReservationTableView from '../components/admin/ReservationTableView';
 import SearchContainer from '../containers/SearchContainer';
 import SettingsView from '../components/general/SettingsView';
@@ -17,12 +17,12 @@ import StorageTableView from '../components/admin/StorageTableView';
 
 export default class Routes extends Component {
   static propTypes = {
-    api: PropTypes.shape(),
+    api: PropTypes.shape().isRequired,
   }
 
   componentDidMount() {
     if (/index\.html/.test(browserHistory.getCurrentLocation().pathname)) {
-      browserHistory.push('/search');
+      browserHistory.push('/searchActions');
     }
   }
 
@@ -45,7 +45,7 @@ export default class Routes extends Component {
         <Route name="Member" path="/member">
           <IndexRedirect to="add" />
           <Route
-            component={props => (<MemberViewContainer {...props} api={api} />)}
+            component={MemberView}
             name="MemberView"
             path="view/:no"
           />

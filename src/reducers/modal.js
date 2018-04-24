@@ -6,6 +6,7 @@ import {
   OPEN_MODAL,
   UPDATE_MODAL_INPUT,
 } from '../actions/actionTypes';
+import I18n from '../lib/i18n';
 
 const initialState = {
   actions: [],
@@ -35,8 +36,8 @@ export default function modalReducer(state = initialState, action = {}) {
         display: true,
         inputType: action.inputType,
         inputValue: action.inputValue,
-        message: action.message,
-        title: action.title,
+        message: action.message || I18n(action.messageKey, action.messageOptions),
+        title: action.title || I18n(action.titleKey, action.titleOptions),
         type: action.modalType || 'info',
       };
     case FETCH_MEMBER_FAIL:
@@ -45,8 +46,8 @@ export default function modalReducer(state = initialState, action = {}) {
       return {
         ...state,
         display: true,
-        message: action.message,
-        title: action.title,
+        message: action.message || I18n(action.messageKey, action.messageOptions),
+        title: action.title || I18n(action.titleKey, action.titleOptions),
         type: 'info',
       };
     case UPDATE_MODAL_INPUT:

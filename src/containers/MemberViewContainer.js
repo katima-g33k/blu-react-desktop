@@ -1,19 +1,26 @@
 import { connect } from 'react-redux';
 
-import { fetchMember, endPrinting } from '../actions/memberActions';
+import { fetch, endPrinting } from '../actions/memberActions';
 import MemberView from '../components/member/view/MemberView';
 
-const mapStateToProps = ({ memberStore }) => ({ ...memberStore });
+const mapStateToProps = ({ appStore, memberStore }) => ({
+  amount: memberStore.amount,
+  apiClient: appStore.apiClient,
+  isLoading: memberStore.isLoading,
+  isPrinting: memberStore.isPrinting,
+  member: memberStore.member,
+  no: memberStore.no,
+});
 
 const mapDispatchToProps = dispatch => ({
-  fetch: no => dispatch(fetchMember(no)),
+  fetch: (apiClient, no) => dispatch(fetch(apiClient, no)),
   onAfterPrint: () => dispatch(endPrinting()),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   ...stateProps,
   ...dispatchProps,
-  fetch: () => dispatchProps.fetch(stateProps.no || ownProps.params.no),
+  fetch: () => dispatchProps.fetch(stateProps.apiClient, stateProps.no || ownProps.params.no),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(MemberView);
