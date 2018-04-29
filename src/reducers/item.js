@@ -1,7 +1,9 @@
+import createReducer from './reducerFactory';
 import {
   FETCH_ITEM_FAIL,
   FETCH_ITEM_PENDING,
   FETCH_ITEM_SUCCESS,
+  UPDATE_STATUS_SUCCESS,
 } from '../actions/actionTypes';
 import { Item } from '../lib/models';
 
@@ -11,26 +13,30 @@ const initialState = {
   item: new Item(),
 };
 
-export default function itemReducer(state = initialState, action = {}) {
-  switch (action.type) {
-    case FETCH_ITEM_FAIL:
-      return {
-        ...state,
-        isLoading: false,
-      };
-    case FETCH_ITEM_PENDING:
-      return {
-        ...state,
-        isLoading: true,
-        item: new Item(),
-      };
-    case FETCH_ITEM_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        item: new Item(action.item),
-      };
-    default:
-      return state;
-  }
-}
+const handlers = {
+  [FETCH_ITEM_FAIL]: state => ({
+    ...state,
+    isLoading: false,
+  }),
+  [FETCH_ITEM_PENDING]: state => ({
+    ...state,
+    isLoading: true,
+    item: new Item(),
+  }),
+  [FETCH_ITEM_SUCCESS]: (state, action) => ({
+    ...state,
+    isLoading: false,
+    item: new Item(action.item),
+  }),
+  [UPDATE_STATUS_SUCCESS]: (state, action) => {
+    const item = new Item(state.item);
+    item.updateStatus(action.status);
+
+    return {
+      ...state,
+      item,
+    };
+  },
+};
+
+export default createReducer(initialState, handlers);

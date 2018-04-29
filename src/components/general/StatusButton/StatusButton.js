@@ -3,29 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, Glyphicon } from 'react-bootstrap';
 
 import './statusButton.css';
-import I18n from '../../lib/i18n';
-
-const styles = {
-  left: {
-    borderRight: 0,
-    borderTopRightRadius: 0,
-    borderBottomRightRadius: 0,
-    width: '20%',
-  },
-  center: {
-    borderLeft: 0,
-    borderRight: 0,
-    cursor: 'default',
-    borderRadius: 0,
-    width: '60%',
-  },
-  right: {
-    borderLeft: 0,
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    width: '20%',
-  },
-};
+import I18n from '../../../lib/i18n';
 
 const bsStyles = {
   OUTDATED: 'warning',
@@ -56,14 +34,12 @@ export default class StatusButton extends Component {
           id="left"
           disabled={this.props.disableLeft}
           onClick={this.props.onClickLeft}
-          // style={styles.left}
         >
           <Glyphicon glyph="minus" />
         </Button>
         <Button
-          bsStyle={bsStyles[this.props.status]}
           id="center"
-          // style={styles.center}
+          bsStyle={bsStyles[this.props.status]}
         >
           {I18n(`Item.status.${this.props.status}`)}
         </Button>
@@ -71,7 +47,6 @@ export default class StatusButton extends Component {
           id="right"
           disabled={this.props.disableRight}
           onClick={this.props.onClickRight}
-          // style={styles.right}
         >
           <Glyphicon glyph="plus" />
         </Button>

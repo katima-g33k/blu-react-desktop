@@ -1,6 +1,7 @@
-// eslint import/prefer-default-export: 0
 import fetch from './fetch';
+import updateStatus from './updateStatus';
 
 export {
   fetch,
+  updateStatus,
 };
