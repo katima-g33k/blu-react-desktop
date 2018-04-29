@@ -20,7 +20,7 @@ export default class MemberActionPanel extends Component {
   }
 
   generalActions = [{
-    label: I18n('MemberView.actions.modifier'),
+    label: I18n('MemberView.actions.modify'),
     onClick: this.props.modify,
   }];
 

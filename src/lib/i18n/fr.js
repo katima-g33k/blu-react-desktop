@@ -35,6 +35,12 @@ const fr = {
     title: 'Formulaire de l\'ouvrage',
   },
   ItemView: {
+    actions: {
+      delete: 'Supprimer',
+      modify: 'Modifier',
+      reserve: 'Réserver',
+      storage: 'Gérer les caisses',
+    },
     title: 'Ouvrage',
     information: {
       title: 'Informations',

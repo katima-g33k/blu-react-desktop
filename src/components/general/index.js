@@ -2,7 +2,7 @@ import ActionPanel from './ActionPanel';
 import AlignedData from './AlignedData';
 import Button from './Button';
 import Checkbox from './Checkbox';
-import CustomButton from './CustomButton';
+import CustomButton from './StatusButton';
 import DatePicker from './DatePicker';
 import Input from './Input';
 import ProfileStats from './ProfileStats';

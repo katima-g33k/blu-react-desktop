@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Label, Panel, Row } from 'react-bootstrap';
 
-import ActionPanel from '../../general/ActionPanel';
+import ActionPanel from '../../../containers/ItemActionPanelContainer';
 import AlignedData from '../../general/AlignedData';
 import CopyTable from './ItemCopyTable';
 import I18n from '../../../lib/i18n';
@@ -135,7 +135,7 @@ export default class ItemView extends Component {
           </Panel>
         </Col>
         <Col md={2}>
-          <ActionPanel actions={[]} />
+          <ActionPanel />
         </Col>
       </Row>
     ) : (<Spinner />);
