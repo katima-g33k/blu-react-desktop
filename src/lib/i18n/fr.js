@@ -2,6 +2,8 @@
 const fr = {
   actions: {
     add: 'Ajouter',
+    delete: 'Supprimer',
+    ok: 'OK',
     save: 'Enregistrer',
   },
   general: {
@@ -72,6 +74,14 @@ const fr = {
       storage: 'Caisses de rangement',
     },
     modal: {
+      deleteConfirmation: {
+        message: 'Voulez-vous vraiment supprimer cet ouvrage? Cette action est IRRÉVERSIBLE',
+        title: 'Suppression d\'un ouvrage',
+      },
+      deleted: {
+        message: 'L\'ouvrage a été supprimé',
+        title: 'Ouvrage supprimé',
+      },
       updateStorage: {
         title: 'Modifier les caisses de rangements',
         message: 'Veuillez entrer les caisses de rangements, séparé par ;',

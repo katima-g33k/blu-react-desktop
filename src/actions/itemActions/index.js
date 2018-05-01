@@ -1,9 +1,13 @@
 import fetch from './fetch';
-import updateStorage from './updateStorage';
+import remove from './remove';
+import reserve from './reserve';
 import updateStatus from './updateStatus';
+import updateStorage from './updateStorage';
 
 export {
   fetch,
-  updateStorage,
+  remove,
+  reserve,
   updateStatus,
+  updateStorage,
 };

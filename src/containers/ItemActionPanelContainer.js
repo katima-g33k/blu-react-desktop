@@ -3,6 +3,8 @@ import { browserHistory } from 'react-router';
 
 import ItemActionPanel from '../components/item/view/ItemActionPanel';
 import {
+  remove,
+  reserve,
   updateStorage,
 } from '../actions/itemActions';
 
@@ -15,8 +17,8 @@ const mapStateToProps = ({ itemStore: { item }, appStore }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  handleDelete: (apiClient, id) => {},
-  handleReserve: (apiClient, id) => {},
+  handleDelete: (apiClient, id) => dispatch(remove(apiClient, id)),
+  handleReserve: (apiClient, id) => dispatch(reserve(apiClient, id)),
   handleUpdateStorage: (apiClient, id, storage) => dispatch(updateStorage(apiClient, id, storage)),
 });
 
