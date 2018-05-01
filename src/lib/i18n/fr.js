@@ -2,6 +2,16 @@
 const fr = {
   actions: {
     add: 'Ajouter',
+    save: 'Enregistrer',
+  },
+  general: {
+    item: {
+      status: {
+        OUTDATED: 'Désuet',
+        REMOVED: 'Retiré',
+        VALID: 'Valide',
+      },
+    },
   },
   Admin: {
     statistics: {
@@ -60,6 +70,12 @@ const fr = {
       category: 'Catégorie',
       subject: 'Matière',
       storage: 'Caisses de rangement',
+    },
+    modal: {
+      updateStorage: {
+        title: 'Modifier les caisses de rangements',
+        message: 'Veuillez entrer les caisses de rangements, séparé par ;',
+      },
     },
     stats: {
       title: 'Statistiques',

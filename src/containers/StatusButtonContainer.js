@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import { Item } from '../lib/models';
-import ItemActionPanel from '../components/general/StatusButton';
+import StatusButton from '../components/general/StatusButton';
 import { updateStatus } from '../actions/itemActions';
 
 const mapStateToProps = ({ itemStore: { item }, appStore }) => ({
@@ -31,4 +31,4 @@ const mergeProps = (stateProps, dispatchProps) => ({
   status: stateProps.status,
 });
 
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(ItemActionPanel);
+export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(StatusButton);

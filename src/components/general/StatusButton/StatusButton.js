@@ -41,7 +41,7 @@ export default class StatusButton extends Component {
           id="center"
           bsStyle={bsStyles[this.props.status]}
         >
-          {I18n(`Item.status.${this.props.status}`)}
+          {I18n(`general.item.status.${this.props.status}`)}
         </Button>
         <Button
           id="right"

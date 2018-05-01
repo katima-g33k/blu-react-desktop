@@ -4,6 +4,7 @@ import {
   FETCH_ITEM_PENDING,
   FETCH_ITEM_SUCCESS,
   UPDATE_STATUS_SUCCESS,
+  UPDATE_STORAGE_SUCCESS,
 } from '../actions/actionTypes';
 import { Item } from '../lib/models';
 
@@ -23,20 +24,27 @@ const handlers = {
     isLoading: true,
     item: new Item(),
   }),
-  [FETCH_ITEM_SUCCESS]: (state, action) => ({
+  [FETCH_ITEM_SUCCESS]: (state, { item }) => ({
     ...state,
     isLoading: false,
-    item: new Item(action.item),
+    item,
   }),
-  [UPDATE_STATUS_SUCCESS]: (state, action) => {
-    const item = new Item(state.item);
-    item.updateStatus(action.status);
+  [UPDATE_STATUS_SUCCESS]: (state, { status }) => {
+    const item = state.item.clone();
+    item.updateStatus(status);
 
     return {
       ...state,
       item,
     };
   },
+  [UPDATE_STORAGE_SUCCESS]: (state, action) => ({
+    ...state,
+    item: new Item({
+      ...state.item,
+      storage: action.storage,
+    }),
+  }),
 };
 
 export default createReducer(initialState, handlers);

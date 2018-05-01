@@ -86,6 +86,8 @@ export default class Item {
     return this.storage.length ? this.storage.join('; ') : '';
   }
 
+  clone = () => new Item(this);
+
   static get STATUS() {
     return {
       VALID: 'VALID',
