@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
-import { openResult } from '../actions/searchActions';
+import { openResult, resetSearch } from '../actions/searchActions';
 import SearchResults from '../components/search/SearchResults';
 
 const mapStateToProps = ({ searchStore }) => ({
@@ -13,7 +13,8 @@ const mapStateToProps = ({ searchStore }) => ({
 
 const mapDispatchToProps = dispatch => ({
   onAddButton: ({ type }) => browserHistory.push(`${type}/add`),
-  onRowClick: (type, id) => dispatch(openResult(type, id)),
+  onRowClick: (data, type) => dispatch(openResult(type, data.id || data.no)),
+  resetSearch: () => dispatch(resetSearch()),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
@@ -27,7 +28,10 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
 
     return dispatchProps.onAddButton(stateProps);
   },
-  onRowClick: data => dispatchProps.onRowClick(stateProps.type, data.id || data.no),
+  onRowClick: (data) => {
+    dispatchProps.resetSearch();
+    (ownProps.onRowClick || dispatchProps.onRowClick)(data, stateProps.type);
+  },
 });
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(SearchResults);

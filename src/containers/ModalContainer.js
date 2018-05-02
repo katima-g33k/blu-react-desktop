@@ -9,7 +9,6 @@ const mapStateToProps = ({ modalStore }) => ({
 
 const mapDispatchToProps = dispatch => ({
   closeModal: () => dispatch(closeModal()),
-  onClick: () => dispatch(closeModal()),
   onInput: value => dispatch(updateInputValue(value)),
 });
 

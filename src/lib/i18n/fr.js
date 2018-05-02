@@ -82,6 +82,10 @@ const fr = {
         message: 'L\'ouvrage a été supprimé',
         title: 'Ouvrage supprimé',
       },
+      reserveWarning: {
+        message: 'Attention! Il y a des exemplaires en stock Voulez-vous vraiment réserver l\'ouvrage ?',
+        title: 'Réservation d\'un ouvrage',
+      },
       updateStorage: {
         title: 'Modifier les caisses de rangements',
         message: 'Veuillez entrer les caisses de rangements, séparé par ;',

@@ -1,5 +1,6 @@
 import {
   CANCEL_SEARCH,
+  RESET_SEARCH,
   SEARCH_FAIL,
   SEARCH_PENDING,
   SEARCH_SUCCESS,
@@ -28,6 +29,8 @@ export default function searchReducer(state = initialState, action = {}) {
         isCancelled: true,
         isLoading: false,
       };
+    case RESET_SEARCH:
+      return initialState;
     case SEARCH_FAIL:
       return {
         ...state,

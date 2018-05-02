@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Button, FormControl, Modal as RBModal } from 'react-bootstrap';
 
+import './modal.css';
 import I18n from '../../../lib/i18n';
-import SearchContainer from '../../../containers/SearchContainer';
+import Search from '../../../containers/SearchContainer';
+
+const { Title, Header, Body, Footer } = RBModal;
 
 const INPUT_TYPES = {
   NUMBER: 'number',
@@ -34,8 +37,8 @@ export default class Modal extends Component {
     ]),
     onInput: PropTypes.func.isRequired,
     onSelect: PropTypes.func,
-    message: PropTypes.string.isRequired,
-    onClick: PropTypes.func.isRequired,
+    message: PropTypes.string,
+    onClick: PropTypes.func,
     title: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.values(TYPES)),
   }
@@ -45,6 +48,8 @@ export default class Modal extends Component {
     cancelable: false,
     inputType: INPUT_TYPES.TEXT,
     inputValue: '',
+    message: '',
+    onClick: undefined,
     onSelect: () => {},
     type: TYPES.INFO,
   }
@@ -52,35 +57,34 @@ export default class Modal extends Component {
   static TYPES = TYPES
   static INPUT_TYPES = INPUT_TYPES
 
-  renderBody = () => {
-    switch (this.props.type) {
-      case TYPES.INPUT:
-        return (
-          <div>
-            <p>{this.props.message}</p>
-            <FormControl
-              componentClass={this.props.inputType === INPUT_TYPES.TEXTAREA ? 'textarea' : 'input'}
-              id="inputModalField"
-              onChange={this.props.onInput}
-              type={this.props.inputType}
-              value={this.props.inputValue}
-            />
-          </div>
-        );
-      case TYPES.SEARCH:
-        return (
-          <SearchContainer
-            {...this.props}
-            disableArchive
-            noHeader
-            onRowClick={this.props.onSelect}
-            type="parent"
-          />
-        );
-      default:
-        return this.props.message;
-    }
+  getId = () => `${this.props.type}Modal`
+
+  body = {
+    [TYPES.INPUT]: (
+      <div>
+        <p>{this.props.message}</p>
+        <FormControl
+          componentClass={this.props.inputType === INPUT_TYPES.TEXTAREA ? 'textarea' : 'input'}
+          id="inputModalField"
+          onChange={this.props.onInput}
+          type={this.props.inputType}
+          value={this.props.inputValue}
+        />
+      </div>
+    ),
+    [TYPES.SEARCH]: (
+      <Search
+        disableAddButton
+        disableArchive
+        disableTypeSelection
+        noHeader
+        onRowClick={this.props.onSelect}
+        type={Search.TYPES.PARENT}
+      />
+    ),
   }
+
+  renderBody = () => this.body[this.props.type] || this.props.message
 
   renderButton = action => (
     <Button
@@ -112,27 +116,31 @@ export default class Modal extends Component {
       return this.props.actions.map(this.renderButton);
     }
 
-    return this.renderButton({
-      label: I18n('modal.ok'),
-      onClick: this.props.onClick,
-    });
+    if (this.props.onClick) {
+      return this.renderButton({
+        label: I18n('modal.ok'),
+        onClick: this.props.onClick,
+      });
+    }
+
+    return null;
   }
 
   render() {
     return (
-      <RBModal show={this.props.display}>
-        <RBModal.Header>
-          <RBModal.Title>
+      <RBModal id={this.getId()} show={this.props.display}>
+        <Header>
+          <Title>
             {this.props.title}
-          </RBModal.Title>
-        </RBModal.Header>
-        <RBModal.Body>
+          </Title>
+        </Header>
+        <Body>
           {this.renderBody()}
-        </RBModal.Body>
-        <RBModal.Footer>
+        </Body>
+        <Footer>
           {this.renderCancelButton()}
           {this.renderButtons()}
-        </RBModal.Footer>
+        </Footer>
       </RBModal>
     );
   }

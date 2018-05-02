@@ -13,19 +13,37 @@ import Table from '../general/Table.js';
 export default class Search extends Component {
   static propTypes = {
     data: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    disableAddButton: PropTypes.bool,
     highlight: PropTypes.string,
     isLoading: PropTypes.bool,
-    onAddButton: PropTypes.func.isRequired,
+    onAddButton: PropTypes.func,
     onRowClick: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
+    disableAddButton: false,
     highlight: '',
     isLoading: false,
+    onAddButton() {},
   }
 
   rowClass = () => 'searchActions-result'
+
+  renderAddButton = () => {
+    if (this.props.disableAddButton) {
+      return null;
+    }
+
+    return (
+      <Button
+        bsStyle="success"
+        onClick={this.props.onAddButton}
+      >
+        <Glyphicon glyph="plus" /> {I18n('Search.results.addButton')}
+      </Button>
+    );
+  }
 
   renderResults = () => (
     <Table
@@ -43,12 +61,7 @@ export default class Search extends Component {
     return (
       <div>
         <h3>{I18n('Search.results.title', { num: this.props.data.length })}</h3>
-        <Button
-          bsStyle="success"
-          onClick={this.props.onAddButton}
-        >
-          <Glyphicon glyph="plus" /> {I18n('Search.results.addButton')}
-        </Button>
+        {this.renderAddButton()}
         {this.props.isLoading ? (<Spinner />) : this.renderResults()}
       </div>
     );

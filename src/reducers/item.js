@@ -1,5 +1,6 @@
 import createReducer from './reducerFactory';
 import {
+  DELETE_ITEM_SUCCESS,
   FETCH_ITEM_FAIL,
   FETCH_ITEM_PENDING,
   FETCH_ITEM_SUCCESS,
@@ -15,6 +16,10 @@ const initialState = {
 };
 
 const handlers = {
+  [DELETE_ITEM_SUCCESS]: state => ({
+    ...state,
+    item: new Item(),
+  }),
   [FETCH_ITEM_FAIL]: state => ({
     ...state,
     isLoading: false,

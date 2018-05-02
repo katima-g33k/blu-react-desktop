@@ -11,13 +11,21 @@ import {
   Row,
 } from 'react-bootstrap';
 
+import './search.css';
 import I18n from '../../lib/i18n';
 import SearchResults from '../../containers/SearchResultsContainer';
+
+const TYPES = {
+  ITEM: 'item',
+  MEMBER: 'member',
+  PARENT: 'parent',
+};
 
 export default class Search extends Component {
   static propTypes = {
     archives: PropTypes.bool.isRequired,
     cancelSearch: PropTypes.func.isRequired,
+    disableAddButton: PropTypes.bool,
     disableArchive: PropTypes.bool,
     disableTypeSelection: PropTypes.bool,
     handleArchive: PropTypes.func.isRequired,
@@ -26,18 +34,23 @@ export default class Search extends Component {
     handleType: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,
     noHeader: PropTypes.bool,
-    type: PropTypes.string.isRequired,
+    onRowClick: PropTypes.func,
+    type: PropTypes.oneOf(Object.values(TYPES)).isRequired,
     value: PropTypes.string.isRequired,
   }
 
   static defaultProps = {
-    disableArchives: false,
+    disableAddButton: false,
+    disableArchive: false,
     disableTypeSelection: false,
     noHeader: false,
+    onRowClick: undefined,
   }
 
+  static TYPES = TYPES
+
   renderSearchForm = () => (
-    <form>
+    <form id="searchForm">
       <FormControl
         type="search"
         onChange={this.props.handleInput}
@@ -47,8 +60,8 @@ export default class Search extends Component {
       {this.renderArchiveCheckbox()}
       <Button
         bsStyle={this.props.isLoading ? 'danger' : 'primary'}
-        type="submit"
         onClick={!this.props.isLoading ? this.props.handleSearch : this.props.cancelSearch}
+        type="submit"
       >
         {I18n(this.props.isLoading ? 'Search.cancel' : 'Search.title')}
       </Button>
@@ -64,18 +77,18 @@ export default class Search extends Component {
       <FormGroup>
         <Radio
           name="type"
-          value="member"
+          value={TYPES.MEMBER}
           inline
-          checked={this.props.type === 'member'}
+          checked={this.props.type === TYPES.MEMBER}
           onChange={this.props.handleType}
         >
           {I18n('Search.filters.member')}
         </Radio>
         <Radio
           name="type"
-          value="item"
+          value={TYPES.ITEM}
           inline
-          checked={this.props.type === 'item'}
+          checked={this.props.type === TYPES.ITEM}
           onChange={this.props.handleType}
         >
           {I18n('Search.filters.item')}
@@ -101,7 +114,10 @@ export default class Search extends Component {
 
   render() {
     return (
-      <Panel header={this.props.noHeader ? null : I18n('Search.title')}>
+      <Panel
+        id={this.constructor.name}
+        header={this.props.noHeader ? null : I18n('Search.title')}
+      >
         <Row>
           <Col sm={10} md={10}>
             {this.renderSearchForm()}
@@ -109,7 +125,10 @@ export default class Search extends Component {
         </Row>
         <Row>
           <Col sm={12} md={10}>
-            <SearchResults />
+            <SearchResults
+              disableAddButton={this.props.disableAddButton}
+              onRowClick={this.props.onRowClick}
+            />
           </Col>
         </Row>
       </Panel>

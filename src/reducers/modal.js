@@ -22,22 +22,13 @@ const initialState = {
 export default function modalReducer(state = initialState, action = {}) {
   switch (action.type) {
     case CLOSE_MODAL:
-      return {
-        ...state,
-        display: false,
-        message: '',
-        title: '',
-      };
+      return initialState;
     case OPEN_MODAL:
       return {
-        ...state,
-        actions: action.actions,
-        cancelable: action.cancelable,
+        ...action,
         display: true,
-        inputType: action.inputType,
-        inputValue: action.inputValue,
-        message: action.message || I18n(action.messageKey, action.messageOptions),
-        title: action.title || I18n(action.titleKey, action.titleOptions),
+        message: action.messageKey ? I18n(action.messageKey, action.messageOptions) : action.message,
+        title: action.titleKey ? I18n(action.titleKey, action.titleOptions) : action.title,
         type: action.modalType || 'info',
       };
     case FETCH_MEMBER_FAIL:
@@ -56,6 +47,6 @@ export default function modalReducer(state = initialState, action = {}) {
         inputValue: action.inputValue,
       };
     default:
-      return initialState;
+      return state;
   }
 }

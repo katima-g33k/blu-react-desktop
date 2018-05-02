@@ -34,9 +34,12 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   },
   handleSearch: (event) => {
     event.preventDefault();
-    dispatchProps.handleSearch(stateProps.value, stateProps.type, stateProps.archives);
+    dispatchProps.handleSearch(stateProps.value, ownProps.type || stateProps.type, stateProps.archives);
   },
 });
 
 
-export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(Search);
+const container = connect(mapStateToProps, mapDispatchToProps, mergeProps)(Search);
+container.TYPES = Search.TYPES;
+
+export default container;

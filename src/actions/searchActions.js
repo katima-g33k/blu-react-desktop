@@ -4,6 +4,7 @@ import {
   CANCEL_SEARCH,
   OPEN_ITEM,
   OPEN_MEMBER,
+  RESET_SEARCH,
   SEARCH_FAIL,
   SEARCH_PENDING,
   SEARCH_SUCCESS,
@@ -18,6 +19,10 @@ import Member from '../lib/models/Member';
 const apiUrl = localStorage.getItem('apiUrl');
 const apiKey = localStorage.getItem('apiKey');
 const apiClient = new API(apiUrl, apiKey);
+
+export const resetSearch = () => ({
+  type: RESET_SEARCH,
+});
 
 export const cancelSearch = () => ({
   type: CANCEL_SEARCH,
