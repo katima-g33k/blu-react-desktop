@@ -50,7 +50,7 @@ export default class Modal extends Component {
     inputValue: '',
     message: '',
     onClick: undefined,
-    onSelect: () => {},
+    onSelect: () => console.log('test 5'),
     type: TYPES.INFO,
   }
 

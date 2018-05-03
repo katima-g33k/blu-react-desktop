@@ -34,7 +34,6 @@ export default class Search extends Component {
     handleType: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,
     noHeader: PropTypes.bool,
-    onRowClick: PropTypes.func,
     type: PropTypes.oneOf(Object.values(TYPES)).isRequired,
     value: PropTypes.string.isRequired,
   }
@@ -44,7 +43,6 @@ export default class Search extends Component {
     disableArchive: false,
     disableTypeSelection: false,
     noHeader: false,
-    onRowClick: undefined,
   }
 
   static TYPES = TYPES
@@ -125,10 +123,7 @@ export default class Search extends Component {
         </Row>
         <Row>
           <Col sm={12} md={10}>
-            <SearchResults
-              disableAddButton={this.props.disableAddButton}
-              onRowClick={this.props.onRowClick}
-            />
+            <SearchResults disableAddButton={this.props.disableAddButton} />
           </Col>
         </Row>
       </Panel>

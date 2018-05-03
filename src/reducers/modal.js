@@ -25,6 +25,7 @@ export default function modalReducer(state = initialState, action = {}) {
       return initialState;
     case OPEN_MODAL:
       return {
+        ...initialState,
         ...action,
         display: true,
         message: action.messageKey ? I18n(action.messageKey, action.messageOptions) : action.message,
@@ -35,7 +36,7 @@ export default function modalReducer(state = initialState, action = {}) {
     case RENEW_MEMBER_FAIL:
     case SEARCH_FAIL:
       return {
-        ...state,
+        ...initialState,
         display: true,
         message: action.message || I18n(action.messageKey, action.messageOptions),
         title: action.title || I18n(action.titleKey, action.titleOptions),

@@ -4,6 +4,7 @@ import {
   SEARCH_FAIL,
   SEARCH_PENDING,
   SEARCH_SUCCESS,
+  SET_RESULT_ON_CLICK,
   UPDATE_ARCHIVES,
   UPDATE_SEARCH_VALUE,
   UPDATE_TYPE,
@@ -49,6 +50,11 @@ export default function searchReducer(state = initialState, action = {}) {
         isCancelled: false,
         isLoading: false,
         data: state.isCancelled ? [] : action.data.map(row => new Instance(row)),
+      };
+    case SET_RESULT_ON_CLICK:
+      return {
+        ...state,
+        onRowClick: action.onRowClick,
       };
     case UPDATE_ARCHIVES:
       return {

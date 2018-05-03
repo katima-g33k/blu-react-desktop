@@ -4,6 +4,7 @@ import {
   FETCH_ITEM_FAIL,
   FETCH_ITEM_PENDING,
   FETCH_ITEM_SUCCESS,
+  RESERVE_ITEM_SUCCESS,
   UPDATE_STATUS_SUCCESS,
   UPDATE_STORAGE_SUCCESS,
 } from '../actions/actionTypes';
@@ -16,10 +17,7 @@ const initialState = {
 };
 
 const handlers = {
-  [DELETE_ITEM_SUCCESS]: state => ({
-    ...state,
-    item: new Item(),
-  }),
+  [DELETE_ITEM_SUCCESS]: () => initialState,
   [FETCH_ITEM_FAIL]: state => ({
     ...state,
     isLoading: false,
@@ -34,6 +32,15 @@ const handlers = {
     isLoading: false,
     item,
   }),
+  [RESERVE_ITEM_SUCCESS]: (state, { reservation }) => {
+    const item = state.item.clone();
+    item.reservation.push(reservation);
+
+    return {
+      ...state,
+      item,
+    };
+  },
   [UPDATE_STATUS_SUCCESS]: (state, { status }) => {
     const item = state.item.clone();
     item.updateStatus(status);

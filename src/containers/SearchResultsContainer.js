@@ -8,6 +8,7 @@ const mapStateToProps = ({ searchStore }) => ({
   data: searchStore.data,
   highlight: searchStore.value,
   isLoading: searchStore.isLoading,
+  onRowClick: searchStore.onRowClick,
   type: searchStore.type,
 });
 
@@ -29,8 +30,8 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
     return dispatchProps.onAddButton(stateProps);
   },
   onRowClick: (data) => {
+    (stateProps.onRowClick || dispatchProps.onRowClick)(data, stateProps.type);
     dispatchProps.resetSearch();
-    (ownProps.onRowClick || dispatchProps.onRowClick)(data, stateProps.type);
   },
 });
 

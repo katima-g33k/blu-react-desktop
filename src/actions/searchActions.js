@@ -8,6 +8,7 @@ import {
   SEARCH_FAIL,
   SEARCH_PENDING,
   SEARCH_SUCCESS,
+  SET_RESULT_ON_CLICK,
   UPDATE_SEARCH_VALUE,
   UPDATE_TYPE,
   UPDATE_ARCHIVES,
@@ -19,6 +20,11 @@ import Member from '../lib/models/Member';
 const apiUrl = localStorage.getItem('apiUrl');
 const apiKey = localStorage.getItem('apiKey');
 const apiClient = new API(apiUrl, apiKey);
+
+export const setSearchResultOnClick = onRowClick => ({
+  onRowClick,
+  type: SET_RESULT_ON_CLICK,
+});
 
 export const resetSearch = () => ({
   type: RESET_SEARCH,
