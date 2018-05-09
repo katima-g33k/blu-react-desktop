@@ -8,9 +8,8 @@ import CopyTable from './ItemCopyTable';
 import I18n from '../../../lib/i18n';
 import { INFORMATION_FIELDS, LABEL_STYLE, PANEL_STYLE } from './constant';
 import ProfileStats from '../../general/ProfileStats';
-import Reservation from '../../../lib/models/Reservation';
-import ReservationList from './ReservationList';
-import { Item } from '../../../lib/models';
+import ReservationList from '../../../containers/ReservationListContainer';
+import { Item, Reservation } from '../../../lib/models';
 import Spinner from '../../general/Spinner';
 
 const border = {
@@ -22,7 +21,6 @@ export default class ItemView extends Component {
     fetch: PropTypes.func.isRequired,
     isLoading: PropTypes.bool,
     item: PropTypes.instanceOf(Item).isRequired,
-    // onReservationDeleted: PropTypes.func,
   };
 
   static defaultProps = {
@@ -39,7 +37,10 @@ export default class ItemView extends Component {
     const reservedCopies = copies.filter(copy => copy.isReserved);
     const copyReservations = reservedCopies.map(copy => new Reservation({ copy }));
 
-    return reservation.concat(copyReservations);
+    return [
+      ...reservation,
+      ...copyReservations,
+    ];
   }
 
   renderInformation = () => {
@@ -96,12 +97,7 @@ export default class ItemView extends Component {
   renderReservations = () => {
     if (this.props.item.reservation.length) {
       return (
-        <ReservationList
-          {...this.props}
-          api={{}}
-          onReservationDeleted={() => {}}
-          reservations={this.getReservations()}
-        />
+        <ReservationList reservations={this.getReservations()} />
       );
     }
 

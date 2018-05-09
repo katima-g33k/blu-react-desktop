@@ -2,6 +2,7 @@ import {
   CANCEL_COPY_RESERVATION_SUCCESS,
   CANCEL_SELL_SUCCESS,
   DELETE_COPY_SUCCESS,
+  DELETE_RESERVATION_SUCCESS,
   RESERVE_COPY_SUCCESS,
   SELL_COPY_SUCCESS,
   SET_COPIES,
@@ -72,6 +73,19 @@ export default function copyTableReducer(state = initialState, action = {}) {
         copies: filterCopiesList(state.copies, action.copy),
         filteredCopies: filterCopiesList(state.filteredCopies, action.copy),
       };
+    case DELETE_RESERVATION_SUCCESS:
+      if (action.reservation.copy) {
+        const copy = action.reservation.copy.clone();
+        copy.cancelReservation();
+
+        return {
+          ...state,
+          copies: updateCopiesList(state.copies, copy),
+          filteredCopies: updateCopiesList(state.filteredCopies, copy),
+        };
+      }
+
+      return state;
     case SET_COPIES:
       return {
         ...state,

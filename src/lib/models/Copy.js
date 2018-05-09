@@ -133,6 +133,10 @@ export default class Copy {
     }));
   }
 
+  clone() {
+    return new Copy(this);
+  }
+
   static get STATUS() {
     return {
       ADDED: 'ADDED',

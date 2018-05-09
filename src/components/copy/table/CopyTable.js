@@ -45,7 +45,7 @@ export default class CopyTable extends Component {
         label: I18n('TableColumns.memberCopy.added'),
         dataSort: true,
         width: '120px',
-        dataFormat: date => formatShortDate(date),
+        dataFormat: formatShortDate,
         sortFunc: (a, b, order) => sortDate(a.dateAdded, b.dateAdded, order),
       },
       {
@@ -53,7 +53,7 @@ export default class CopyTable extends Component {
         label: I18n('TableColumns.memberCopy.sold'),
         dataSort: true,
         width: '120px',
-        dataFormat: date => formatShortDate(date),
+        dataFormat: formatShortDate,
         sortFunc: (a, b, order) => sortDate(a.dateSold, b.dateSold, order),
       },
       {
@@ -61,7 +61,7 @@ export default class CopyTable extends Component {
         label: I18n('TableColumns.memberCopy.paid'),
         dataSort: true,
         width: '120px',
-        dataFormat: date => formatShortDate(date),
+        dataFormat: formatShortDate,
         sortFunc: (a, b, order) => sortDate(a.datePaid, b.datePaid, order),
       },
       {

@@ -1,6 +1,7 @@
 import createReducer from './reducerFactory';
 import {
   DELETE_ITEM_SUCCESS,
+  DELETE_RESERVATION_SUCCESS,
   FETCH_ITEM_FAIL,
   FETCH_ITEM_PENDING,
   FETCH_ITEM_SUCCESS,
@@ -18,6 +19,20 @@ const initialState = {
 
 const handlers = {
   [DELETE_ITEM_SUCCESS]: () => initialState,
+  [DELETE_RESERVATION_SUCCESS]: (state, action) => {
+    const item = state.item.clone();
+
+    if (action.reservation.copy) {
+      item.copies.find(copy => copy.id === action.reservation.copy.id).cancelReservation();
+    } else {
+      item.reservation = item.reservation.filter(reservation => reservation.id !== action.reservation.id);
+    }
+
+    return {
+      ...state,
+      item,
+    };
+  },
   [FETCH_ITEM_FAIL]: state => ({
     ...state,
     isLoading: false,
