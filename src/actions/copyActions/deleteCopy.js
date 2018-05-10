@@ -1,4 +1,5 @@
 import API from '../../lib/api';
+import { closeModal } from '../modalActions';
 import {
   DELETE_COPY_FAIL,
   DELETE_COPY_PENDING,
@@ -31,6 +32,7 @@ const deleteCopy = async (copy, dispatch) => {
   try {
     await apiClient.member.copy.delete(copy.id);
     dispatch(deleteSuccess(copy));
+    dispatch(closeModal());
   } catch (error) {
     dispatch(deleteFail(error));
   }

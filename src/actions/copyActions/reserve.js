@@ -1,5 +1,4 @@
-import API from '../../lib/api';
-import { Copy, Transaction } from '../../lib/models';
+import { closeModal } from '../modalActions';
 import I18n from '../../lib/i18n';
 import {
   OPEN_MODAL,
@@ -7,48 +6,48 @@ import {
   RESERVE_COPY_PENDING,
   RESERVE_COPY_SUCCESS,
 } from '../actionTypes';
+import Modal from '../../components/general/modals/Modal';
+import { setSearchResultOnClick } from '../searchActions';
+import { Transaction } from '../../lib/models';
 
-const apiUrl = localStorage.getItem('apiUrl');
-const apiKey = localStorage.getItem('apiKey');
-const apiClient = new API(apiUrl, apiKey);
-
-const reserveCopyFail = error => ({
+const fail = error => ({
   error,
   type: RESERVE_COPY_FAIL,
 });
 
-const reserveCopyPending = () => ({
+const pending = () => ({
   type: RESERVE_COPY_PENDING,
 });
 
-const reserveCopySuccess = (copy, member) => ({
+const success = (copy, member) => ({
   copy,
   member,
   type: RESERVE_COPY_SUCCESS,
 });
 
-const reserveCopy = async (copy, member, dispatch) => {
-  dispatch(reserveCopyPending());
+export default (api, copy) => (dispatch) => {
+  dispatch(setSearchResultOnClick(async (parent) => {
+    dispatch(pending());
 
-  try {
-    await apiClient.member.copy.transaction.insert(member.no, copy.id, Transaction.TYPES.RESERVE);
+    try {
+      await api.member.copy.transaction.insert(parent.no, copy.id, Transaction.TYPES.RESERVE);
 
-    const reservedCopy = new Copy(copy);
-    reservedCopy.reserve(member);
+      const reservedCopy = copy.clone();
+      reservedCopy.reserve(parent);
 
-    dispatch(reserveCopySuccess(reservedCopy, member));
-  } catch (error) {
-    dispatch(reserveCopyFail(error));
-  }
-};
+      dispatch(success(reservedCopy, parent));
+      dispatch(closeModal());
+    } catch (error) {
+      dispatch(fail(error));
+    }
+  }));
 
-export default copy => (dispatch) => {
+
   dispatch({
     cancelable: true,
-    message: I18n('CopyTable.modals.reserve.message'),
-    modalType: 'search',
-    onSelect: member => reserveCopy(copy, member, dispatch),
-    title: I18n('CopyTable.modals.reserve.title'),
+    onClick: null,
+    title: I18n('modal.searchParent.title'),
+    modalType: Modal.TYPES.SEARCH,
     type: OPEN_MODAL,
   });
 };

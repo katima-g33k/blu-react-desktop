@@ -2,7 +2,6 @@ import moment from 'moment';
 
 import { setSearchResultOnClick } from '../searchActions';
 import { closeModal } from '../modalActions';
-import { resetSearch } from '../searchActions';
 import I18n from '../../lib/i18n';
 import Modal from '../../components/general/modals/Modal';
 import {
@@ -48,7 +47,7 @@ const openSearchModal = (dispatch, api, itemId) => {
   dispatch({
     cancelable: true,
     onClick: null,
-    title: 'Recherche d\'un parent-étudiant',
+    title: I18n('modal.searchParent.title'),
     modalType: Modal.TYPES.SEARCH,
     type: OPEN_MODAL,
   });

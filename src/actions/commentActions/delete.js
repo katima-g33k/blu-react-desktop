@@ -22,7 +22,7 @@ const deleteCommentSuccess = comment => ({
   type: DELETE_COMMENT_SUCCESS,
 });
 
-export const deleteComment = comment => async (dispatch) => {
+const deleteComment = comment => async (dispatch) => {
   dispatch(deleteCommentPending());
 
   try {
@@ -33,7 +33,7 @@ export const deleteComment = comment => async (dispatch) => {
   }
 };
 
-export const confirmDelete = comment => (dispatch) => {
+export default comment => (dispatch) => {
   dispatch({
     actions: [
       {

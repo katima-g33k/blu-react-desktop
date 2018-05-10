@@ -25,7 +25,7 @@ const updateCommentSuccess = comment => ({
   type: UPDATE_COMMENT_SUCCESS,
 });
 
-export const updateComment = async (id, comment, dispatch) => {
+const updateComment = async (id, comment, dispatch) => {
   dispatch(updateCommentPending());
 
   try {
@@ -36,7 +36,7 @@ export const updateComment = async (id, comment, dispatch) => {
   }
 };
 
-export const openUpdateCommentModal = (id, comment) => (dispatch) => {
+export default (id, comment) => (dispatch) => {
   dispatch({
     actions: [{
       label: I18n('MemberView.modal.comment.update.action'),

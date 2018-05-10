@@ -3,10 +3,10 @@ import Comment from '../../lib/models/Comment';
 import {
   INSERT_COMMENT_FAIL,
   INSERT_COMMENT_PENDING,
-  INSERT_COMMENT_SUCCESS, OPEN_COMMENT, OPEN_MODAL,
+  INSERT_COMMENT_SUCCESS,
+  OPEN_MODAL,
 } from '../actionTypes';
 import { generateFailAction } from '../failedActionFactory';
-import { updateComment } from './update';
 import I18n from '../../lib/i18n';
 
 const apiUrl = localStorage.getItem('apiUrl');
@@ -35,7 +35,7 @@ const insertComment = async (no, comment, dispatch) => {
   }
 };
 
-export const openInsertCommentModal = no => (dispatch) => {
+export default no => (dispatch) => {
   dispatch({
     actions: [{
       label: I18n('MemberView.modal.comment.insert.action'),

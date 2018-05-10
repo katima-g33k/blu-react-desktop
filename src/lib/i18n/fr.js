@@ -313,6 +313,9 @@ const fr = {
     cancel: 'Annuler',
     error: 'Erreur %{code}',
     ok: 'Ok',
+    searchParent: {
+      title: 'Recherche d\'un parent-étudiant',
+    },
   },
   table: {
     defaultFileName: 'data',

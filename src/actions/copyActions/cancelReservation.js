@@ -6,6 +6,7 @@ import {
   CANCEL_COPY_RESERVATION_SUCCESS,
   OPEN_MODAL,
 } from '../actionTypes';
+import { closeModal } from '../modalActions';
 import I18n from '../../lib/i18n';
 
 const apiUrl = localStorage.getItem('apiUrl');
@@ -26,7 +27,7 @@ const cancelReservationSuccess = copy => ({
   type: CANCEL_COPY_RESERVATION_SUCCESS,
 });
 
-const cancelReservation = async (copy, dispatch) => {
+const cancelReservation = async (dispatch, copy) => {
   dispatch(cancelReservationPending());
 
   try {
@@ -36,6 +37,7 @@ const cancelReservation = async (copy, dispatch) => {
     updatedCopy.cancelReservation();
 
     dispatch(cancelReservationSuccess(updatedCopy));
+    dispatch(closeModal());
   } catch (error) {
     dispatch(cancelReservationFail(error));
   }
@@ -46,7 +48,7 @@ export default copy => (dispatch) => {
     actions: [
       {
         label: I18n('CopyTable.modals.cancelReservation.action'),
-        onClick: () => cancelReservation(copy, dispatch),
+        onClick: () => cancelReservation(dispatch, copy),
         style: 'primary',
       },
     ],
