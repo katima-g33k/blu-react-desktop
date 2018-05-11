@@ -36,7 +36,6 @@ export default class Modal extends Component {
       PropTypes.string,
     ]),
     onInput: PropTypes.func.isRequired,
-    onSelect: PropTypes.func,
     message: PropTypes.string,
     onClick: PropTypes.func,
     title: PropTypes.string.isRequired,
@@ -50,7 +49,6 @@ export default class Modal extends Component {
     inputValue: '',
     message: '',
     onClick: undefined,
-    onSelect: () => console.log('test 5'),
     type: TYPES.INFO,
   }
 
@@ -59,29 +57,30 @@ export default class Modal extends Component {
 
   getId = () => `${this.props.type}Modal`
 
-  body = {
-    [TYPES.INPUT]: (
-      <div>
-        <p>{this.props.message}</p>
-        <FormControl
-          componentClass={this.props.inputType === INPUT_TYPES.TEXTAREA ? 'textarea' : 'input'}
-          id="inputModalField"
-          onChange={this.props.onInput}
-          type={this.props.inputType}
-          value={this.props.inputValue}
+  get body() {
+    return {
+      [TYPES.INPUT]: (
+        <div>
+          <p>{this.props.message}</p>
+          <FormControl
+            componentClass={this.props.inputType === INPUT_TYPES.TEXTAREA ? 'textarea' : 'input'}
+            id="inputModalField"
+            onChange={this.props.onInput}
+            type={this.props.inputType}
+            value={this.props.inputValue}
+          />
+        </div>
+      ),
+      [TYPES.SEARCH]: (
+        <Search
+          disableAddButton
+          disableArchive
+          disableTypeSelection
+          noHeader
+          type={Search.TYPES.PARENT}
         />
-      </div>
-    ),
-    [TYPES.SEARCH]: (
-      <Search
-        disableAddButton
-        disableArchive
-        disableTypeSelection
-        noHeader
-        onRowClick={this.props.onSelect}
-        type={Search.TYPES.PARENT}
-      />
-    ),
+      ),
+    };
   }
 
   renderBody = () => this.body[this.props.type] || this.props.message

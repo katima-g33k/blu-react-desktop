@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Glyphicon, Label } from 'react-bootstrap';
+import { Button, Glyphicon } from 'react-bootstrap';
 
-import { formatShortDate } from '../../../lib/dateHelper';
-import { link } from '../../../lib/link';
-import TableLayout from '../../general/TableLayout';
-import { Reservation } from '../../../lib/models';
+import { formatShortDate } from '../../../../lib/dateHelper';
+import I18n from '../../../../lib/i18n';
+import { link } from '../../../../lib/link';
+import TableLayout from '../../../general/TableLayout';
+import { Reservation } from '../../../../lib/models';
+
+import './reservationList.css';
 
 export default class ReservationList extends Component {
   static propTypes = {
@@ -25,7 +28,7 @@ export default class ReservationList extends Component {
     },
     {
       dataField: 'parent',
-      label: 'Parent',
+      label: I18n('ReservationList.table.parent'),
       dataFormat(parent, { copy }) {
         const member = copy ? copy.reservee : parent;
         return link(`/member/view/${member.no}`, member.name);
@@ -33,19 +36,19 @@ export default class ReservationList extends Component {
     },
     {
       dataField: 'date',
-      label: 'Date',
+      label: I18n('ReservationList.table.date'),
       width: '150px',
-      dataFormat: formatShortDate,
+      dataFormat: (date, reservation) => formatShortDate(date || reservation.copy.dateReserved),
     },
     {
       dataField: 'received',
-      label: 'Reçu',
+      label: I18n('ReservationList.table.received'),
       width: '70px',
       dataAlign: 'center',
       dataFormat: (cell, { copy }) => copy && (
-        <Label bsStyle="success">
+        <Button id="labelButton" bsStyle="success" disabled>
           <Glyphicon glyph="ok-sign" />
-        </Label>
+        </Button>
       ),
     },
   ]
@@ -63,7 +66,7 @@ export default class ReservationList extends Component {
         columns={this.columns}
         data={this.props.reservations}
         rowActions={this.rowActions()}
-        title={'Liste des réservations'}
+        title={I18n('ReservationList.title')}
       />
     );
   }

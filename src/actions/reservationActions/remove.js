@@ -47,8 +47,8 @@ export default (api, reservation) => async (dispatch) => {
       },
     }],
     cancelable: true,
-    message: `Souhaitez-vous vraiment supprimer la réservation de ${reservation.parent.name} ?`,
-    title: 'Supprimer une réservation',
+    message: I18n('ReservationList.modal.message', { name: reservation.parent.name }),
+    title: I18n('ReservationList.modal.title'),
     type: OPEN_MODAL,
   });
 };

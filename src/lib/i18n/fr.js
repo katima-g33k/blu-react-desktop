@@ -200,6 +200,18 @@ const fr = {
     toPay: 'À rembourser',
     paid: 'Remboursés',
   },
+  ReservationList: {
+    title: 'Liste des réservation',
+    table: {
+      parent: 'Parent',
+      date: 'Date',
+      received: 'Reçu',
+    },
+    modal: {
+      message: 'Souhaitez-vous vraiment supprimer la réservation de %{name} ?',
+      title: 'Supprimer une réservation',
+    },
+  },
   Search: {
     title: 'Recherche',
     filters: {

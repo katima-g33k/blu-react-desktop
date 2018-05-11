@@ -5,6 +5,7 @@ import {
   UPDATE_COPY_PENDING,
   UPDATE_COPY_SUCCESS,
 } from '../actionTypes';
+import { closeModal } from '../modalActions';
 import Copy from '../../lib/models/Copy';
 import I18n from '../../lib/i18n';
 import Modal from '../../components/general/modals/Modal';
@@ -33,6 +34,7 @@ const update = async (copy, price, dispatch) => {
   try {
     await apiClient.member.copy.update(copy.id, price);
     dispatch(updateSuccess(new Copy({ ...copy, price })));
+    dispatch(closeModal());
   } catch (error) {
     dispatch(updateFail(error));
   }
