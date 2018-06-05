@@ -1,4 +1,8 @@
+import { browserHistory } from 'react-router';
+
+import { closeModal } from '../modalActions';
 import I18n from '../../lib/i18n';
+import merge from './merge';
 import { OPEN_MODAL } from '../actionTypes';
 import pay from './pay';
 
@@ -67,6 +71,53 @@ export const openTransferModal = member => (dispatch) => {
     cancelable: true,
     messageKey: 'MemberView.modal.transfer.message',
     titleKey: 'MemberView.modal.transfer.title',
+    type: OPEN_MODAL,
+  });
+};
+
+export const openExistsModal = (routeNo, formNo, userIsAdmin, apiClient) => (dispatch) => {
+  if (!routeNo) {
+    // If inserting a new member
+    dispatch({
+      cancelable: true,
+      actions: [{
+        label: I18n('MemberForm.modals.exists.goToMember.action'),
+        onClick: () => {
+          dispatch(closeModal());
+          browserHistory.push(`/member/view/${formNo}`);
+        },
+        style: 'primary',
+      }],
+      message: I18n('MemberForm.modals.exists.goToMember.message'),
+      title: I18n('MemberForm.modals.exists.title'),
+      type: OPEN_MODAL,
+    });
+    return;
+  }
+
+  if (userIsAdmin) {
+    // Only admins can merge
+    dispatch({
+      cancelable: true,
+      actions: [{
+        label: I18n('MemberForm.modals.exists.merge.action'),
+        onClick: () => merge(routeNo, formNo, apiClient, dispatch),
+        style: 'danger',
+      }],
+      message: I18n('MemberForm.modals.exists.merge.message'),
+      title: I18n('MemberForm.modals.exists.title'),
+      type: OPEN_MODAL,
+    });
+    return;
+  }
+
+  dispatch({
+    actions: [{
+      label: I18n('actions.ok'),
+      onClick: () => dispatch(closeModal()),
+    }],
+    message: I18n('MemberForm.modals.exists.message'),
+    title: I18n('MemberForm.modals.exists.title'),
     type: OPEN_MODAL,
   });
 };

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
-import { Provider } from 'react-redux';
 import moment from 'moment';
 
 import API from './lib/api';
@@ -15,18 +15,18 @@ import scanner from './lib/Scanner';
 import Settings from './lib/Settings';
 import SettingsView from './components/general/SettingsView';
 import Sidebar from './components/general/Sidebar';
-import store from './reducers/store';
 
 export default class App extends Component {
-  constructor(props) {
-    super(props);
-    this.api = new API(Settings.apiUrl, Settings.apiKey);
-    this.state = {
-      error: null,
-      settingsUpdatedAt: null,
-      showModal: null,
-      user: null,
-    };
+  static propTypes = {
+    api: PropTypes.instanceOf(API).isRequired,
+    onLoad: PropTypes.func.isRequired,
+  }
+
+  state = {
+    error: null,
+    settingsUpdatedAt: null,
+    showModal: null,
+    user: null,
   }
 
   componentWillMount() {
@@ -41,6 +41,10 @@ export default class App extends Component {
     }
   }
 
+  componentDidMount() {
+    this.props.onLoad();
+  }
+
   onInvalidScan = () => {
     this.setState({ showModal: 'invalidCode' });
   }
@@ -48,7 +52,7 @@ export default class App extends Component {
   onItemScan = async (ean13) => {
     if (this.canChangeLocation()) {
       try {
-        const { id } = await this.api.item.exists(ean13);
+        const { id } = await this.props.api.item.exists(ean13);
         const path = id ? `view/${id}` : `add?ean13=${ean13}`;
         browserHistory.push(`/item/${path}`);
       } catch (error) {
@@ -60,7 +64,7 @@ export default class App extends Component {
   onMemberScan = async (no) => {
     if (this.canChangeLocation()) {
       try {
-        const res = await this.api.member.exists(no);
+        const res = await this.props.api.member.exists(no);
         const path = res.no ? `view/${res.no}` : `add?no=${no}`;
         browserHistory.push(`/member/${path}`);
       } catch (error) {
@@ -74,7 +78,7 @@ export default class App extends Component {
   }
 
   onLogout = () => {
-    this.api.employee.logout();
+    this.props.api.employee.logout();
     sessionStorage.removeItem('user');
     this.setState({ user: null });
   }
@@ -109,7 +113,7 @@ export default class App extends Component {
     if (!this.state.user) {
       return (
         <Row componentClass="main">
-          <Login onConnected={this.onLogin} api={this.api} />
+          <Login onConnected={this.onLogin} api={this.props.api} />
         </Row>
       );
     }
@@ -120,7 +124,7 @@ export default class App extends Component {
           <Sidebar onLogout={this.onLogout} />
         </Col>
         <Col sm={12} md={10}>
-          <Routes api={this.api} />
+          <Routes api={this.props.api} />
         </Col>
         {this.renderModal()}
       </Row>
@@ -157,23 +161,21 @@ export default class App extends Component {
 
   render() {
     return (
-      <Provider store={store}>
-        <Row>
-          <Col md={12}>
-            <Row>
-              <Col md={12}>
-                <Header />
-              </Col>
-            </Row>
-            <Row>
-              <Col md={12}>
-                {this.renderMain()}
-              </Col>
-            </Row>
-          </Col>
-          <Modal />
-        </Row>
-      </Provider>
+      <Row>
+        <Col md={12}>
+          <Row>
+            <Col md={12}>
+              <Header />
+            </Col>
+          </Row>
+          <Row>
+            <Col md={12}>
+              {this.renderMain()}
+            </Col>
+          </Row>
+        </Col>
+        <Modal />
+      </Row>
     );
   }
 }

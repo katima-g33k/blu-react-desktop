@@ -2,6 +2,7 @@
 const fr = {
   actions: {
     add: 'Ajouter',
+    cancel: 'Annuler',
     delete: 'Supprimer',
     ok: 'OK',
     save: 'Enregistrer',
@@ -104,6 +105,55 @@ const fr = {
   },
   MemberForm: {
     title: 'Formulaire du membre',
+    subtitle: {
+      add: 'Ajouter un membre',
+      contact: 'Information de contact',
+      edit: 'Modifier un member',
+    },
+    fields: {
+      address: 'Adresse',
+      city: 'Ville',
+      email: {
+        label: 'Courriel',
+        placeholder: 'courriel@exemple.com',
+      },
+      isParent: 'Parent-Étudiant',
+      firstName: 'Prénom',
+      lastName: 'Nom',
+      no: {
+        label: 'Numéro de member',
+        placeholder: '200000000',
+      },
+      noNo: 'Pas de numéro',
+      phone: {
+        label: 'Téléphone %{index}',
+        note: 'Note',
+        placeholder: 'XXX-XXX-XXXX',
+      },
+      state: 'Province',
+      zip: {
+        label: 'Code postal',
+        placeholder: 'A0A 0A0',
+      },
+    },
+    modals: {
+      exists: {
+        message: 'Les informations que vous avez inscrites correspondent à un compte déjà existant.',
+        title: 'Erreur - Membre existant',
+        goToMember: {
+          action: 'Aller à la fiche',
+          message: 'Un membre avec les informations saisies existe déjà. Voulez-vous aller à sa fiche ?',
+        },
+        merge: {
+          action: 'Fusionner',
+          message: 'Les informations que vous avez inscrites correspondent à un compte déjà existant. Voulez-vous fusionner ce compte avec le compte correspondant ?',
+        },
+        merged: {
+          message: 'Les comptes ont été fusionnés, vous serez redirigé au compte du membre.',
+          title: 'Comptes fusionmés',
+        },
+      },
+    },
   },
   MemberView: {
     title: 'Membre',

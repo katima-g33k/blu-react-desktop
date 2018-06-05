@@ -221,7 +221,7 @@ export default class ItemViewContainer extends Component {
         return (
           <InformationModal
             message={'L\'ouvrage a été supprimé.'}
-            onClick={() => browserHistory.push('/search')}
+            onClick={() => browserHistory.push('/')}
             title="Ouvrage supprimé"
           />
         );

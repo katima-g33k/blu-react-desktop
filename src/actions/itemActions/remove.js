@@ -27,7 +27,7 @@ const successModal = dispatch => ({
   actions: [{
     label: I18n('actions.ok'),
     onClick: () => {
-      browserHistory.push('/search');
+      browserHistory.push('/');
       dispatch(closeModal());
     },
   }],

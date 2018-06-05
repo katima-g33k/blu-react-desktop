@@ -206,7 +206,7 @@ export default class ItemFormContainer extends Component {
   onCancel = () => {
     this.logger.trace('onCancel()');
     const { id } = this.state;
-    this.props.router.push(id ? `/item/view/${id}` : '/searchActions');
+    this.props.router.push(id ? `/item/view/${id}` : '/');
   }
 
   onSave = async () => {

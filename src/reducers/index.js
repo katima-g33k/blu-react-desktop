@@ -4,6 +4,7 @@ import itemStore from './item';
 import memberStore from './member';
 import modalStore from './modal';
 import searchStore from './search';
+import stateStore from './states';
 
 export {
   appStore,
@@ -12,4 +13,5 @@ export {
   memberStore,
   modalStore,
   searchStore,
+  stateStore,
 };

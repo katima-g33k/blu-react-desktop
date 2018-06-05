@@ -8,6 +8,7 @@ import Item from './Item';
 import Member from './Member';
 import Phone from './Phone';
 import Reservation from './Reservation';
+import State from './State';
 import Storage from './Storage';
 import Transaction from './Transaction';
 
@@ -22,6 +23,7 @@ export {
   Member,
   Phone,
   Reservation,
+  State,
   Storage,
   Transaction,
 };

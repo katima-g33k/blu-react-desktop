@@ -219,7 +219,7 @@ export default class MemberViewContainer extends Component {
         return (
           <InformationModal
             message={'Le compte a été supprimé.'}
-            onClick={() => browserHistory.push('/search')}
+            onClick={() => browserHistory.push('/')}
             title="Compte supprimé"
           />
         );

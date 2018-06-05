@@ -7,7 +7,7 @@ import EmployeesTable from '../components/admin/EmployeesTable';
 import ItemFormContainer from '../components/item/form/ItemFormContainer';
 import ItemList from '../components/admin/ItemList';
 import ItemView from '../containers/ItemViewContainer';
-import MemberFormContainer from '../components/member/form/MemberFormContainer';
+import MemberForm from '../containers/MemberFormContainer';
 import MemberView from '../containers/MemberViewContainer';
 import ReservationTableView from '../components/admin/ReservationTableView';
 import SearchContainer from '../containers/SearchContainer';
@@ -22,7 +22,7 @@ export default class Routes extends Component {
 
   componentDidMount() {
     if (/index\.html/.test(browserHistory.getCurrentLocation().pathname)) {
-      browserHistory.push('/searchActions');
+      browserHistory.push('/search');
     }
   }
 
@@ -50,12 +50,12 @@ export default class Routes extends Component {
             path="view/:no"
           />
           <Route
-            component={props => (<MemberFormContainer {...props} api={api} />)}
+            component={MemberForm}
             name="MemberAdd"
             path="add"
           />
           <Route
-            component={props => (<MemberFormContainer {...props} api={api} />)}
+            component={MemberForm}
             name="MemberEdit"
             path="edit/:no"
           />
