@@ -4,7 +4,7 @@ import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
 import DuplicateMembers from '../components/admin/DuplicateMembers';
 import EmployeesTable from '../components/admin/EmployeesTable';
-import ItemFormContainer from '../components/item/form/ItemFormContainer';
+import ItemForm from '../containers/ItemFormContainer';
 import ItemList from '../components/admin/ItemList';
 import ItemView from '../containers/ItemViewContainer';
 import MemberForm from '../containers/MemberFormContainer';
@@ -73,12 +73,12 @@ export default class Routes extends Component {
             path="view/:id"
           />
           <Route
-            component={props => (<ItemFormContainer {...props} api={api} />)}
+            component={ItemForm}
             name="ItemAdd"
             path="add"
           />
           <Route
-            component={props => (<ItemFormContainer {...props} api={api} />)}
+            component={ItemForm}
             name="ItemEdit"
             path="edit/:id"
           />

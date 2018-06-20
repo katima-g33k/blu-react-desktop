@@ -33,7 +33,7 @@ export default class Select extends Component {
       label: PropTypes.string,
       value: PropTypes.string,
     })),
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   };
 
   static defaultProps = {

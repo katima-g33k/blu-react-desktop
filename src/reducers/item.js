@@ -14,7 +14,7 @@ import { Item } from '../lib/models';
 const initialState = {
   id: 0,
   isLoading: false,
-  item: new Item(),
+  item: new Item({ isBook: true }),
 };
 
 const handlers = {

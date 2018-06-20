@@ -46,6 +46,37 @@ const fr = {
   },
   ItemForm: {
     title: 'Formulaire de l\'ouvrage',
+    subtitle: {
+      book: {
+        add: 'Ajouter un ouvrage',
+        edit: 'Modifier un ouvrage',
+      },
+      item: {
+        add: 'Ajouter un objet',
+        edit: 'Modifier un objet',
+      },
+    },
+    fields: {
+      isBook: 'Est un ouvrage',
+      name: 'Titre',
+      subject: 'Sujet',
+      ean13: 'EAN13',
+      noEan13: 'Pas de code',
+      comment: {
+        book: 'Commentaires',
+        item: 'Description',
+      },
+      editor: 'Éditeur',
+      edition: 'Édition',
+      publication: 'Année',
+      author: {
+        label: 'Auteur %{index}',
+        placeholder: {
+          firstName: 'Prénom',
+          lastName: 'Nom*',
+        },
+      },
+    },
   },
   ItemView: {
     actions: {

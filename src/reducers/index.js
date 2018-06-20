@@ -5,6 +5,7 @@ import memberStore from './member';
 import modalStore from './modal';
 import searchStore from './search';
 import stateStore from './states';
+import subjectStore from './subject';
 
 export {
   appStore,
@@ -14,4 +15,5 @@ export {
   modalStore,
   searchStore,
   stateStore,
+  subjectStore,
 };
