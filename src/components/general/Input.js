@@ -32,7 +32,7 @@ export default class Input extends Component {
     placeholder: PropTypes.string,
     required: PropTypes.bool,
     type: PropTypes.oneOf(Object.values(types)),
-    value: PropTypes.string,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }
 
   static defaultProps = {

@@ -19,6 +19,13 @@ import I18n from '../../../lib/i18n';
 import { Item } from '../../../lib/models';
 import AuthorInput from './AuthorInput';
 import SubjectSelector from '../../../containers/SubjectSelectorContainer';
+import {
+  authorIsValid,
+  ean13IsValid,
+  editorIsValid,
+  nameIsValid,
+  publicationIsValid,
+} from '../../../lib/itemHelper';
 
 const classNames = {
   row: 'form-row',
@@ -27,27 +34,28 @@ const classNames = {
 
 export default class ItemForm extends Component {
   static propTypes = {
+    exists: PropTypes.func.isRequired,
     id: PropTypes.number,
     item: PropTypes.instanceOf(Item).isRequired,
-    onLoad: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
+    onLoad: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     id: 0,
-    subjects: [],
   }
 
   state = {
+    ean13: this.props.item.ean13,
     item: this.props.item,
     validation: {
+      author: true,
       ean13: true,
       editor: true,
       name: true,
       publication: true,
     },
-    subjects: [],
   }
 
   componentDidMount() {
@@ -58,8 +66,32 @@ export default class ItemForm extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.props.item.id !== nextProps.item.id) {
-      this.setState({ item: nextProps.item });
+      this.setState({
+        ean13: nextProps.item.ean13,
+        item: nextProps.item,
+      });
     }
+  }
+
+  isValid = () => {
+    const validation = {
+      author: authorIsValid(this.state.item),
+      ean13: ean13IsValid(this.state.item),
+      editor: editorIsValid(this.state.item),
+      name: nameIsValid(this.state.item),
+      publication: publicationIsValid(this.state.item),
+    };
+
+    this.setState({ validation });
+    return Object.values(validation).every(value => value);
+  }
+
+  itemExists = () => {
+    if (this.state.item.ean13 === this.state.ean13) {
+      return false;
+    }
+
+    return this.props.exists(this.state.item.ean13);
   }
 
   handleOnChange = (event, value) => this.setState({
@@ -69,9 +101,43 @@ export default class ItemForm extends Component {
     },
   })
 
-  handleOnSave = () => {
-    this.props.onSave();
+  handleIsBook = (event, value) => this.setState({
+    item: {
+      ...this.state.item,
+      isBook: value,
+      editor: '',
+      edition: '',
+      publication: '',
+      author: [],
+    },
+  })
+
+  handleNoEan13 = (event, value) => this.setState({
+    item: {
+      ...this.state.item,
+      ean13: '',
+      noEan13: value,
+    },
+  })
+
+  handleOnSave = async () => {
+    if (!this.isValid() || await this.itemExists()) {
+      return;
+    }
+
+    this.props.onSave(this.state.item);
   }
+
+  renderIsBook = () => !this.props.id && (
+    <Row>
+      <Checkbox
+        checked={this.state.item.isBook}
+        id="isBook"
+        label={I18n('ItemForm.fields.isBook')}
+        onChange={this.handleIsBook}
+      />
+    </Row>
+  )
 
   renderNoEan13 = () => !this.props.id && (
     <Checkbox
@@ -79,7 +145,7 @@ export default class ItemForm extends Component {
       id="noEan13"
       inputWidth={{ md: 3 }}
       label={I18n('ItemForm.fields.noEan13')}
-      onChange={this.handleOnChange}
+      onChange={this.handleNoEan13}
     />
   )
 
@@ -145,14 +211,7 @@ export default class ItemForm extends Component {
               {I18n(`ItemForm.subtitle.${type}.${id ? 'edit' : 'add'}`)}
             </Row>
             <Row>
-              <Row>
-                <Checkbox
-                  checked={isBook}
-                  id="isBook"
-                  label={I18n('ItemForm.fields.isBook')}
-                  onChange={this.handleOnChange}
-                />
-              </Row>
+              {this.renderIsBook()}
               <Row
                 componentClass={FormGroup}
                 className={classNames.row}
@@ -198,7 +257,7 @@ export default class ItemForm extends Component {
                   id="comment"
                   label={I18n(`ItemForm.fields.comment.${type}`)}
                   onChange={this.handleOnChange}
-                  placeholder={I18n(`ItemForm.fields.comisBook ? 'book' : 'item'ment.${type}`)}
+                  placeholder={I18n(`ItemForm.fields.comment.${type}`)}
                   value={this.state.item.comment}
                 />
               </Row>

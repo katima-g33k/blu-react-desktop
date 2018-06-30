@@ -3,16 +3,20 @@ import { connect } from 'react-redux';
 import { fetch } from '../actions/itemActions';
 import ItemView from '../components/item/view/ItemView';
 
-const mapStateToProps = ({ itemStore }) => ({ ...itemStore });
+const mapStateToProps = ({ appStore, itemStore }) => ({
+  api: appStore.apiClient,
+  isLoading: itemStore.isLoading,
+  item: itemStore.item,
+});
 
 const mapDispatchToProps = dispatch => ({
-  fetch: id => dispatch(fetch(id)),
+  fetch: (id, api) => dispatch(fetch(id, api)),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps,
-  ...dispatchProps,
-  fetch: () => dispatchProps.fetch(stateProps.id || ownProps.params.id),
+  fetch: () => dispatchProps.fetch(stateProps.id || ownProps.params.id, stateProps.api),
+  isLoading: stateProps.isLoading,
+  item: stateProps.item,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(ItemView);

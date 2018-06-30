@@ -2,6 +2,13 @@ import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 
 import ItemForm from '../components/item/form/ItemForm';
+import {
+  exists,
+  fetch,
+  insert,
+  update,
+} from '../actions/itemActions';
+import { formatItemFormData } from '../lib/itemHelper';
 
 const mapStateToProps = ({ appStore, itemStore }) => ({
   api: appStore.apiClient,
@@ -9,29 +16,39 @@ const mapStateToProps = ({ appStore, itemStore }) => ({
   userIsAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
 });
 
-const mapDispatchToProps = () => ({
+const mapDispatchToProps = dispatch => ({
   onExists: (id, isUpdate, userIsAdmin, api) => {
     // dispatch(openExistsModal(id, isUpdate, userIsAdmin, api))
   },
-  onLoad: (id, api) => {
-    // dispatch(fetch(api, id))
-  },
-  onInsert: (item, api) => {
-    // dispatch(insert(item, api))
-  },
-  onUpdate: (id, item, api) => {
-    // dispatch(update(id, item, api))
-  },
+  onLoad: (id, api) => dispatch(fetch(id, api)),
+  onInsert: (item, api) => dispatch(insert(item, api)),
+  onUpdate: (id, item, api) => dispatch(update(id, item, api)),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  exists: () => {},
+  exists: async (ean13) => {
+    const itemExists = await exists(ean13);
+
+    if (itemExists) {
+      dispatchProps.onExists();
+    }
+
+    return itemExists;
+  },
   item: stateProps.item,
   id: +ownProps.params.id,
   onCancel: () => browserHistory.push(ownProps.params.id ? `/item/view/${ownProps.params.id}` : '/'),
   onLoad: () => dispatchProps.onLoad(ownProps.params.id, stateProps.api),
   onSave: (formData) => {
-    console.log(formData);
+    const formattedData = formatItemFormData(formData);
+
+    if (ownProps.params.id) {
+      console.log('update');
+      dispatchProps.onUpdate(ownProps.params.id, formattedData, stateProps.api);
+    } else {
+      console.log('insert');
+      dispatchProps.onInsert(formattedData, stateProps.api);
+    }
   },
 });
 

@@ -17,7 +17,8 @@ const pending = () => ({
   type: INSERT_MEMBER_PENDING,
 });
 
-const success = () => ({
+const success = member => ({
+  member,
   type: INSERT_MEMBER_SUCCESS,
 });
 
@@ -27,7 +28,7 @@ export default (member, apiClient) => async (dispatch) => {
   try {
     await apiClient.member.insert(member);
 
-    dispatch(success());
+    dispatch(success(member));
     browserHistory.push(`/member/view/${member.no}`);
   } catch (error) {
     dispatch(fail(error));

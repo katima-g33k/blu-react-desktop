@@ -1,3 +1,5 @@
+/* eslint react/no-did-mount-set-state: 0 */
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
@@ -21,6 +23,7 @@ export default class SubjectSelector extends Component {
 
   state = {
     optGroups: [],
+    subjectsByValue: {},
     value: this.props.value,
   }
 
@@ -28,13 +31,19 @@ export default class SubjectSelector extends Component {
     if (!this.props.subjectsByCategory.length) {
       this.props.onLoad();
     } else {
-      this.setOptGroups(this.props.subjectsByCategory);
+      this.setState({
+        optGroups: this.getOptGroups(this.props.subjectsByCategory),
+        subjectsByValue: this.getSubjectsByValue(this.props.subjectsByCategory),
+      });
     }
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.subjectsByCategory.length !== nextProps.subjectsByCategory.length) {
-      this.setOptGroups(nextProps.subjectsByCategory);
+      this.setState({
+        optGroups: this.getOptGroups(nextProps.subjectsByCategory),
+        subjectsByValue: this.getSubjectsByValue(nextProps.subjectsByCategory),
+      });
     }
 
     if (this.props.value !== nextProps.value) {
@@ -42,19 +51,31 @@ export default class SubjectSelector extends Component {
     }
   }
 
-  setOptGroups = subjectsByCategory => this.setState({
-    optGroups: subjectsByCategory.map(category => ({
-      label: category.name,
-      options: category.subject.map(subject => ({
-        label: subject.name,
-        value: `${subject.id}`,
-      })),
+  getOptGroups = subjectsByCategory => subjectsByCategory.map(category => ({
+    label: category.name,
+    options: category.subject.map(subject => ({
+      label: subject.name,
+      value: `${subject.id}`,
     })),
-  })
+  }))
+
+  getSubjectsByValue = subjectsByCategory => subjectsByCategory.reduce((acc, category) => {
+    category.subject.forEach((subject) => {
+      acc[subject.id] = {
+        ...subject,
+        category: {
+          id: category.id,
+          name: category.name,
+        },
+      };
+    });
+
+    return acc;
+  }, {});
 
   handleOnChange = (event, value) => {
     this.setState({ value });
-    this.props.onChange(event, value);
+    this.props.onChange(event, this.state.subjectsByValue[value]);
   }
 
   render() {
