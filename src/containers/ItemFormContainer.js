@@ -6,6 +6,7 @@ import {
   exists,
   fetch,
   insert,
+  openExistsModal,
   update,
 } from '../actions/itemActions';
 import { formatItemFormData } from '../lib/itemHelper';
@@ -17,8 +18,8 @@ const mapStateToProps = ({ appStore, itemStore }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  onExists: (id, isUpdate, userIsAdmin, api) => {
-    // dispatch(openExistsModal(id, isUpdate, userIsAdmin, api))
+  onExists: (id, existingItemId, userIsAdmin, api) => {
+    dispatch(openExistsModal(id, existingItemId, userIsAdmin, api))
   },
   onLoad: (id, api) => dispatch(fetch(id, api)),
   onInsert: (item, api) => dispatch(insert(item, api)),
@@ -27,10 +28,10 @@ const mapDispatchToProps = dispatch => ({
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   exists: async (ean13) => {
-    const itemExists = await exists(ean13);
+    const itemExists = await exists(ean13, stateProps.api);
 
     if (itemExists) {
-      dispatchProps.onExists();
+      dispatchProps.onExists(ownProps.params.id, itemExists, stateProps.userIsAdmin, stateProps.api);
     }
 
     return itemExists;

@@ -77,6 +77,24 @@ const fr = {
         },
       },
     },
+    modals: {
+      exists: {
+        message: 'Les informations que vous avez inscrites correspondent à un ouvrage déjà existant.',
+        title: 'Erreur - Ouvrage existant',
+        goToItem: {
+          action: 'Aller à la fiche',
+          message: 'Un ouvrage avec les informations saisies existe déjà. Voulez-vous aller à sa fiche ?',
+        },
+        merge: {
+          action: 'Fusionner',
+          message: 'Les informations que vous avez inscrites correspondent à un ouvrage déjà existant. Voulez-vous fusionner cet ouvrage avec l\'ouvrage correspondant ?',
+        },
+        merged: {
+          message: 'Les ouvrages ont été fusionnés, vous serez redirigé à la fiche de l\'ouvrage.',
+          title: 'Ouvrages fusionmés',
+        },
+      },
+    },
   },
   ItemView: {
     actions: {

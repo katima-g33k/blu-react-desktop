@@ -3,7 +3,7 @@ import { Col, Panel, Row } from 'react-bootstrap';
 import { Link } from 'react-router';
 
 import ActionPanel from '../../general/ActionPanel';
-import ItemFormContainer from '../../item/form/ItemFormContainer';
+import ItemForm from '../../../containers/ItemFormContainer';
 import SearchContainer from '../../../containers/SearchContainer';
 import Table from '../../general/Table';
 
@@ -22,7 +22,7 @@ export default class AddCopies extends Component {
     const { ean13, onFormCancel, onFormSave, params } = this.props;
 
     return (
-      <ItemFormContainer
+      <ItemForm
         {...this.props}
         ean13={ean13}
         params={params}

@@ -28,14 +28,11 @@ export default (item, api) => async (dispatch) => {
   dispatch(pending());
 
   try {
-    const response = await api.item.insert(item);
-
-    console.log(response);
-
-    const insertedItem = new Item({ ...item, id: response.id });
+    const { id } = await api.item.insert(item);
+    const insertedItem = new Item({ ...item, id });
 
     dispatch(success(insertedItem));
-    browserHistory.push(`/item/view/${response.id}`);
+    browserHistory.push(`/item/view/${id}`);
   } catch (error) {
     fail(error);
   }
