@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { PulseLoader } from 'halogen';
 
-const Spinner = () => (
-  <div style={{ textAlign: 'center' }}>
-    <PulseLoader
-      color="#7D8364"
-      size="16px"
-    />
-  </div>
-);
+const styles = {
+  spinner: {
+    color: '#7D8364',
+    size: '16px',
+  },
+  wrapper: {
+    textAlign: 'center',
+  },
+};
 
-export default Spinner;
+export default class Spinner extends Component {
+  render() {
+    return (
+      <div style={styles.wrapper}>
+        <PulseLoader {...styles.spinner} />
+      </div>
+    );
+  }
+}

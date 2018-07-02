@@ -14,7 +14,6 @@ import { formatMemberFormData } from '../lib/memberHelper';
 const mapStateToProps = ({ appStore, memberStore, stateStore }) => ({
   api: appStore.apiClient,
   member: memberStore.member,
-  states: stateStore.states,
   userIsAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
 });
 
@@ -48,7 +47,6 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
       dispatchProps.onInsert(formattedData, stateProps.api);
     }
   },
-  states: stateProps.states,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(MemberForm);

@@ -13,9 +13,7 @@ import {
 import {
   Checkbox,
   Input,
-  Select,
 } from '../../general/formInputs';
-import { DEFAULT_STATE_VALUE } from '../../../lib/constants';
 import {
   emailIsValid,
   formatPhoneNumber,
@@ -26,7 +24,8 @@ import {
   zipIsValid,
 } from '../../../lib/memberHelper';
 import I18n from '../../../lib/i18n';
-import { Member, State } from '../../../lib/models';
+import { Member } from '../../../lib/models';
+import StateSelector from '../../../containers/StateSelectorContainer';
 
 import './memberForm.css';
 
@@ -43,12 +42,10 @@ export default class MemberForm extends Component {
     onCancel: PropTypes.func.isRequired,
     onLoad: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
-    states: PropTypes.arrayOf(PropTypes.instanceOf(State)),
   }
 
   static defaultProps = {
     no: 0,
-    states: [],
   }
 
   state = {
@@ -69,23 +66,13 @@ export default class MemberForm extends Component {
     if (!this.state.member.no && this.props.no) {
       this.props.onLoad();
     }
-
-    this.setStateOptions(this.props.states);
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.member.no !== nextProps.member.no) {
       this.setState({ member: nextProps.member });
     }
-
-    if (this.props.states !== nextProps.states) {
-      this.setStateOptions(nextProps.states);
-    }
   }
-
-  setStateOptions = states => this.setState({
-    states: states.map(({ code, name }) => ({ value: code, label: name })),
-  })
 
   isValid = () => {
     const validation = {
@@ -131,19 +118,6 @@ export default class MemberForm extends Component {
         ...this.state.member.city,
         id: 0,
         name: value,
-      },
-    },
-  })
-
-  handleStateOnChange = (event, value) => this.setState({
-    member: {
-      ...this.state.member,
-      city: {
-        ...this.state.member.city,
-        state: {
-          code: value,
-          name: '',
-        },
       },
     },
   })
@@ -308,12 +282,8 @@ export default class MemberForm extends Component {
                   />
                 </Row>
                 <Row className={classNames.row}>
-                  <Select
-                    id="state"
-                    default={DEFAULT_STATE_VALUE}
-                    label={I18n('MemberForm.fields.state')}
-                    onChange={this.handleStateOnChange}
-                    options={this.state.states}
+                  <StateSelector
+                    onChange={this.handleOnChange}
                     value={this.state.member.city.state.code}
                   />
                 </Row>

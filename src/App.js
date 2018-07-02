@@ -19,7 +19,6 @@ import Sidebar from './components/general/Sidebar';
 export default class App extends Component {
   static propTypes = {
     api: PropTypes.instanceOf(API).isRequired,
-    onLoad: PropTypes.func.isRequired,
   }
 
   state = {
@@ -39,10 +38,6 @@ export default class App extends Component {
     if (user) {
       this.setState({ user: JSON.parse(user) });
     }
-  }
-
-  componentDidMount() {
-    this.props.onLoad();
   }
 
   onInvalidScan = () => {
