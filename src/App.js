@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
-import { browserHistory } from 'react-router';
 import moment from 'moment';
 
 import API from './lib/api';
@@ -19,6 +18,9 @@ import Sidebar from './components/general/Sidebar';
 export default class App extends Component {
   static propTypes = {
     api: PropTypes.instanceOf(API).isRequired,
+    onInvalidScan: PropTypes.func.isRequired,
+    onItemScan: PropTypes.func.isRequired,
+    onMemberScan: PropTypes.func.isRequired,
   }
 
   state = {
@@ -31,40 +33,12 @@ export default class App extends Component {
   componentWillMount() {
     const user = sessionStorage.getItem('user');
 
-    scanner.addListener('onInvalidScan', this.onInvalidScan);
-    scanner.addListener('onItemScan', this.onItemScan);
-    scanner.addListener('onMemberScan', this.onMemberScan);
+    scanner.addListener('onInvalidScan', this.props.onInvalidScan);
+    scanner.addListener('onItemScan', this.props.onItemScan);
+    scanner.addListener('onMemberScan', this.props.onMemberScan);
 
     if (user) {
       this.setState({ user: JSON.parse(user) });
-    }
-  }
-
-  onInvalidScan = () => {
-    this.setState({ showModal: 'invalidCode' });
-  }
-
-  onItemScan = async (ean13) => {
-    if (this.canChangeLocation()) {
-      try {
-        const { id } = await this.props.api.item.exists(ean13);
-        const path = id ? `view/${id}` : `add?ean13=${ean13}`;
-        browserHistory.push(`/item/${path}`);
-      } catch (error) {
-        this.setState({ error });
-      }
-    }
-  }
-
-  onMemberScan = async (no) => {
-    if (this.canChangeLocation()) {
-      try {
-        const res = await this.props.api.member.exists(no);
-        const path = res.no ? `view/${res.no}` : `add?no=${no}`;
-        browserHistory.push(`/member/${path}`);
-      } catch (error) {
-        this.setState({ error });
-      }
     }
   }
 
@@ -82,48 +56,49 @@ export default class App extends Component {
     this.setState({ settingsUpdatedAt: moment() });
   }
 
-  canChangeLocation = () =>
-    !browserHistory.getCurrentLocation().pathname.match(/add|edit|copies/);
-
   resetState = () => {
     this.setState({ error: null, showModal: null });
   }
 
-  renderMain = () => {
-    const { apiKey, apiUrl, secretKey } = Settings;
+  renderSetup = () => (
+    <Row componentClass="main">
+      <Col md={6} mdOffset={3}>
+        <SettingsView
+          firstSetup
+          onSave={this.onSettingsSave}
+        />
+      </Col>
+    </Row>
+  )
 
-    if (!apiKey || !apiUrl || !secretKey) {
-      return (
-        <Row componentClass="main">
-          <Col md={6} mdOffset={3}>
-            <SettingsView
-              firstSetup
-              onSave={this.onSettingsSave}
-            />
-          </Col>
-        </Row>
-      );
+  renderLogin = () => (
+    <Row componentClass="main">
+      <Login onConnected={this.onLogin} api={this.props.api} />
+    </Row>
+  )
+
+  renderRoutes = () => (
+    <Row componentClass="main">
+      <Col componentClass="aside" sm={0} md={2}>
+        <Sidebar onLogout={this.onLogout} />
+      </Col>
+      <Col sm={12} md={10}>
+        <Routes api={this.props.api} />
+      </Col>
+      {this.renderModal()}
+    </Row>
+  )
+
+  renderMain = () => {
+    if (!Settings.isServerSet()) {
+      return this.renderSetup();
     }
 
     if (!this.state.user) {
-      return (
-        <Row componentClass="main">
-          <Login onConnected={this.onLogin} api={this.props.api} />
-        </Row>
-      );
+      return this.renderLogin();
     }
 
-    return (
-      <Row componentClass="main">
-        <Col componentClass="aside" sm={0} md={2}>
-          <Sidebar onLogout={this.onLogout} />
-        </Col>
-        <Col sm={12} md={10}>
-          <Routes api={this.props.api} />
-        </Col>
-        {this.renderModal()}
-      </Row>
-    );
+    return this.renderRoutes();
   }
 
 

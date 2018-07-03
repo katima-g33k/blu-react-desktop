@@ -78,4 +78,8 @@ export default class Settings {
   static getProperties() {
     return PROPERTIES;
   }
+
+  static isServerSet() {
+    return Boolean(Settings.apiKey && Settings.apiUrl && Settings.secretKey);
+  }
 }
