@@ -17,6 +17,7 @@ const types = {
   EMAIL: 'email',
   PHONE: 'phone',
   NUMBER: 'number',
+  PASSWORD: 'password',
   TEXT: 'text',
 };
 

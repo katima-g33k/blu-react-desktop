@@ -1,132 +1,53 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
-import moment from 'moment';
-
-import API from './lib/api';
 
 import Header from './components/general/Header';
-import { InformationModal } from './components/general/modals';
-import Login from './components/login/Login';
+import Login from './containers/LoginContainer';
 import Modal from './containers/ModalContainer';
-import Routes from './routes/Routes';
-import scanner from './lib/Scanner';
-import Settings from './lib/Settings';
-import SettingsView from './components/general/SettingsView';
+import Routes from './containers/RoutesContainer';
+import Scanner from './containers/ScannerContainer';
+import SettingsView from './containers/SettingsViewContainer';
 import Sidebar from './components/general/Sidebar';
 
 export default class App extends Component {
   static propTypes = {
-    api: PropTypes.instanceOf(API).isRequired,
-    onInvalidScan: PropTypes.func.isRequired,
-    onItemScan: PropTypes.func.isRequired,
-    onMemberScan: PropTypes.func.isRequired,
+    isConnected: PropTypes.bool,
+    isInitialSetup: PropTypes.bool,
   }
 
-  state = {
-    error: null,
-    settingsUpdatedAt: null,
-    showModal: null,
-    user: null,
-  }
-
-  componentWillMount() {
-    const user = sessionStorage.getItem('user');
-
-    scanner.addListener('onInvalidScan', this.props.onInvalidScan);
-    scanner.addListener('onItemScan', this.props.onItemScan);
-    scanner.addListener('onMemberScan', this.props.onMemberScan);
-
-    if (user) {
-      this.setState({ user: JSON.parse(user) });
-    }
-  }
-
-  onLogin = (user) => {
-    this.setState({ user });
-  }
-
-  onLogout = () => {
-    this.props.api.employee.logout();
-    sessionStorage.removeItem('user');
-    this.setState({ user: null });
-  }
-
-  onSettingsSave = () => {
-    this.setState({ settingsUpdatedAt: moment() });
-  }
-
-  resetState = () => {
-    this.setState({ error: null, showModal: null });
+  static defaultProps = {
+    isConnected: false,
+    isInitialSetup: true,
   }
 
   renderSetup = () => (
-    <Row componentClass="main">
-      <Col md={6} mdOffset={3}>
-        <SettingsView
-          firstSetup
-          onSave={this.onSettingsSave}
-        />
-      </Col>
-    </Row>
-  )
-
-  renderLogin = () => (
-    <Row componentClass="main">
-      <Login onConnected={this.onLogin} api={this.props.api} />
-    </Row>
+    <Col md={6} mdOffset={3}>
+      <SettingsView />
+    </Col>
   )
 
   renderRoutes = () => (
-    <Row componentClass="main">
+    <div>
       <Col componentClass="aside" sm={0} md={2}>
-        <Sidebar onLogout={this.onLogout} />
+        <Sidebar />
       </Col>
       <Col sm={12} md={10}>
-        <Routes api={this.props.api} />
+        <Routes />
       </Col>
-      {this.renderModal()}
-    </Row>
+    </div>
   )
 
   renderMain = () => {
-    if (!Settings.isServerSet()) {
+    if (this.props.isInitialSetup) {
       return this.renderSetup();
     }
 
-    if (!this.state.user) {
-      return this.renderLogin();
+    if (!this.props.isConnected) {
+      return (<Login />);
     }
 
     return this.renderRoutes();
-  }
-
-
-  renderModal = () => {
-    const { error, showModal } = this.state;
-
-    if (error) {
-      return (
-        <InformationModal
-          message={error.message}
-          onClick={this.resetState}
-          title={`Error ${error.code}`}
-        />
-      );
-    }
-
-    switch (showModal) {
-      case 'invalidCode':
-        return (
-          <InformationModal
-            message={'Le code que vous venez de scanner n\'est pas supporté par le système de la BLU'}
-            onClick={this.resetState}
-            title={'Code invalide'}
-          />
-        );
-      default:
-        return null;
-    }
   }
 
   render() {
@@ -140,11 +61,14 @@ export default class App extends Component {
           </Row>
           <Row>
             <Col md={12}>
-              {this.renderMain()}
+              <Row componentClass="main">
+                {this.renderMain()}
+              </Row>
             </Col>
           </Row>
         </Col>
         <Modal />
+        <Scanner />
       </Row>
     );
   }

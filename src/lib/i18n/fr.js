@@ -4,6 +4,8 @@ const fr = {
     add: 'Ajouter',
     cancel: 'Annuler',
     delete: 'Supprimer',
+    login: 'Se connecter',
+    logout: 'Déconnexion',
     ok: 'OK',
     save: 'Enregistrer',
   },
@@ -151,6 +153,14 @@ const fr = {
   },
   Login: {
     title: 'Connexion',
+    fields: {
+      username: 'Pseudonym',
+      password: 'Mot de passe',
+    },
+    error: {
+      title: 'Erreur de connexion',
+      message: 'Pseudonym ou mot de passe invalide.',
+    },
   },
   MemberForm: {
     title: 'Formulaire du membre',
@@ -331,6 +341,19 @@ const fr = {
   },
   SettingsView: {
     title: 'Paramètres',
+    fields: {
+      apiKey: 'Clé d\'API',
+      apiUrl: 'URL de l\'API',
+      secretKey: 'Clé d\'encryption',
+      calibrate: 'Calibrer le scanner',
+    },
+    calibrator: {
+      title: 'Calibration du scanneur',
+      message: {
+        waiting: 'Veuillez scanner un code à barres afin de calibrer le scanneur',
+        scanned: 'Code scanné avec succès',
+      },
+    },
   },
   Sidebar: {
     search: 'Recherche',

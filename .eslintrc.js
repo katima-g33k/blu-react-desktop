@@ -22,5 +22,6 @@ module.exports = {
     'jsx-a11y/no-interactive-element-to-noninteractive-role': 0,
     'jsx-a11y/no-noninteractive-element-to-interactive-role': 0,
     'jsx-a11y/no-noninteractive-tabindex': 0,
+    'no-prototype-builtins': 0,
   },
 }

@@ -1,95 +1,78 @@
-import React, { Component, PropTypes } from 'react';
-import { Col, Panel, Row } from 'react-bootstrap';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import {
+  Button,
+  ButtonToolbar,
+  Col,
+  Form,
+  Panel,
+  Row,
+} from 'react-bootstrap';
 
-import AutoForm from '../general/AutoForm';
-import { encrypt } from '../../lib/cipher';
-import I18n from '../../lib/i18n/i18n';
-import { InformationModal } from '../general/modals';
-
-const schema = {
-  titleClass: 'h3',
-  options: {
-    horizontal: true,
-  },
-  sections: [
-    {
-      fields: [
-        {
-          key: 'username',
-          type: 'texte',
-          label: 'Pseudonym',
-          required: true,
-        },
-        {
-          key: 'password',
-          type: 'password',
-          label: 'Mot de passe',
-          required: true,
-        },
-      ],
-    },
-  ],
-};
+import './login.css';
+import I18n from '../../lib/i18n';
+import { Input } from '../general/formInputs';
 
 export default class Login extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      error: null,
-    };
-  }
-
   static propTypes = {
-    api: PropTypes.shape(),
-    onConnected: PropTypes.func.isRequired,
+    onLogin: PropTypes.func.isRequired,
   }
 
-  connect = async ({ username, password }) => {
-    try {
-      const res = await this.props.api.employee.login(username, encrypt(password));
-      sessionStorage.setItem('user', JSON.stringify(res));
-      this.props.onConnected(res);
-    } catch (error) {
-      this.setState({ error });
-    }
+  state = {
+    password: '',
+    username: '',
   }
 
-  closeModal = () => {
-    this.setState({ error: null });
-  }
+  handleOnChange = (event, value) => this.setState({
+    ...this.state,
+    [event.target.id]: value,
+  })
 
-  renderModal = () => {
-    const { error } = this.state;
-    const messages = {
-      UNAUTHORIZED: 'Pseudonym ou mot de passe invalide.',
-    };
-
-    return error && (
-      <InformationModal
-        message={messages[error.message] || error.message}
-        onClick={this.closeModal}
-        title={`Error ${error.code}`}
-      />
-    );
-  }
+  handleOnLogin = () => this.props.onLogin(this.state.username, this.state.password)
 
   render() {
     return (
-      <Row>
+      <Row id={this.constructor.name}>
         <Col md={6} mdOffset={3}>
-          <Panel header={I18n.t('Login.title')}>
+          <Panel header={I18n('Login.title')}>
             <Row>
               <Col md={10} mdOffset={1}>
-                <AutoForm
-                  confirmButtonText={'Se connecter'}
-                  onSave={this.connect}
-                  schema={schema}
-                />
+                <Form onSubmit={event => event.preventDefault()}>
+                  <Row>
+                    <Row>
+                      <Input
+                        id="username"
+                        label={I18n('Login.fields.username')}
+                        onChange={this.handleOnChange}
+                        value={this.state.username}
+                      />
+                    </Row>
+                    <Row>
+                      <Input
+                        id="password"
+                        label={I18n('Login.fields.password')}
+                        onChange={this.handleOnChange}
+                        type={Input.TYPES.PASSWORD}
+                        value={this.state.password}
+                      />
+                    </Row>
+                  </Row>
+                  <Row>
+                    <ButtonToolbar>
+                      <Button
+                        bsStyle="primary"
+                        onClick={this.handleOnLogin}
+                        type="submit"
+                      >
+                        {I18n('actions.login')}
+                      </Button>
+                    </ButtonToolbar>
+                  </Row>
+                </Form>
               </Col>
             </Row>
           </Panel>
         </Col>
-        {this.renderModal()}
       </Row>
     );
   }

@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
 import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
@@ -10,19 +11,27 @@ import ItemView from '../containers/ItemViewContainer';
 import MemberForm from '../containers/MemberFormContainer';
 import MemberView from '../containers/MemberViewContainer';
 import ReservationTableView from '../components/admin/ReservationTableView';
-import SearchContainer from '../containers/SearchContainer';
-import SettingsView from '../components/general/SettingsView';
+import Search from '../containers/SearchContainer';
+import SettingsView from '../containers/SettingsViewContainer';
 import Statistics from '../components/admin/Statistics';
 import StorageTableView from '../components/admin/StorageTableView';
 
 export default class Routes extends Component {
   static propTypes = {
     api: PropTypes.shape().isRequired,
+    currentPath: PropTypes.string.isRequired,
+    onRouteChange: PropTypes.func.isRequired,
   }
 
   componentDidMount() {
     if (/index\.html/.test(browserHistory.getCurrentLocation().pathname)) {
       browserHistory.push('/search');
+    }
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.currentPath !== nextProps.currentPath) {
+      this.props.onRouteChange(nextProps.currentPath);
     }
   }
 
@@ -32,12 +41,12 @@ export default class Routes extends Component {
     return (
       <Router history={browserHistory}>
         <Route
-          component={props => (<SearchContainer {...props} api={api} />)}
+          component={Search}
           path="/"
         >
           <IndexRedirect to="/search" />
           <Route
-            component={props => (<SearchContainer {...props} api={api} />)}
+            component={Search}
             name="Search"
             path="/search"
           />
@@ -68,7 +77,7 @@ export default class Routes extends Component {
         <Route name="Item" path="/item">
           <IndexRedirect to="add" />
           <Route
-            component={props => (<ItemView {...props} api={api} />)}
+            component={ItemView}
             name="ItemView"
             path="view/:id"
           />
@@ -116,7 +125,7 @@ export default class Routes extends Component {
           />
         </Route>
         <Route
-          component={props => (<SettingsView {...props} api={api} />)}
+          component={SettingsView}
           name="settings"
           path="/settings"
         />
