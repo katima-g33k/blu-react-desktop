@@ -1,4 +1,4 @@
-import { closeModal } from '../modalActions';
+import { close } from '../modalActions';
 import I18n from '../../lib/i18n';
 import {
   OPEN_MODAL,
@@ -7,7 +7,7 @@ import {
   RESERVE_COPY_SUCCESS,
 } from '../actionTypes';
 import Modal from '../../components/general/modals/Modal';
-import { setSearchResultOnClick } from '../searchActions';
+import { setResultOnClick } from '../searchActions';
 import { Transaction } from '../../lib/models';
 
 const fail = error => ({
@@ -26,7 +26,7 @@ const success = (copy, member) => ({
 });
 
 export default (api, copy) => (dispatch) => {
-  dispatch(setSearchResultOnClick(async (parent) => {
+  dispatch(setResultOnClick(async (parent) => {
     dispatch(pending());
 
     try {
@@ -36,7 +36,7 @@ export default (api, copy) => (dispatch) => {
       reservedCopy.reserve(parent);
 
       dispatch(success(reservedCopy, parent));
-      dispatch(closeModal());
+      dispatch(close());
     } catch (error) {
       dispatch(fail(error));
     }

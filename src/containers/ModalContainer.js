@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { closeModal, updateInputValue } from '../actions/modalActions';
+import { close, updateInputValue } from '../actions/modalActions';
 import Modal from '../components/general/modals/Modal';
 
 const mapStateToProps = ({ modalStore }) => ({
@@ -8,7 +8,7 @@ const mapStateToProps = ({ modalStore }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  closeModal: () => dispatch(closeModal()),
+  closeModal: () => dispatch(close()),
   onInput: value => dispatch(updateInputValue(value)),
 });
 

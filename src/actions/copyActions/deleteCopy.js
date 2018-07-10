@@ -1,5 +1,5 @@
 import API from '../../lib/api';
-import { closeModal } from '../modalActions';
+import { close } from '../modalActions';
 import {
   DELETE_COPY_FAIL,
   DELETE_COPY_PENDING,
@@ -26,13 +26,13 @@ const deleteSuccess = copy => ({
   type: DELETE_COPY_SUCCESS,
 });
 
-const deleteCopy = async (copy, dispatch) => {
+const deleteCopy = copy => async (dispatch) => {
   dispatch(deletePending());
 
   try {
     await apiClient.member.copy.delete(copy.id);
     dispatch(deleteSuccess(copy));
-    dispatch(closeModal());
+    dispatch(close());
   } catch (error) {
     dispatch(deleteFail(error));
   }
@@ -43,7 +43,7 @@ export default copy => (dispatch) => {
     actions: [
       {
         label: I18n('CopyTable.modals.delete.action'),
-        onClick: () => deleteCopy(copy, dispatch),
+        onClick: () => dispatch(deleteCopy(copy)),
         style: 'danger',
       },
     ],

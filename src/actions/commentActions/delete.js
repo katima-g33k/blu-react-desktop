@@ -38,9 +38,7 @@ export default comment => (dispatch) => {
     actions: [
       {
         label: I18n('MemberView.modal.comment.delete.action'),
-        onClick: async () => {
-          await dispatch(deleteComment(comment));
-        },
+        onClick: () => dispatch(deleteComment(comment)),
         style: 'danger',
       },
     ],

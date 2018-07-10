@@ -23,7 +23,7 @@ const fail = error => ({
   type: MERGE_ITEM_FAIL,
 });
 
-export default async (originalId, duplicateId, api, dispatch) => {
+export default (originalId, duplicateId, api) => async (dispatch) => {
   dispatch(pending());
 
   try {

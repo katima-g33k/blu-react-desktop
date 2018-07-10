@@ -25,7 +25,8 @@ export default apiClient => async (dispatch) => {
   dispatch(pending());
 
   try {
-    const states = (await apiClient.state.list()).map(state => new State(state));
+    const stateData = await apiClient.state.list();
+    const states = stateData.map(state => new State(state));
     dispatch(success(states));
   } catch (error) {
     dispatch(fail(error));

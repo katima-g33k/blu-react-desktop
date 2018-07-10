@@ -1,4 +1,4 @@
-import { closeModal } from '../modalActions';
+import { close } from '../modalActions';
 import { encrypt } from '../../lib/cipher';
 import I18n from '../../lib/i18n';
 import {
@@ -36,7 +36,7 @@ export default (username, password, api) => async (dispatch) => {
       actions: [
         {
           label: I18n('actions.ok'),
-          onClick: () => dispatch(closeModal()),
+          onClick: () => dispatch(close()),
         },
       ],
       type: OPEN_MODAL,

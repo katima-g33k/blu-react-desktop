@@ -2,10 +2,10 @@
 
 import { browserHistory } from 'react-router';
 
-import { closeModal } from '../modalActions';
+import { close } from '../modalActions';
 import I18n from '../../lib/i18n';
 import { OPEN_MODAL } from '../actionTypes';
-import merge from '../memberActions/merge';
+import merge from './merge';
 
 export const openExistsModal = (itemId, existingItemId, userIsAdmin, api) => (dispatch) => {
   if (!itemId) {
@@ -15,7 +15,7 @@ export const openExistsModal = (itemId, existingItemId, userIsAdmin, api) => (di
       actions: [{
         label: I18n('ItemForm.modals.exists.goToItem.action'),
         onClick: () => {
-          dispatch(closeModal());
+          dispatch(close());
           browserHistory.push(`/item/view/${existingItemId}`);
         },
         style: 'primary',
@@ -33,7 +33,7 @@ export const openExistsModal = (itemId, existingItemId, userIsAdmin, api) => (di
       cancelable: true,
       actions: [{
         label: I18n('ItemForm.modals.exists.merge.action'),
-        onClick: () => merge(existingItemId, itemId, api, dispatch),
+        onClick: () => dispatch(merge(existingItemId, itemId, api)),
         style: 'danger',
       }],
       message: I18n('ItemForm.modals.exists.merge.message'),
@@ -46,7 +46,7 @@ export const openExistsModal = (itemId, existingItemId, userIsAdmin, api) => (di
   dispatch({
     actions: [{
       label: I18n('actions.ok'),
-      onClick: () => dispatch(closeModal()),
+      onClick: () => dispatch(close()),
     }],
     message: I18n('ItemForm.modals.exists.message'),
     title: I18n('ItemForm.modals.exists.title'),

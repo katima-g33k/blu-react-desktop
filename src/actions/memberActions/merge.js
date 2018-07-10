@@ -1,6 +1,6 @@
 import { browserHistory } from 'react-router';
 
-import { closeModal } from '../modalActions';
+import { close } from '../modalActions';
 import I18n from '../../lib/i18n';
 import {
   MERGE_MEMBER_FAIL,
@@ -23,7 +23,7 @@ const fail = error => ({
   type: MERGE_MEMBER_FAIL,
 });
 
-export default async (duplicate, no, apiClient, dispatch) => {
+export default (duplicate, no, apiClient) => async (dispatch) => {
   dispatch(pending());
 
   try {
@@ -34,7 +34,7 @@ export default async (duplicate, no, apiClient, dispatch) => {
       actions: [{
         label: I18n('actions.ok'),
         onClick: () => {
-          dispatch(closeModal());
+          dispatch(close());
           browserHistory.push(`/member/view/${no}`);
         },
       }],

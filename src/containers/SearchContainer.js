@@ -2,14 +2,15 @@ import { connect } from 'react-redux';
 
 import Search from '../components/search/Search';
 import {
-  cancelSearch,
+  cancel,
   search,
   updateArchives,
-  updateSearchValue,
+  updateValue,
   updateType,
 } from '../actions/searchActions';
 
-const mapStateToProps = ({ searchStore }) => ({
+const mapStateToProps = ({ appStore, searchStore }) => ({
+  api: appStore.apiCliemt,
   archives: searchStore.archives,
   isLoading: searchStore.isLoading,
   type: searchStore.type,
@@ -17,10 +18,10 @@ const mapStateToProps = ({ searchStore }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  cancelSearch: () => dispatch(cancelSearch()),
+  cancelSearch: () => dispatch(cancel()),
   handleArchive: () => dispatch(updateArchives()),
-  handleInput: event => dispatch(updateSearchValue(event.target.value)),
-  handleSearch: (value, type, archives) => dispatch(search(value, type, archives)),
+  handleInput: event => dispatch(updateValue(event.target.value)),
+  handleSearch: (value, type, archives, api) => dispatch(search(value, type, archives, api)),
   handleType: event => dispatch(updateType(event.target.value)),
 });
 
@@ -34,7 +35,8 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   },
   handleSearch: (event) => {
     event.preventDefault();
-    dispatchProps.handleSearch(stateProps.value, ownProps.type || stateProps.type, stateProps.archives);
+    const type = ownProps.type || stateProps.type;
+    dispatchProps.handleSearch(stateProps.value, type, stateProps.archives, stateProps.api);
   },
 });
 

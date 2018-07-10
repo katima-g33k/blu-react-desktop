@@ -21,21 +21,23 @@ const fail = error => ({
   type: UPDATE_STORAGE_FAIL,
 });
 
+const updateStorage = (id, value, api) => async (dispatch) => {
+  dispatch(pending());
+
+  try {
+    const newStorage = value.replace(/\D+/g, ' ').split(/\D/).sort((a, b) => a - b);
+    await api.item.storage.set(id, newStorage);
+    dispatch(success(newStorage));
+  } catch (error) {
+    dispatch(fail(error));
+  }
+};
+
 export default (api, id, storage) => (dispatch) => {
   dispatch({
     actions: [{
       label: I18n('actions.save'),
-      onClick: async ({ inputValue }) => {
-        dispatch(pending());
-
-        try {
-          const newStorage = inputValue.replace(/\D+/g, ' ').split(/\D/).sort((a, b) => a - b);
-          await api.item.storage.set(id, newStorage);
-          dispatch(success(newStorage));
-        } catch (error) {
-          dispatch(fail(error));
-        }
-      },
+      onClick: ({ inputValue }) => dispatch(updateStorage(id, inputValue, api)),
     }],
     cancelable: true,
     inputValue: storage.join('; '),

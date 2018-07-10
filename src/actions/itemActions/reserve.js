@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-import { setSearchResultOnClick } from '../searchActions';
-import { closeModal } from '../modalActions';
+import { setResultOnClick } from '../searchActions';
+import { close } from '../modalActions';
 import I18n from '../../lib/i18n';
 import Modal from '../../components/general/modals/Modal';
 import {
@@ -26,8 +26,8 @@ const fail = error => ({
   type: RESERVE_ITEM_FAIL,
 });
 
-const openSearchModal = (dispatch, api, itemId) => {
-  dispatch(setSearchResultOnClick(async (parent) => {
+const openSearchModal = (api, itemId) => (dispatch) => {
+  dispatch(setResultOnClick(async (parent) => {
     dispatch(pending());
 
     try {
@@ -39,11 +39,12 @@ const openSearchModal = (dispatch, api, itemId) => {
         parent,
       });
       dispatch(success(reservation));
-      dispatch(closeModal());
+      dispatch(close());
     } catch (error) {
       dispatch(fail(error));
     }
   }));
+
   dispatch({
     cancelable: true,
     onClick: null,
@@ -58,7 +59,7 @@ export default (api, id, isInStock) => (dispatch) => {
     dispatch({
       actions: [{
         label: I18n('ItemView.actions.reserve'),
-        onClick: () => openSearchModal(dispatch, api, id),
+        onClick: () => dispatch(openSearchModal(api, id)),
       }],
       cancelable: true,
       messageKey: 'ItemView.modal.reserveWarning.message',
@@ -66,6 +67,6 @@ export default (api, id, isInStock) => (dispatch) => {
       type: OPEN_MODAL,
     });
   } else {
-    openSearchModal(dispatch, api, id);
+    dispatch(openSearchModal(api, id));
   }
 };

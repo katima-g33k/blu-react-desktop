@@ -24,7 +24,7 @@ const insertCommentSuccess = comment => ({
   type: INSERT_COMMENT_SUCCESS,
 });
 
-const insertComment = async (no, comment, dispatch) => {
+const insertComment = (no, comment) => async (dispatch) => {
   dispatch(insertCommentPending());
 
   try {
@@ -39,7 +39,7 @@ export default no => (dispatch) => {
   dispatch({
     actions: [{
       label: I18n('MemberView.modal.comment.insert.action'),
-      onClick: ({ inputValue }) => insertComment(no, inputValue, dispatch),
+      onClick: ({ inputValue }) => dispatch(insertComment(no, inputValue)),
     }],
     cancelable: true,
     message: I18n('MemberView.modal.comment.insert.message'),

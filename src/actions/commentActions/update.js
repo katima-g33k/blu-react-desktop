@@ -25,7 +25,7 @@ const updateCommentSuccess = comment => ({
   type: UPDATE_COMMENT_SUCCESS,
 });
 
-const updateComment = async (id, comment, dispatch) => {
+const updateComment = (id, comment) => async (dispatch) => {
   dispatch(updateCommentPending());
 
   try {
@@ -40,7 +40,7 @@ export default (id, comment) => (dispatch) => {
   dispatch({
     actions: [{
       label: I18n('MemberView.modal.comment.update.action'),
-      onClick: ({ inputValue }) => updateComment(id, inputValue, dispatch),
+      onClick: ({ inputValue }) => dispatch(updateComment(id, inputValue)),
     }],
     cancelable: true,
     inputType: Modal.INPUT_TYPES.TEXTAREA,

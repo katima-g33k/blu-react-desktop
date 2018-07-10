@@ -1,6 +1,6 @@
 import { browserHistory } from 'react-router';
 
-import { closeModal } from '../modalActions';
+import { close } from '../modalActions';
 import I18n from '../../lib/i18n';
 import merge from './merge';
 import { OPEN_MODAL } from '../actionTypes';
@@ -83,7 +83,7 @@ export const openExistsModal = (routeNo, formNo, userIsAdmin, apiClient) => (dis
       actions: [{
         label: I18n('MemberForm.modals.exists.goToMember.action'),
         onClick: () => {
-          dispatch(closeModal());
+          dispatch(close());
           browserHistory.push(`/member/view/${formNo}`);
         },
         style: 'primary',
@@ -101,7 +101,7 @@ export const openExistsModal = (routeNo, formNo, userIsAdmin, apiClient) => (dis
       cancelable: true,
       actions: [{
         label: I18n('MemberForm.modals.exists.merge.action'),
-        onClick: () => merge(routeNo, formNo, apiClient, dispatch),
+        onClick: () => dispatch(merge(routeNo, formNo, apiClient)),
         style: 'danger',
       }],
       message: I18n('MemberForm.modals.exists.merge.message'),
@@ -114,7 +114,7 @@ export const openExistsModal = (routeNo, formNo, userIsAdmin, apiClient) => (dis
   dispatch({
     actions: [{
       label: I18n('actions.ok'),
-      onClick: () => dispatch(closeModal()),
+      onClick: () => dispatch(close()),
     }],
     message: I18n('MemberForm.modals.exists.message'),
     title: I18n('MemberForm.modals.exists.title'),

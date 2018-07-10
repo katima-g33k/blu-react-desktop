@@ -11,7 +11,7 @@ import {
 import MemberForm from '../components/member/form/MemberForm';
 import { formatMemberFormData } from '../lib/memberHelper';
 
-const mapStateToProps = ({ appStore, memberStore, stateStore }) => ({
+const mapStateToProps = ({ appStore, memberStore }) => ({
   api: appStore.apiClient,
   member: memberStore.member,
   userIsAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,

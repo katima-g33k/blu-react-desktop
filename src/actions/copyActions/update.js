@@ -5,7 +5,7 @@ import {
   UPDATE_COPY_PENDING,
   UPDATE_COPY_SUCCESS,
 } from '../actionTypes';
-import { closeModal } from '../modalActions';
+import { close } from '../modalActions';
 import Copy from '../../lib/models/Copy';
 import I18n from '../../lib/i18n';
 import Modal from '../../components/general/modals/Modal';
@@ -28,13 +28,13 @@ const updateSuccess = copy => ({
   type: UPDATE_COPY_SUCCESS,
 });
 
-const update = async (copy, price, dispatch) => {
+const update = (copy, price) => async (dispatch) => {
   dispatch(updatePending());
 
   try {
     await apiClient.member.copy.update(copy.id, price);
     dispatch(updateSuccess(new Copy({ ...copy, price })));
-    dispatch(closeModal());
+    dispatch(close());
   } catch (error) {
     dispatch(updateFail(error));
   }
@@ -44,7 +44,7 @@ export default copy => (dispatch) => {
   dispatch({
     actions: [{
       label: I18n('CopyTable.modals.update.action'),
-      onClick: ({ inputValue }) => update(copy, +inputValue, dispatch),
+      onClick: ({ inputValue }) => dispatch(update(copy, +inputValue)),
     }],
     cancelable: true,
     inputType: Modal.INPUT_TYPES.NUMBER,

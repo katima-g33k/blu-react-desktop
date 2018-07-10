@@ -1,6 +1,6 @@
 import { browserHistory } from 'react-router';
 
-import { closeModal } from '../modalActions';
+import { close } from '../modalActions';
 import {
   DELETE_ITEM_FAIL,
   DELETE_ITEM_PENDING,
@@ -28,7 +28,7 @@ const successModal = dispatch => ({
     label: I18n('actions.ok'),
     onClick: () => {
       browserHistory.push('/');
-      dispatch(closeModal());
+      dispatch(close());
     },
   }],
   messageKey: 'ItemView.modal.deleted.message',

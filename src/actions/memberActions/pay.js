@@ -1,7 +1,7 @@
 import API from '../../lib/api';
 import { Copy } from '../../lib/models';
 import I18n from '../../lib/i18n';
-import { openModal } from '../modalActions';
+import { open } from '../modalActions';
 import {
   PAY_MEMBER_FAIL,
   PAY_MEMBER_PENDING,
@@ -54,7 +54,7 @@ export default (member, printReceipt = false) => async (dispatch) => {
       dispatch(startPrinting(amount));
     }
 
-    dispatch(openModal(
+    dispatch(open(
       I18n('MemberView.modal.paySuccessful.title'),
       I18n('MemberView.modal.paySuccessful.message', { amount }),
     ));
