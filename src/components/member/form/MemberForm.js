@@ -40,7 +40,7 @@ export default class MemberForm extends Component {
     member: PropTypes.instanceOf(Member).isRequired,
     no: PropTypes.number,
     onCancel: PropTypes.func.isRequired,
-    onLoad: PropTypes.func.isRequired,
+    fetch: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
   }
 
@@ -64,7 +64,7 @@ export default class MemberForm extends Component {
 
   componentDidMount() {
     if (!this.state.member.no && this.props.no) {
-      this.props.onLoad();
+      this.props.fetch();
     }
   }
 

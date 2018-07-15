@@ -1,13 +1,13 @@
-import { OPEN_MODAL } from '../actionTypes';
 import { canChangeLocation } from '../../lib/scannerHelpers';
+import i18n from '../../lib/i18n';
+import { OPEN_MODAL } from '../actionTypes';
 
 export default () => (dispatch) => {
   if (canChangeLocation()) {
-    // TODO: I18n
     dispatch({
       cancelable: false,
-      message: 'Le code que vous venez de scanner n\'est pas supporté par le système de la BLU',
-      title: 'Code invalide',
+      message: i18n('general.scanner.invalid.message'),
+      title: i18n('general.scanner.invalid.title'),
       type: OPEN_MODAL,
     });
   }

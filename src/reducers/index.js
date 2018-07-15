@@ -1,5 +1,6 @@
 import appStore from './app';
 import copyStore from './copy';
+import employeeStore from './employee';
 import historyStore from './history';
 import itemStore from './item';
 import memberStore from './member';
@@ -13,6 +14,7 @@ import userStore from './user';
 export {
   appStore,
   copyStore,
+  employeeStore,
   historyStore,
   itemStore,
   memberStore,

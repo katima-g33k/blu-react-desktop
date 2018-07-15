@@ -19,7 +19,7 @@ const mapStateToProps = ({ appStore, memberStore }) => ({
 
 const mapDispatchToProps = dispatch => ({
   onExists: (no, isUpdate, userIsAdmin, api) => dispatch(openExistsModal(no, isUpdate, userIsAdmin, api)),
-  onLoad: (no, api) => dispatch(fetch(api, no)),
+  fetch: (no, api) => dispatch(fetch(api, no)),
   onInsert: (member, api) => dispatch(insert(member, api)),
   onUpdate: (no, member, api) => dispatch(update(no, member, api)),
 });
@@ -37,7 +37,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   member: stateProps.member,
   no: +ownProps.params.no,
   onCancel: () => browserHistory.push(ownProps.params.no ? `/member/view/${ownProps.params.no}` : '/'),
-  onLoad: () => dispatchProps.onLoad(ownProps.params.no, stateProps.api),
+  fetch: () => dispatchProps.fetch(ownProps.params.no, stateProps.api),
   onSave: (formData) => {
     const formattedData = formatMemberFormData(formData);
 

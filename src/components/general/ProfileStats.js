@@ -1,8 +1,11 @@
-import React, { Component, PropTypes } from 'react';
+// TODO: Optimize
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 
 import Spinner from './Spinner';
 import { Translate } from '../../lib/i18n/i18n';
+import { Copy } from '../../lib/models';
 
 const style = {
   table: {
@@ -130,14 +133,18 @@ const calculateStats = (copies, callback) => {
 };
 
 export default class ProfileStats extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { stats: null };
+  static propTypes = {
+    copies: PropTypes.arrayOf(PropTypes.instanceOf(Copy)),
+    priceStats: PropTypes.bool,
   }
 
-  static propTypes = {
-    copies: PropTypes.array,
-    priceStats: PropTypes.bool,
+  static defaultProps = {
+    copies: [],
+    priceStats: false,
+  }
+
+  state = {
+    stats: null,
   }
 
   componentWillMount = () => {

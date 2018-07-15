@@ -9,12 +9,12 @@ const mapStateToProps = ({ appStore, stateStore }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  onLoad: api => dispatch(fetch(api)),
+  fetch: api => dispatch(fetch(api)),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   onChange: ownProps.onChange,
-  onLoad: () => dispatchProps.onLoad(stateProps.api),
+  fetch: () => dispatchProps.fetch(stateProps.api),
   states: stateProps.states,
   value: ownProps.value,
 });

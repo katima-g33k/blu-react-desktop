@@ -11,14 +11,14 @@ import { State } from '../../lib/models';
 export default class StateSelector extends Component {
   static propTypes = {
     onChange: PropTypes.func,
-    onLoad: PropTypes.func,
+    fetch: PropTypes.func,
     states: PropTypes.arrayOf(PropTypes.instanceOf(State)),
     value: Select.propTypes.value,
   }
 
   static defaultProps = {
     onChange: () => {},
-    onLoad: () => {},
+    fetch: () => {},
     states: [],
     value: null,
   }
@@ -31,7 +31,7 @@ export default class StateSelector extends Component {
 
   componentDidMount() {
     if (!this.props.states.length) {
-      this.props.onLoad();
+      this.props.fetch();
     } else {
       this.setState({
         options: this.getOptions(this.props.states),

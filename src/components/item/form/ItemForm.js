@@ -38,7 +38,7 @@ export default class ItemForm extends Component {
     id: PropTypes.number,
     item: PropTypes.instanceOf(Item).isRequired,
     onCancel: PropTypes.func.isRequired,
-    onLoad: PropTypes.func.isRequired,
+    fetch: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
   }
 
@@ -60,7 +60,7 @@ export default class ItemForm extends Component {
 
   componentDidMount() {
     if (!this.state.item.id && this.props.id) {
-      this.props.onLoad();
+      this.props.fetch();
     }
   }
 

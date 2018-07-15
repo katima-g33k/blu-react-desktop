@@ -9,14 +9,14 @@ import { Select } from './formInputs';
 export default class SubjectSelector extends Component {
   static propTypes = {
     onChange: PropTypes.func,
-    onLoad: PropTypes.func,
+    fetch: PropTypes.func,
     subjectsByCategory: PropTypes.arrayOf(PropTypes.shape()),
     value: Select.propTypes.value,
   }
 
   static defaultProps = {
     onChange: () => {},
-    onLoad: () => {},
+    fetch: () => {},
     subjectsByCategory: [],
     value: null,
   }
@@ -29,7 +29,7 @@ export default class SubjectSelector extends Component {
 
   componentDidMount() {
     if (!this.props.subjectsByCategory.length) {
-      this.props.onLoad();
+      this.props.fetch();
     } else {
       this.setState({
         optGroups: this.getOptGroups(this.props.subjectsByCategory),

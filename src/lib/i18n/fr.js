@@ -1,5 +1,5 @@
 /* eslint max-len: 0 */
-const fr = {
+export default {
   actions: {
     add: 'Ajouter',
     cancel: 'Annuler',
@@ -17,6 +17,12 @@ const fr = {
         VALID: 'Valide',
       },
     },
+    scanner: {
+      invalid: {
+        message: 'Le code que vous venez de scanner n\'est pas supporté par le système de la BLU',
+        title: 'Code invalide',
+      },
+    },
   },
   Admin: {
     statistics: {
@@ -31,7 +37,44 @@ const fr = {
       },
     },
     employees: {
+      modals: {
+        form: {
+          title: {
+            add: 'Ajouter un.e employé.e',
+            edit: 'Modifier un.e employé.e',
+          },
+          fields: {
+            confirmPassword: 'Confirmer le mot de passe',
+            isActive: 'Est activé',
+            isAdmin: 'Est administrateur',
+            password: 'Mot de passe',
+            setPassword: 'Changer le mot de passe',
+            username: 'Nom d\'utilisateur',
+          },
+        },
+        remove: {
+          message: 'Êtes-vous certains de vouloir supprimer %{username} ?',
+          title: 'Suppression d\'un.e employé.e',
+        },
+      },
       title: 'Adminnistraton - Gestion des employé.e.s',
+      table: {
+        columns: {
+          username: 'Nom d\'utilisateur',
+          isAdmin: {
+            title: 'Permissions',
+            admin: 'Administrateur',
+            user: 'Utilisateur',
+          },
+          isActive: {
+            title: 'Est activé',
+            active: 'Actif',
+            inactive: 'Inactif',
+          },
+        },
+        placeholder: 'Aucun employé dans le système',
+        title: 'Liste des employé.e.s',
+      },
     },
     itemList: {
       title: 'Adminnistraton - Gestion des ouvrages',
@@ -457,5 +500,3 @@ const fr = {
     placeholder: 'Aucune donnée',
   },
 };
-
-export default fr;

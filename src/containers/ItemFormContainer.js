@@ -21,7 +21,7 @@ const mapDispatchToProps = dispatch => ({
   onExists: (id, existingItemId, userIsAdmin, api) => {
     dispatch(openExistsModal(id, existingItemId, userIsAdmin, api))
   },
-  onLoad: (id, api) => dispatch(fetch(id, api)),
+  fetch: (id, api) => dispatch(fetch(id, api)),
   onInsert: (item, api) => dispatch(insert(item, api)),
   onUpdate: (id, item, api) => dispatch(update(id, item, api)),
 });
@@ -39,7 +39,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   item: stateProps.item,
   id: +ownProps.params.id,
   onCancel: () => browserHistory.push(ownProps.params.id ? `/item/view/${ownProps.params.id}` : '/'),
-  onLoad: () => dispatchProps.onLoad(ownProps.params.id, stateProps.api),
+  fetch: () => dispatchProps.fetch(ownProps.params.id, stateProps.api),
   onSave: (formData) => {
     const formattedData = formatItemFormData(formData);
 
