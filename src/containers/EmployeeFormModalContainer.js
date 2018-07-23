@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import EmployeeFormModal from '../components/general/modals/EmployeeFormModal';
+import EmployeeFormModal from '../components/general/modals/employeeFormModal/EmployeeFormModal';
 import {
   insert,
   setCurrent,

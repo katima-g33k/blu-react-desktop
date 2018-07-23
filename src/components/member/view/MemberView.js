@@ -11,7 +11,7 @@ import MemberActionPanel from '../../../containers/MemberActionPanelContainer';
 import MemberComments from '../../../containers/MemberCommentContainer';
 import MemberReceipt from '../receipt/MemberReceipt';
 import ParentLogo from './ParentLogo';
-import ProfileStats from '../../general/ProfileStats';
+import ProfileStats from '../../general/profileStats/ProfileStats';
 import Spinner from '../../general/Spinner';
 
 const border = {

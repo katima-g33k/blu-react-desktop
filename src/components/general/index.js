@@ -5,7 +5,7 @@ import Checkbox from './Checkbox';
 import CustomButton from './StatusButton';
 import DatePicker from './DatePicker';
 import Input from './Input';
-import ProfileStats from './ProfileStats';
+import ProfileStats from './profileStats/ProfileStats';
 import Select from './Select';
 import Spinner from './Spinner';
 import Table from './Table';

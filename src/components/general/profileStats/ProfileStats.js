@@ -3,27 +3,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 
-import Spinner from './Spinner';
-import { Translate } from '../../lib/i18n/i18n';
-import { Copy } from '../../lib/models';
+import Spinner from '../Spinner';
+import { Translate } from '../../../lib/i18n/i18n';
+import { Copy } from '../../../lib/models/index';
 
-const style = {
-  table: {
-    borderCollapse: 'collapse',
-    margin: 'auto',
-  },
-  td: {
-    textAlign: 'center',
-    padding: '15px',
-    border: '1px #000 solid',
-  },
-  title: {
-    fontWeight: 'bold',
-    textAlign: 'center',
-    padding: '15px',
-    border: '1px #000 solid',
-  },
-};
+import './profileStats.css';
 
 const calculateStats = (copies, callback) => {
   const statistics = {
@@ -147,7 +131,7 @@ export default class ProfileStats extends Component {
     stats: null,
   }
 
-  componentWillMount = () => {
+  componentDidMount = () => {
     calculateStats(this.props.copies || [], stats => this.setState({ stats }));
   }
 
@@ -162,17 +146,17 @@ export default class ProfileStats extends Component {
     return (
       <Row>
         <Col md={12}>
-          <Row style={{ marginTop: '15px' }}>
+          <Row className="price-stat">
             <Col md={12}>
               {`Prix maximum: ${priceStats.max.all}$ (${priceStats.max.inStock}$ en stock)`}
             </Col>
           </Row>
-          <Row style={{ marginTop: '15px' }}>
+          <Row className="price-stat">
             <Col md={12}>
               {`Prix moyen: ${priceStats.avg.all}$ (${priceStats.avg.inStock}$ en stock)`}
             </Col>
           </Row>
-          <Row style={{ marginTop: '15px' }}>
+          <Row className="price-stat">
             <Col md={12}>
               {`Prix minimum: ${priceStats.min.all}$ (${priceStats.min.inStock}$ en stock)`}
             </Col>
@@ -186,55 +170,55 @@ export default class ProfileStats extends Component {
     const { added, sold, toSell, toPay, paid } = this.state.stats.accountStats;
 
     return (
-      <table style={style.table}>
+      <table>
         <tbody>
           <tr>
-            <td colSpan={3} style={style.title}>
+            <td className="title" colSpan={3}>
               <Translate value="ProfileStats.added" />
             </td>
           </tr>
           <tr>
-            <td colSpan={3} style={style.td}>
+            <td colSpan={3}>
               {added.count} <Translate value="ProfileStats.books" />
               <br />
               ({added.price} $)
             </td>
           </tr>
           <tr>
-            <td colSpan={2} style={style.title}>
+            <td className="title" colSpan={2}>
               <Translate value="ProfileStats.sold" />
             </td>
-            <td style={style.title}>
+            <td className="title">
               <Translate value="ProfileStats.toSell" />
             </td>
           </tr>
           <tr>
-            <td colSpan={2} style={style.td}>
+            <td colSpan={2}>
               {sold.count} <Translate value="ProfileStats.books" />
               <br />
               ({sold.price} $)
             </td>
-            <td rowSpan={3} style={style.td}>
+            <td rowSpan={3}>
               {toSell.count} <Translate value="ProfileStats.books" />
               <br />
               ({toSell.price} $)
             </td>
           </tr>
           <tr>
-            <td style={style.title}>
+            <td className="title">
               <Translate value="ProfileStats.toPay" />
             </td>
-            <td style={style.title}>
+            <td className="title">
               <Translate value="ProfileStats.paid" />
             </td>
           </tr>
           <tr>
-            <td style={style.td}>
+            <td>
               {toPay.count} <Translate value="ProfileStats.books" />
               <br />
               ({toPay.price} $)
             </td>
-            <td style={style.td}>
+            <td>
               {paid.count} <Translate value="ProfileStats.books" />
               <br />
               ({paid.price} $)
@@ -250,7 +234,7 @@ export default class ProfileStats extends Component {
     const { priceStats } = this.props;
 
     return stats ? (
-      <Row>
+      <Row id={this.constructor.name}>
         {priceStats ? (
           <Col md={5}>
             {this.renderPriceStats()}

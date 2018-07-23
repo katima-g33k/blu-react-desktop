@@ -7,7 +7,7 @@ import AlignedData from '../../general/AlignedData';
 import CopyTable from './ItemCopyTable';
 import I18n from '../../../lib/i18n';
 import { INFORMATION_FIELDS, LABEL_STYLE, PANEL_STYLE } from './constant';
-import ProfileStats from '../../general/ProfileStats';
+import ProfileStats from '../../general/profileStats/ProfileStats';
 import ReservationList from '../../../containers/ReservationListContainer';
 import { Item, Reservation } from '../../../lib/models';
 import Spinner from '../../general/Spinner';
