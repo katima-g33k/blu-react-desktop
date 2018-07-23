@@ -8,6 +8,7 @@ import modalStore from './modal';
 import searchStore from './search';
 import settingsStore from './settings';
 import stateStore from './states';
+import storageStore from './storage';
 import subjectStore from './subject';
 import userStore from './user';
 
@@ -22,6 +23,7 @@ export {
   searchStore,
   settingsStore,
   stateStore,
+  storageStore,
   subjectStore,
   userStore,
 };

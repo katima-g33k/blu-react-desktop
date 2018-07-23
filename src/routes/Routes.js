@@ -14,7 +14,7 @@ import ReservationTableView from '../components/admin/ReservationTableView';
 import Search from '../containers/SearchContainer';
 import SettingsView from '../containers/SettingsViewContainer';
 import Statistics from '../components/admin/Statistics';
-import StorageTableView from '../components/admin/StorageTableView';
+import StorageManagement from '../containers/StorageManagementContainer';
 
 export default class Routes extends Component {
   static propTypes = {
@@ -109,7 +109,7 @@ export default class Routes extends Component {
             path="statistics"
           />
           <Route
-            component={props => (<StorageTableView {...props} api={api} />)}
+            component={props => (<StorageManagement {...props} api={api} />)}
             name="storage"
             path="storage"
           />

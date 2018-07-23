@@ -84,6 +84,23 @@ export default {
     },
     storage: {
       title: 'Adminnistraton - Gestion des caisses de rangement',
+      actions: {
+        clear: 'Vider',
+      },
+      table: {
+        columns: {
+          no: 'Numéro de caisse',
+          content: 'Contenu',
+        },
+        placeholder: 'Aucune réservation dans le système',
+        title: 'Liste des caisses de rangement',
+      },
+      modals: {
+        clear: {
+          message: 'Êtes-vous certains de vouloir vider les caisses de rangement ? Ceci est IRRÉVERSIBLE. Ne le faîtes pas à moins d\'être certain de ne plus avoir besoin des caisses présentement enregistrées.',
+          title: 'Vider les caisses de rangement',
+        },
+      },
     },
     duplicates: {
       title: 'Administration - Liste des comptes dupliqués',
