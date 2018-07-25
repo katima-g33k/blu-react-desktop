@@ -22,7 +22,7 @@ const fail = error => ({
   type: DELETE_RESERVATION_FAIL,
 });
 
-const reserve = (reservation, api) => async (dispatch) => {
+const remove = (reservation, api) => async (dispatch) => {
   dispatch(pending());
 
   try {
@@ -46,7 +46,7 @@ export default (api, reservation) => async (dispatch) => {
     actions: [{
       label: I18n('actions.delete'),
       style: 'danger',
-      onClick: () => dispatch(reserve(reservation, api)),
+      onClick: () => dispatch(remove(reservation, api)),
     }],
     cancelable: true,
     message: I18n('ReservationList.modal.message', { name: reservation.parent.name }),

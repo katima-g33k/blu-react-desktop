@@ -80,6 +80,24 @@ export default {
       title: 'Adminnistraton - Gestion des ouvrages',
     },
     reservation: {
+      actions: {
+        clear: 'Tout Supprimer',
+      },
+      modals: {
+        clear: {
+          message: 'Êtes-vous certains de vouloir supprimer TOUTES les réservations ? Ceci est IRRÉVERSIBLE. Ne le faîtes pas à moins d\'être certain de ne pas avoir de réservation pour la session en cours.',
+          title: 'Suppression des réservations',
+        },
+      },
+      table: {
+        columns: {
+          date: 'Date',
+          item: 'Ouvrage',
+          parent: 'Parent',
+        },
+        placeholder: 'Aucune réservation dans le système',
+        title: 'Liste des réservations',
+      },
       title: 'Adminnistraton - Geston des réservations',
     },
     storage: {

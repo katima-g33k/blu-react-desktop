@@ -5,6 +5,7 @@ import historyStore from './history';
 import itemStore from './item';
 import memberStore from './member';
 import modalStore from './modal';
+import reservationsStore from './reservations';
 import searchStore from './search';
 import settingsStore from './settings';
 import stateStore from './states';
@@ -20,6 +21,7 @@ export {
   itemStore,
   memberStore,
   modalStore,
+  reservationsStore,
   searchStore,
   settingsStore,
   stateStore,

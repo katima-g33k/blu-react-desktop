@@ -10,7 +10,7 @@ import ItemList from '../components/admin/ItemList';
 import ItemView from '../containers/ItemViewContainer';
 import MemberForm from '../containers/MemberFormContainer';
 import MemberView from '../containers/MemberViewContainer';
-import ReservationTableView from '../components/admin/ReservationTableView';
+import ReservationManagement from '../containers/ReservationManagementContainer';
 import Search from '../containers/SearchContainer';
 import SettingsView from '../containers/SettingsViewContainer';
 import Statistics from '../components/admin/Statistics';
@@ -99,7 +99,7 @@ export default class Routes extends Component {
             path="employees"
           />
           <Route
-            component={props => (<ReservationTableView {...props} api={api} />)}
+            component={props => (<ReservationManagement {...props} api={api} />)}
             name="reservations"
             path="reservations"
           />
