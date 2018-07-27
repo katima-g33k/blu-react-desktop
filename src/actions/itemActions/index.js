@@ -1,5 +1,6 @@
 import exists from './exists';
 import fetch from './fetch';
+import fetchList from './fetchList';
 import insert from './insert';
 import merge from './merge';
 import { openExistsModal } from './modals';
@@ -12,6 +13,7 @@ import updateStorage from './updateStorage';
 export {
   exists,
   fetch,
+  fetchList,
   insert,
   merge,
   openExistsModal,

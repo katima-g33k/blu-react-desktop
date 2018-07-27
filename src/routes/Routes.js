@@ -6,7 +6,7 @@ import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer'
 import DuplicateMembers from '../components/admin/DuplicateMembers';
 import EmployeesTable from '../containers/EmployeeTableContainer';
 import ItemForm from '../containers/ItemFormContainer';
-import ItemList from '../components/admin/ItemList';
+import ItemList from '../containers/ItemListContainer';
 import ItemView from '../containers/ItemViewContainer';
 import MemberForm from '../containers/MemberFormContainer';
 import MemberView from '../containers/MemberViewContainer';

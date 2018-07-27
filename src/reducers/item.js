@@ -5,6 +5,9 @@ import {
   FETCH_ITEM_FAIL,
   FETCH_ITEM_PENDING,
   FETCH_ITEM_SUCCESS,
+  FETCH_ITEM_LIST_FAIL,
+  FETCH_ITEM_LIST_PENDING,
+  FETCH_ITEM_LIST_SUCCESS,
   INSERT_ITEM_SUCCESS,
   RESERVE_ITEM_SUCCESS,
   UPDATE_ITEM_SUCCESS,
@@ -17,6 +20,7 @@ const initialState = {
   id: 0,
   isLoading: false,
   item: new Item({ isBook: true }),
+  items: [],
 };
 
 const handlers = {
@@ -48,6 +52,20 @@ const handlers = {
     ...state,
     isLoading: false,
     item,
+  }),
+  [FETCH_ITEM_LIST_FAIL]: state => ({
+    ...state,
+    isLoading: false,
+  }),
+  [FETCH_ITEM_LIST_PENDING]: state => ({
+    ...state,
+    isLoading: true,
+    items: [],
+  }),
+  [FETCH_ITEM_LIST_SUCCESS]: (state, { items }) => ({
+    ...state,
+    isLoading: false,
+    items,
   }),
   [INSERT_ITEM_SUCCESS]: (state, { item }) => ({
     ...state,

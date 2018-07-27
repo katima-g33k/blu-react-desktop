@@ -1,3 +1,4 @@
+// TODO: Update ilters and optimize for large renders
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
@@ -75,25 +76,43 @@ export default class TableLayout extends Component {
   renderFilters = () => {
     const { filters = [] } = this.props;
 
-    return filters.map(filter => (
-      <Col key={filter.label} md={2}>
-        {filter.type === 'input' ? (
-          <Input
-            id={filter.id}
-            onChange={filter.onChange}
-            placeholder={filter.label}
-            value={filter.value}
-          />
-        ) : (
-          <Checkbox
-            checked={filter.value}
-            id={filter.id}
-            label={filter.label}
-            onChange={filter.onChange}
-          />
-        )}
-      </Col>
-    ));
+    return filters.map((filter) => {
+      if (filter.component) {
+        return (
+          <Col key={filter.key} md={2}>
+            {filter.component}
+          </Col>
+        );
+      }
+
+      if (filter.type === 'input') {
+        return (
+          <Col key={filter.key} md={2}>
+            <Input
+              id={filter.key}
+              onChange={filter.onChange}
+              placeholder={filter.label}
+              value={filter.value}
+            />
+          </Col>
+        );
+      }
+
+      if (filter.type === 'checkbox') {
+        return (
+          <Col key={filter.key} md={2}>
+            <Checkbox
+              checked={filter.checked}
+              id={filter.key}
+              label={filter.label}
+              onChange={filter.onChange}
+            />
+          </Col>
+        );
+      }
+
+      return null;
+    });
   }
 
   render() {

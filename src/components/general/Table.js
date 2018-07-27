@@ -37,6 +37,10 @@ export default class Table extends Component {
     striped: false,
   };
 
+  shouldComponentUpdate(nextProps) {
+    return nextProps.data.length !== this.props.data.length;
+  }
+
   get actionColumnWidth() {
     let actionCount = this.props.rowActions.length;
 

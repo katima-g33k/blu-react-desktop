@@ -78,6 +78,25 @@ export default {
     },
     itemList: {
       title: 'Adminnistraton - Gestion des ouvrages',
+      table: {
+        columns: {
+          author: 'Auteur.e.s',
+          edition: 'Édition',
+          editor: 'Éditeur',
+          inStock: 'En stock',
+          name: 'Titre',
+          publication: 'Publication',
+          status: 'Statut',
+          subject: 'Matière',
+        },
+        filters: {
+          outdated: 'Désuet',
+          removed: 'Retiré',
+          valid: 'Valide',
+        },
+        placeholder: 'Aucun ouvrage dans le système',
+        title: 'Liste des ouvrages (%{items})',
+      },
     },
     reservation: {
       actions: {
