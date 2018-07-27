@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
 
 import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
-import DuplicateMembers from '../components/admin/DuplicateMembers';
+import DuplicateMembers from '../containers/DuplicateMembersContainer';
 import EmployeesTable from '../containers/EmployeeTableContainer';
 import ItemForm from '../containers/ItemFormContainer';
 import ItemList from '../containers/ItemListContainer';
@@ -99,7 +99,7 @@ export default class Routes extends Component {
             path="employees"
           />
           <Route
-            component={props => (<ReservationManagement {...props} api={api} />)}
+            component={ReservationManagement}
             name="reservations"
             path="reservations"
           />
@@ -109,17 +109,17 @@ export default class Routes extends Component {
             path="statistics"
           />
           <Route
-            component={props => (<StorageManagement {...props} api={api} />)}
+            component={StorageManagement}
             name="storage"
             path="storage"
           />
           <Route
-            component={props => (<ItemList {...props} api={api} />)}
+            component={ItemList}
             name="itemList"
             path="item/list"
           />
           <Route
-            component={props => (<DuplicateMembers {...props} api={api} />)}
+            component={DuplicateMembers}
             name="duplicates"
             path="duplicates"
           />

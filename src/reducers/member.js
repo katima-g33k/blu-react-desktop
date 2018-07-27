@@ -3,6 +3,7 @@ import {
   FETCH_MEMBER_FAIL,
   FETCH_MEMBER_PENDING,
   FETCH_MEMBER_SUCCESS,
+  FETCH_MEMBER_DUPLICATES_SUCCESS,
   INSERT_COMMENT_SUCCESS,
   OPEN_MEMBER,
   PAY_MEMBER_SUCCESS,
@@ -11,116 +12,109 @@ import {
   RENEW_MEMBER_SUCCESS,
   UPDATE_COMMENT_SUCCESS,
 } from '../actions/actionTypes';
+import createReducer from './reducerFactory';
 import Member from '../lib/models/Member';
 
 const initialState = {
   amount: 0,
+  duplicates: [],
   isLoading: false,
   member: new Member(),
   no: 0,
   isPrinting: false,
 };
 
-export default function memberReducer(state = initialState, action = {}) {
-  switch (action.type) {
-    case DELETE_COMMENT_SUCCESS:
-      return {
-        ...state,
-        member: new Member({
-          ...state.member,
-          account: {
-            ...state.member.account,
-            comment: state.member.account.comment.filter(comment => comment.id !== action.comment.id),
-          },
-        }),
-      };
-    case FETCH_MEMBER_FAIL:
-      return {
-        ...state,
-        isLoading: false,
-      };
-    case FETCH_MEMBER_PENDING:
-      return {
-        ...state,
-        isLoading: true,
-        member: new Member(),
-      };
-    case FETCH_MEMBER_SUCCESS:
-      return {
-        ...state,
-        isLoading: false,
-        member: new Member(action.member),
-      };
-    case INSERT_COMMENT_SUCCESS:
-      return {
-        ...state,
-        member: new Member({
-          ...state.member,
-          account: {
-            ...state.member.account,
-            comment: [
-              ...state.member.account.comment,
-              action.comment,
-            ],
-          },
-        }),
-      };
-    case OPEN_MEMBER:
-      return {
-        ...state,
-        no: action.no,
-      };
-    case PAY_MEMBER_SUCCESS:
-      return {
-        ...state,
-        member: new Member({
-          ...state.member,
-          account: {
-            ...state.member.account,
-            copies: action.copies,
-          },
-        }),
-      };
-    case PRINT_END:
-      return {
-        ...state,
-        isPrinting: false,
-      };
-    case PRINT_START:
-      return {
-        ...state,
-        amount: action.amount,
-        isPrinting: true,
-      };
-    case RENEW_MEMBER_SUCCESS:
-      return {
-        ...state,
-        member: new Member({
-          ...state.member,
-          account: {
-            ...state.member.account,
-            lastActivity: new Date(),
-          },
-        }),
-      };
-    case UPDATE_COMMENT_SUCCESS:
-      return {
-        ...state,
-        member: new Member({
-          ...state.member,
-          account: {
-            ...state.member.account,
-            comment: state.member.account.comment.map((comment) => {
-              if (comment.id === action.comment.id) {
-                return action.comment;
-              }
+const handlers = {
+  [DELETE_COMMENT_SUCCESS]: (state, action) => ({
+    ...state,
+    member: new Member({
+      ...state.member,
+      account: {
+        ...state.member.account,
+        comment: state.member.account.comment.filter(comment => comment.id !== action.comment.id),
+      },
+    }),
+  }),
+  [FETCH_MEMBER_FAIL]: state => ({
+    ...state,
+    isLoading: false,
+  }),
+  [FETCH_MEMBER_PENDING]: state => ({
+    ...state,
+    isLoading: true,
+    member: new Member(),
+  }),
+  [FETCH_MEMBER_SUCCESS]: (state, action) => ({
+    ...state,
+    isLoading: false,
+    member: new Member(action.member),
+  }),
+  [FETCH_MEMBER_DUPLICATES_SUCCESS]: (state, action) => ({
+    ...state,
+    duplicates: action.duplicates,
+  }),
+  [INSERT_COMMENT_SUCCESS]: (state, action) => ({
+    ...state,
+    member: new Member({
+      ...state.member,
+      account: {
+        ...state.member.account,
+        comment: [
+          ...state.member.account.comment,
+          action.comment,
+        ],
+      },
+    }),
+  }),
+  [OPEN_MEMBER]: (state, action) => ({
+    ...state,
+    no: action.no,
+  }),
+  [PAY_MEMBER_SUCCESS]: (state, action) => ({
+    ...state,
+    member: new Member({
+      ...state.member,
+      account: {
+        ...state.member.account,
+        copies: action.copies,
+      },
+    }),
+  }),
+  [PRINT_END]: state => ({
+    ...state,
+    isPrinting: false,
+  }),
+  [PRINT_START]: (state, action) => ({
+    ...state,
+    amount: action.amount,
+    isPrinting: true,
+  }),
+  [RENEW_MEMBER_SUCCESS]: state => ({
+    ...state,
+    member: new Member({
+      ...state.member,
+      account: {
+        ...state.member.account,
+        lastActivity: new Date(),
+      },
+    }),
+  }),
+  [UPDATE_COMMENT_SUCCESS]: (state, action) => ({
+    ...state,
+    member: new Member({
+      ...state.member,
+      account: {
+        ...state.member.account,
+        comment: state.member.account.comment.map((comment) => {
+          if (comment.id === action.comment.id) {
+            return action.comment;
+          }
 
-              return comment;
-            }),
-          },
+          return comment;
         }),
-      };
-    default:
-      return state;
-  }
-}
+      },
+    }),
+  }),
+};
+
+export default createReducer(initialState, handlers);

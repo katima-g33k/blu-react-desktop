@@ -11,7 +11,10 @@ const DEFAULT_ACTION_COUNT = 4;
 
 export default class Table extends Component {
   static propTypes = {
-    data: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    data: PropTypes.arrayOf(PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.shape()),
+      PropTypes.shape(),
+    ])).isRequired,
     columns: PropTypes.arrayOf(PropTypes.shape()).isRequired,
     highlight: PropTypes.string,
     placeholder: PropTypes.string,

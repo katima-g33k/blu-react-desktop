@@ -141,6 +141,17 @@ export default {
     },
     duplicates: {
       title: 'Administration - Liste des comptes dupliqués',
+      table: {
+        columns: {
+          member: 'Member %{index}',
+        },
+        data: {
+          registration: 'Inscription: %{date}',
+          lastActivity: 'Dernière activité: %{date}',
+        },
+        placeholder: 'Aucun duplicat détecté',
+        title: 'Liste des comptes de membre dupliqués',
+      },
     },
   },
   ItemForm: {

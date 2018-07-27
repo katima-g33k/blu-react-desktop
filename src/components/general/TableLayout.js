@@ -1,4 +1,4 @@
-// TODO: Update ilters and optimize for large renders
+// TODO: Optimize for large renders
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
@@ -15,7 +15,10 @@ export default class TableLayout extends Component {
   static propTypes = {
     actions: PropTypes.arrayOf(PropTypes.shape()),
     columns: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-    data: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    data: PropTypes.arrayOf(PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.shape()),
+      PropTypes.shape(),
+    ])).isRequired,
     filters: PropTypes.arrayOf(PropTypes.shape()),
     exportable: PropTypes.bool,
     exportTitle: PropTypes.string,
