@@ -10,11 +10,13 @@ module.exports = {
     'max-len': ['warn', { code: 120 }],
     'react/prefer-stateless-function': 0,
     'react/jsx-filename-extension': 0,
+    'react/destructuring-assignment': 0,
     'no-plusplus': 0,
     'no-underscore-dangle': [
       'error',
       { 'allowAfterThis': true },
     ],
+    'jsx-a11y/img-has-alt': 0,
     'jsx-a11y/alt-text': 0,
     'jsx-a11y/interactive-supports-focus': 0,
     'jsx-a11y/no-noninteractive-element-interactions': 0,
