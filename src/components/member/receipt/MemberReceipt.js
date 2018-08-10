@@ -111,7 +111,8 @@ export default class MemberReceipt extends Component {
   }
 
   componentDidMount() {
-    print();
+    // TODO: Fix
+    // this.print();
     return this.props.onAfterPrint && this.props.onAfterPrint();
   }
 

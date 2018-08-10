@@ -13,7 +13,7 @@ import MemberView from '../containers/MemberViewContainer';
 import ReservationManagement from '../containers/ReservationManagementContainer';
 import Search from '../containers/SearchContainer';
 import SettingsView from '../containers/SettingsViewContainer';
-import Statistics from '../components/admin/Statistics';
+import Statistics from '../containers/StatisticsContainer';
 import StorageManagement from '../containers/StorageManagementContainer';
 
 export default class Routes extends Component {
@@ -104,7 +104,7 @@ export default class Routes extends Component {
             path="reservations"
           />
           <Route
-            component={props => (<Statistics {...props} api={api} />)}
+            component={Statistics}
             name="statistics"
             path="statistics"
           />

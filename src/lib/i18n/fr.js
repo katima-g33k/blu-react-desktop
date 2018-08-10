@@ -23,13 +23,37 @@ export default {
         title: 'Code invalide',
       },
     },
+    dateLabel: {
+      end: 'Fin',
+      start: 'Début',
+    },
   },
   Admin: {
     statistics: {
+      amountDue: {
+        datePickerLabel: 'Choisir une date',
+        message: {
+          1: 'En date du %{date}, la BLU doit ',
+          2: ' à ses membres actifs',
+        },
+        title: 'Montant à rembourser aux membres',
+      },
+      byInterval: {
+        date: {
+          title: 'Par date',
+        },
+        semester: {
+          title: 'Par session',
+        },
+        title: 'Montant par transaction',
+      },
       title: 'Adminnistraton - Statistiques',
       chart: {
         labels: {
           added: 'Ajoutés',
+          amount: 'Argent',
+          quantity: 'Quantité',
+          savings: 'Argent épargné',
           sold: 'Ventes',
           soldParent: 'Ventes parents-étudiants',
           paid: 'Remboursés',

@@ -1,200 +1,243 @@
-import React, { Component, PropTypes } from 'react';
-import { Col, Panel, Row } from 'react-bootstrap';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+/* eslint react/sort-comp: 0 */
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import {
+  Col,
+  Panel,
+  Row,
+} from 'react-bootstrap';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from 'recharts';
 import moment from 'moment';
 
-import I18n from '../../lib/i18n/i18n';
-import DatePicker from '../general/DatePicker';
-import Select from '../general/Select';
+import { DatePicker, SemesterSelector } from '../general';
+import i18n from '../../lib/i18n';
 
-const semesterList = moment.semester('list');
+const CHART_HEIGHT = 400;
+const CHART_WIDTH = 800;
+const BARS = ['amount', 'quantity', 'savings'];
+const BAR_COLORS = {
+  amount: '#A0B389',
+  quantity: '#BB7739',
+  savings: '#336699',
+};
+
+const styles = {
+  amountDueMessage: {
+    marginTop: '15px',
+  },
+  chartContainer: {
+    marginTop: '50px',
+  },
+  chart: {
+    margin: 'auto',
+  },
+};
 
 export default class Statistics extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      due: {
-        amount: 0,
-        date: moment(),
-      },
-      start: {
-        date: moment.semester('start'),
-        semester: moment.semester('code'),
-      },
-      end: {
-        date: moment.semester('end'),
-        semester: moment.semester('code'),
-      },
-      data: [],
-    };
-  }
-
   static propTypes = {
-    api: PropTypes.shape().isRequired,
+    amountDue: PropTypes.number,
+    dataByInterval: PropTypes.shape(),
+    fetchAmountDue: PropTypes.func.isRequired,
+    fetchByInterval: PropTypes.func.isRequired,
   }
 
-  componentWillMount = async () => {
-    await this.getAmountDue();
-    await this.getStatistics();
+  static defaultProps = {
+    amountDue: 0,
+    dataByInterval: {
+      added: {
+        amount: 0,
+        quantity: 0,
+      },
+      paid: {
+        amount: 0,
+        quantity: 0,
+      },
+      sold: {
+        amount: 0,
+        quantity: 0,
+      },
+      soldParent: {
+        amount: 0,
+        quantity: 0,
+        savings: 0,
+      },
+    },
   }
 
-  getStatistics = async () => {
-    const { start, end } = this.state;
-    const startDate = start.date.format('YYYY-MM-DD');
-    const endDate = end.date.format('YYYY-MM-DD');
+  state = {
+    dueDate: moment(),
+    endDate: moment.semester('end'),
+    endSemester: moment.semester('code'),
+    startDate: moment.semester('start'),
+    startSemester: moment.semester('code'),
+  };
 
-    try {
-      const res = await this.props.api.statistics.byInterval(startDate, endDate);
-      this.setState({
-        data: Object.keys(res).map(key => ({
-          amount: +res[key].amount || 0,
-          name: I18n.t(`Admin.statistics.chart.labels.${key}`),
-          quantity: +res[key].quantity || 0,
-          savings: key === 'soldParent' ? +res[key].savings || 0 : undefined,
-        })),
-      });
-    } catch (error) {
-      this.setState({ error });
+  componentDidMount() {
+    this.props.fetchAmountDue(this.state.dueDate);
+    this.props.fetchByInterval(this.state.startDate, this.state.endDate);
+  }
+
+  get formattedAmountDue() {
+    return `${this.props.amountDue.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1 ').replace('.00', '')} $`;
+  }
+
+  get dataByInterval() {
+    return Object.keys(this.props.dataByInterval).map((key) => {
+      const { amount, quantity, savings } = this.props.dataByInterval[key];
+
+      return {
+        amount: +amount || 0,
+        name: i18n(`Admin.statistics.chart.labels.${key}`),
+        quantity: +quantity || 0,
+        savings: key === 'soldParent' ? +savings || 0 : undefined,
+      };
+    });
+  }
+
+  get formattedDueDate() {
+    return moment(this.state.dueDate).format('LL');
+  }
+
+  onDateChange = (key, date) => this.updateDates(key, date, moment.semester('code', date))
+
+  onStartDateChange = date => this.onDateChange('start', date)
+
+  onEndDateChange = date => this.onDateChange('end', date)
+
+  onStartSemesterChange = (event, semester) => this.updateDates('start', moment.semester('start', semester), semester);
+
+  onEndSemesterChange = (event, semester) => this.updateDates('end', moment.semester('end', semester), semester)
+
+  updateDates = (key, date, semester) => {
+    const state = {
+      ...this.state,
+      [`${key}Date`]: date,
+      [`${key}Semester`]: semester,
+    };
+
+    if (key === 'start' && date.isAfter(this.state.endDate)) {
+      state.endDate = date;
+      state.endSemester = semester;
+    } else if (key === 'end' && date.isBefore(this.state.startDate)) {
+      state.startDate = date;
+      state.startSemester = semester;
     }
+
+    this.setState(state);
+    this.props.fetchByInterval(state.startDate, state.endDate);
   }
 
-  getAmountDue = async () => {
-    const date = moment(this.state.due.date).format('YYYY-MM-DD');
-
-    try {
-      const res = await this.props.api.statistics.amountDue(date);
-      this.setState({
-        due: {
-          ...this.state.due,
-          ...res,
-        },
-      });
-    } catch (error) {
-      this.setState({ error });
-    }
+  updateAmountDue = (dueDate) => {
+    this.setState({ dueDate });
+    this.props.fetchAmountDue(dueDate);
   }
 
-  onDateChange = async (key, date) => {
-    await this.updateDates(key, date, moment.semester('code', date));
-  }
-
-  onSemesterChange = async (key, semester) => {
-    await this.updateDates(key, moment.semester(key, semester), semester);
-  }
-
-  updateDates = async (key, date, semester) => {
-    const data = {};
-    data[key] = { date, semester };
-
-    if (key === 'start' && date.isAfter(this.state.end.date)) {
-      data.end = { date, semester };
-    } else if (key === 'end' && date.isBefore(this.state.start.date)) {
-      data.start = { date, semester };
-    }
-
-    this.setState({ ...data });
-    await this.getStatistics();
-  }
-
-  updateAmountDue = async (date) => {
-    this.setState({ due: { ...this.state.due, date } });
-    await this.getAmountDue();
-  }
+  renderBars = () => BARS.map(bar => (
+    <Bar
+      dataKey={bar}
+      key={bar}
+      name={i18n(`Admin.statistics.chart.labels.${bar}`)}
+      fill={BAR_COLORS[bar]}
+    />
+  ))
 
   render() {
-    const { data, start, end, due } = this.state;
-    const amountDue = due.amount.toFixed(2).replace(/(\d)(?=(\d{3})+\.)/g, '$1 ').replace('.00', '');
-    const dueDate = moment(due.date).format('LL');
-    const semesterListdata = semesterList.map(({ code, name }) => ({
-      label: name,
-      value: code,
-    }));
-
     return (
-      <Panel header={I18n.t('Admin.statistics.title')}>
+      <Panel header={i18n('Admin.statistics.title')}>
         <Row>
           <Col md={12}>
-            <h3>Montant à rembourser aux membres</h3>
+            <h3>{i18n('Admin.statistics.amountDue.title')}</h3>
             <DatePicker
-              label={'Choisir une date'}
+              label={i18n('Admin.statistics.amountDue.datePickerLabel')}
               onChange={this.updateAmountDue}
-              value={due.date}
+              value={this.state.dueDate}
             />
-            <p style={{ marginTop: '15px' }}>
-              {`En date du ${dueDate}, la BLU doit `}<b>{`${amountDue} $`}</b>{' à ses membres actifs'}
+            <p style={styles.amountDueMessage}>
+              {i18n('Admin.statistics.amountDue.message.1', { date: this.formattedDueDate })}
+              <b>{this.formattedAmountDue}</b>
+              {i18n('Admin.statistics.amountDue.message.2')}
             </p>
           </Col>
         </Row>
         <Row>
           <Col md={12}>
-            <h3>Montant par transaction</h3>
+            <h3>{i18n('Admin.statistics.byInterval.title')}</h3>
           </Col>
         </Row>
         <Row>
           <Col sm={12} md={5}>
             <Row>
               <Col md={12}>
-                <h4>Par session</h4>
+                <h4>{i18n('Admin.statistics.byInterval.semester.title')}</h4>
               </Col>
             </Row>
             <Row>
               <Col md={6}>
-                <Select
-                  data={semesterListdata}
-                  label={'Début'}
-                  onChange={event => this.onSemesterChange('start', event.target.value)}
-                  value={start.semester}
+                <SemesterSelector
+                  label={i18n('general.dateLabel.start')}
+                  onChange={this.onStartSemesterChange}
+                  value={this.state.startSemester}
                 />
               </Col>
               <Col md={6}>
-                <Select
-                  data={semesterListdata}
-                  label={'Fin'}
-                  onChange={event => this.onSemesterChange('end', event.target.value)}
-                  value={end.semester}
+                <SemesterSelector
+                  label={i18n('general.dateLabel.end')}
+                  onChange={this.onEndSemesterChange}
+                  value={this.state.endSemester}
                 />
               </Col>
             </Row>
           </Col>
-          <Col sm={12} md={5} smOffset={0} mdOffset={1}>
+          <Col
+            md={5}
+            mdOffset={1}
+            sm={12}
+            smOffset={0}
+          >
             <Row>
               <Col md={12}>
-                <h4>Par date</h4>
+                <h4>{i18n('Admin.statistics.byInterval.date.title')}</h4>
               </Col>
             </Row>
             <Row>
               <Col md={6}>
                 <DatePicker
-                  label={'Début'}
-                  onChange={date => this.onDateChange('start', date)}
-                  value={start.date}
+                  label={i18n('general.dateLabel.start')}
+                  onChange={this.onStartDateChange}
+                  value={this.state.startDate}
                 />
               </Col>
               <Col md={6}>
                 <DatePicker
-                  label={'Fin'}
-                  onChange={date => this.onDateChange('end', date)}
-                  value={end.date}
+                  label={i18n('general.dateLabel.end')}
+                  onChange={this.onEndDateChange}
+                  value={this.state.endDate}
                 />
               </Col>
             </Row>
           </Col>
         </Row>
-        <Row style={{ marginTop: '50px' }}>
+        <Row style={styles.chartContainer}>
           <BarChart
-            data={data}
-            style={{ margin: 'auto' }}
-            height={400}
-            width={800}
+            data={this.dataByInterval}
+            style={styles.chart}
+            height={CHART_HEIGHT}
+            width={CHART_WIDTH}
           >
             <XAxis dataKey="name" />
             <YAxis />
             <CartesianGrid strokeDasharray="3 3" />
             <Tooltip />
             <Legend />
-            <Bar dataKey="amount" name={'Argent'} fill="#A0B389" />
-            <Bar dataKey="quantity" name={'Quantité'} fill="#BB7739" />
-            <Bar dataKey="savings" name={'Argent épargné'} fill="#336699" />
+            {this.renderBars()}
           </BarChart>
         </Row>
       </Panel>

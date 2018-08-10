@@ -9,6 +9,7 @@ import reservationsStore from './reservations';
 import searchStore from './search';
 import settingsStore from './settings';
 import stateStore from './states';
+import statisticsStore from './statistics';
 import storageStore from './storage';
 import subjectStore from './subject';
 import userStore from './user';
@@ -25,6 +26,7 @@ export {
   searchStore,
   settingsStore,
   stateStore,
+  statisticsStore,
   storageStore,
   subjectStore,
   userStore,
