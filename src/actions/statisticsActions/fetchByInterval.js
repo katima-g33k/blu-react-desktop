@@ -1,9 +1,10 @@
+import moment from 'moment';
+
 import {
   FETCH_STATISTICS_BY_INTERVAL_FAIL,
   FETCH_STATISTICS_BY_INTERVAL_PENDING,
   FETCH_STATISTICS_BY_INTERVAL_SUCCESS,
 } from '../actionTypes';
-import moment from 'moment';
 
 const pending = () => ({
   type: FETCH_STATISTICS_BY_INTERVAL_PENDING,

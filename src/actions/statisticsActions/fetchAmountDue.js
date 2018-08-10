@@ -1,9 +1,10 @@
+import moment from 'moment';
+
 import {
   FETCH_AMOUNT_DUE_FAIL,
   FETCH_AMOUNT_DUE_PENDING,
   FETCH_AMOUNT_DUE_SUCCESS,
 } from '../actionTypes';
-import moment from 'moment';
 
 const pending = () => ({
   type: FETCH_AMOUNT_DUE_PENDING,
