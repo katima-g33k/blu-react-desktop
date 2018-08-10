@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Col, Panel, Row } from 'react-bootstrap';
 import { Link } from 'react-router';
 
@@ -67,16 +68,16 @@ export default class AddCopies extends Component {
 }
 
 AddCopies.propTypes = {
-  actions: React.PropTypes.array,
-  columns: React.PropTypes.array,
-  data: React.PropTypes.array,
-  ean13: React.PropTypes.string,
-  isSearch: React.PropTypes.bool,
-  member: React.PropTypes.shape(),
-  modal: React.PropTypes.shape(),
-  onAddButton: React.PropTypes.func,
-  openModal: React.PropTypes.func,
-  onFormSave: React.PropTypes.func,
-  onFormCancel: React.PropTypes.func,
-  params: React.PropTypes.shape(),
+  actions: PropTypes.array,
+  columns: PropTypes.array,
+  data: PropTypes.array,
+  ean13: PropTypes.string,
+  isSearch: PropTypes.bool,
+  member: PropTypes.shape(),
+  modal: PropTypes.shape(),
+  onAddButton: PropTypes.func,
+  openModal: PropTypes.func,
+  onFormSave: PropTypes.func,
+  onFormCancel: PropTypes.func,
+  params: PropTypes.shape(),
 };

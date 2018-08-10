@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Modal } from 'react-bootstrap';
 
 export default class ConfirmModal extends Component {
@@ -52,12 +53,12 @@ export default class ConfirmModal extends Component {
 }
 
 ConfirmModal.propTypes = {
-  cancelText: React.PropTypes.string,
-  confirmText: React.PropTypes.string,
-  confirmationStyle: React.PropTypes.string,
-  customActions: React.PropTypes.array,
-  message: React.PropTypes.string.isRequired,
-  onCancel: React.PropTypes.func,
-  onConfirm: React.PropTypes.func,
-  title: React.PropTypes.string.isRequired,
+  cancelText: PropTypes.string,
+  confirmText: PropTypes.string,
+  confirmationStyle: PropTypes.string,
+  customActions: PropTypes.array,
+  message: PropTypes.string.isRequired,
+  onCancel: PropTypes.func,
+  onConfirm: PropTypes.func,
+  title: PropTypes.string.isRequired,
 };

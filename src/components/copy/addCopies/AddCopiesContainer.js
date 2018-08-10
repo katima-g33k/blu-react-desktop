@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Glyphicon } from 'react-bootstrap';
 
 import AddCopies from './AddCopies';
@@ -229,5 +230,5 @@ export default class AddCopiesContainer extends Component {
 }
 
 AddCopiesContainer.propTypes = {
-  params: React.PropTypes.shape(),
+  params: PropTypes.shape(),
 };

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Button, FormControl, Modal } from 'react-bootstrap';
 
 export default class InputModal extends Component {
@@ -75,12 +76,12 @@ export default class InputModal extends Component {
 }
 
 InputModal.propTypes = {
-  message: React.PropTypes.string,
-  onCancel: React.PropTypes.func.isRequired,
-  onSave: React.PropTypes.func.isRequired,
-  saveStyle: React.PropTypes.string,
-  textarea: React.PropTypes.bool,
-  title: React.PropTypes.string.isRequired,
-  type: React.PropTypes.string,
-  value: React.PropTypes.string,
+  message: PropTypes.string,
+  onCancel: PropTypes.func.isRequired,
+  onSave: PropTypes.func.isRequired,
+  saveStyle: PropTypes.string,
+  textarea: PropTypes.bool,
+  title: PropTypes.string.isRequired,
+  type: PropTypes.string,
+  value: PropTypes.string,
 };
