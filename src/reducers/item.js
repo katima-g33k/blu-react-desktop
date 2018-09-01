@@ -9,6 +9,7 @@ import {
   FETCH_ITEM_LIST_PENDING,
   FETCH_ITEM_LIST_SUCCESS,
   INSERT_ITEM_SUCCESS,
+  RESET_ITEM,
   RESERVE_ITEM_SUCCESS,
   UPDATE_ITEM_SUCCESS,
   UPDATE_STATUS_SUCCESS,
@@ -80,6 +81,10 @@ const handlers = {
       item,
     };
   },
+  [RESET_ITEM]: state => ({
+    ...state,
+    item: initialState.item.clone(),
+  }),
   [UPDATE_ITEM_SUCCESS]: (state, { item }) => ({
     ...state,
     item,

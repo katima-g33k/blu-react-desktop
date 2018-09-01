@@ -21,12 +21,13 @@ const mapDispatchToProps = dispatch => ({
   onExists: (id, existingItemId, userIsAdmin, api) => {
     dispatch(openExistsModal(id, existingItemId, userIsAdmin, api))
   },
-  fetch: (id, api) => dispatch(fetch(id, api)),
-  onInsert: (item, api) => dispatch(insert(item, api)),
+  fetch: (id, api) => dispatch(fetch(api, id)),
+  onInsert: (api, item, callback) => dispatch(insert(api, item, callback)),
   onUpdate: (id, item, api) => dispatch(update(id, item, api)),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
+  ean13: ownProps.ean13, // || ownProps.params ? ownProps.params.ean13 : '',
   exists: async (ean13) => {
     const itemExists = await exists(ean13, stateProps.api);
 
@@ -37,18 +38,16 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
     return itemExists;
   },
   item: stateProps.item,
-  id: +ownProps.params.id,
+  id: ownProps.params ? +ownProps.params.id : 0,
   onCancel: () => browserHistory.push(ownProps.params.id ? `/item/view/${ownProps.params.id}` : '/'),
   fetch: () => dispatchProps.fetch(ownProps.params.id, stateProps.api),
   onSave: (formData) => {
     const formattedData = formatItemFormData(formData);
 
-    if (ownProps.params.id) {
-      console.log('update');
+    if (ownProps.params && ownProps.params.id) {
       dispatchProps.onUpdate(ownProps.params.id, formattedData, stateProps.api);
     } else {
-      console.log('insert');
-      dispatchProps.onInsert(formattedData, stateProps.api);
+      dispatchProps.onInsert(stateProps.api, formattedData, ownProps.onSaveCallback);
     }
   },
 });

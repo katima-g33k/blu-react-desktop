@@ -15,6 +15,8 @@ import './search.css';
 import I18n from '../../lib/i18n';
 import SearchResults from '../../containers/SearchResultsContainer';
 
+const { Body, Heading } = Panel;
+
 const TYPES = {
   ITEM: 'item',
   MEMBER: 'member',
@@ -34,6 +36,8 @@ export default class Search extends Component {
     handleType: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,
     noHeader: PropTypes.bool,
+    onAddButton: PropTypes.func,
+    onRowClick: PropTypes.func,
     type: PropTypes.oneOf(Object.values(TYPES)).isRequired,
     value: PropTypes.string.isRequired,
   }
@@ -43,6 +47,8 @@ export default class Search extends Component {
     disableArchive: false,
     disableTypeSelection: false,
     noHeader: false,
+    onAddButton: null,
+    onRowClick: null,
   }
 
   static TYPES = TYPES
@@ -110,22 +116,33 @@ export default class Search extends Component {
     );
   }
 
+  renderHeader = () => !this.props.noHeader && (
+    <Heading>
+      {I18n('Search.title')}
+    </Heading>
+  )
+
   render() {
     return (
-      <Panel
-        id={this.constructor.name}
-        header={this.props.noHeader ? null : I18n('Search.title')}
-      >
-        <Row>
-          <Col sm={10} md={10}>
-            {this.renderSearchForm()}
-          </Col>
-        </Row>
-        <Row>
-          <Col sm={12} md={10}>
-            <SearchResults disableAddButton={this.props.disableAddButton} />
-          </Col>
-        </Row>
+      <Panel id={this.constructor.name}>
+        {this.renderHeader()}
+        <Body>
+          <Row>
+            <Col sm={10} md={10}>
+              {this.renderSearchForm()}
+            </Col>
+          </Row>
+          <Row>
+            <Col sm={12} md={10}>
+              <SearchResults
+                disableAddButton={this.props.disableAddButton}
+                onAddButton={this.props.onAddButton}
+                onRowClick={this.props.onRowClick}
+                type={this.props.type}
+              />
+            </Col>
+          </Row>
+        </Body>
       </Panel>
     );
   }

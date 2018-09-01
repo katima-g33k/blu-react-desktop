@@ -34,6 +34,7 @@ const classNames = {
 
 export default class ItemForm extends Component {
   static propTypes = {
+    ean13: PropTypes.string,
     exists: PropTypes.func.isRequired,
     id: PropTypes.number,
     item: PropTypes.instanceOf(Item).isRequired,
@@ -43,6 +44,7 @@ export default class ItemForm extends Component {
   }
 
   static defaultProps = {
+    ean13: '',
     id: 0,
   }
 
@@ -76,7 +78,7 @@ export default class ItemForm extends Component {
   isValid = () => {
     const validation = {
       author: authorIsValid(this.state.item),
-      ean13: ean13IsValid(this.state.item),
+      ean13: !!this.props.ean13 || ean13IsValid(this.state.item),
       editor: editorIsValid(this.state.item),
       name: nameIsValid(this.state.item),
       publication: publicationIsValid(this.state.item),
@@ -94,38 +96,45 @@ export default class ItemForm extends Component {
     return this.props.exists(this.state.item.ean13);
   }
 
-  handleOnChange = (event, value) => this.setState({
-    item: {
-      ...this.state.item,
-      [event.target.id]: value,
-    },
-  })
+  handleOnChange = (event, value) => {
+    const property = event.target.id;
 
-  handleIsBook = (event, value) => this.setState({
+    this.setState(state => ({
+      item: {
+        ...state.item,
+        [property]: value,
+      },
+    }));
+  }
+
+  handleIsBook = (event, value) => this.setState(state => ({
     item: {
-      ...this.state.item,
+      ...state.item,
       isBook: value,
       editor: '',
       edition: '',
       publication: '',
       author: [],
     },
-  })
+  }))
 
-  handleNoEan13 = (event, value) => this.setState({
+  handleNoEan13 = (event, value) => this.setState(state => ({
     item: {
-      ...this.state.item,
+      ...state.item,
       ean13: '',
       noEan13: value,
     },
-  })
+  }))
 
   handleOnSave = async () => {
     if (!this.isValid() || await this.itemExists()) {
       return;
     }
 
-    this.props.onSave(this.state.item);
+    this.props.onSave({
+      ...this.state.item,
+      ean13: this.props.ean13 || this.state.item.ean13,
+    });
   }
 
   renderIsBook = () => !this.props.id && (
@@ -139,15 +148,21 @@ export default class ItemForm extends Component {
     </Row>
   )
 
-  renderNoEan13 = () => !this.props.id && (
-    <Checkbox
-      checked={this.state.item.noEan13}
-      id="noEan13"
-      inputWidth={{ md: 3 }}
-      label={I18n('ItemForm.fields.noEan13')}
-      onChange={this.handleNoEan13}
-    />
-  )
+  renderNoEan13 = () => {
+    if (this.props.id || this.props.ean13) {
+      return null;
+    }
+
+    return (
+      <Checkbox
+        checked={this.state.item.noEan13}
+        id="noEan13"
+        inputWidth={{ md: 3 }}
+        label={I18n('ItemForm.fields.noEan13')}
+        onChange={this.handleNoEan13}
+      />
+    );
+  }
 
   renderBookFields = () => this.state.item.isBook && (
     <div>
@@ -239,7 +254,7 @@ export default class ItemForm extends Component {
                 validationState={this.state.validation.ean13 ? null : 'error'}
               >
                 <Input
-                  disabled={this.state.item.noEan13}
+                  disabled={!!(this.props.ean13 || this.state.item.noEan13)}
                   id="ean13"
                   inputWidth={{ md: 3 }}
                   label={I18n('ItemForm.fields.ean13')}
@@ -248,7 +263,7 @@ export default class ItemForm extends Component {
                   placeholder={I18n('ItemForm.fields.ean13')}
                   required
                   type={Input.TYPES.NUMBER}
-                  value={this.state.item.ean13 ? `${this.state.item.ean13}` : ''}
+                  value={this.state.item.ean13 ? `${this.state.item.ean13}` : this.props.ean13}
                 />
                 {this.renderNoEan13()}
               </Row>

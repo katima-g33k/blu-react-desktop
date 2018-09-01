@@ -30,6 +30,11 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
     return dispatchProps.onAddButton(stateProps);
   },
   onRowClick: (data) => {
+    if (ownProps.onRowClick) {
+      ownProps.onRowClick(data);
+      return;
+    }
+
     (stateProps.onRowClick || dispatchProps.onRowClick)(data, stateProps.type);
     dispatchProps.resetSearch();
   },

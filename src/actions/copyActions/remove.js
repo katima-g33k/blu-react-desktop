@@ -1,4 +1,3 @@
-import API from '../../lib/api';
 import { close } from '../modalActions';
 import {
   DELETE_COPY_FAIL,
@@ -8,42 +7,38 @@ import {
 } from '../actionTypes';
 import I18n from '../../lib/i18n';
 
-const apiUrl = localStorage.getItem('apiUrl');
-const apiKey = localStorage.getItem('apiKey');
-const apiClient = new API(apiUrl, apiKey);
-
-const deletePending = () => ({
+const pending = () => ({
   type: DELETE_COPY_PENDING,
 });
 
-const deleteFail = error => ({
+const fail = error => ({
   error,
   type: DELETE_COPY_FAIL,
 });
 
-const deleteSuccess = copy => ({
+const success = copy => ({
   copy,
   type: DELETE_COPY_SUCCESS,
 });
 
-const deleteCopy = copy => async (dispatch) => {
-  dispatch(deletePending());
+const remove = (api, copy) => async (dispatch) => {
+  dispatch(pending());
 
   try {
-    await apiClient.member.copy.delete(copy.id);
-    dispatch(deleteSuccess(copy));
+    await api.member.copy.delete(copy.id);
+    dispatch(success(copy));
     dispatch(close());
   } catch (error) {
-    dispatch(deleteFail(error));
+    dispatch(fail(error));
   }
 };
 
-export default copy => (dispatch) => {
+export default (api, copy) => (dispatch) => {
   dispatch({
     actions: [
       {
         label: I18n('CopyTable.modals.delete.action'),
-        onClick: () => dispatch(deleteCopy(copy)),
+        onClick: () => dispatch(remove(api, copy)),
         style: 'danger',
       },
     ],

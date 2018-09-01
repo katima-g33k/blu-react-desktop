@@ -36,7 +36,7 @@ const fail = error => ({
   type: SEARCH_FAIL,
 });
 
-export default (value, type, archives, api) => async (dispatch) => {
+export default (api, value, type, archives) => async (dispatch) => {
   dispatch(pending());
 
   const searchType = SEARCH_TYPE[type];

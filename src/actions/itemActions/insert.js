@@ -18,13 +18,10 @@ const success = item => ({
 
 const fail = error => ({
   error,
-  message: error.message,
-  titleKey: 'modal.error',
-  titleOptions: { code: error.code || 500 },
   type: INSERT_ITEM_FAIL,
 });
 
-export default (item, api) => async (dispatch) => {
+export default (api, item, callback) => async (dispatch) => {
   dispatch(pending());
 
   try {
@@ -32,6 +29,12 @@ export default (item, api) => async (dispatch) => {
     const insertedItem = new Item({ ...item, id });
 
     dispatch(success(insertedItem));
+
+    if (callback) {
+      callback(insertedItem);
+      return;
+    }
+
     browserHistory.push(`/item/view/${id}`);
   } catch (error) {
     fail(error);

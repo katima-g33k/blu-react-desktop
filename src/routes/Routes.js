@@ -1,8 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
+import {
+  browserHistory,
+  IndexRedirect,
+  Route,
+  Router,
+} from 'react-router';
 
-import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
+import AddCopiesContainer from '../containers/AddCopiesContainer';
 import DuplicateMembers from '../containers/DuplicateMembersContainer';
 import EmployeesTable from '../containers/EmployeeTableContainer';
 import ItemForm from '../containers/ItemFormContainer';
@@ -18,7 +23,6 @@ import StorageManagement from '../containers/StorageManagementContainer';
 
 export default class Routes extends Component {
   static propTypes = {
-    api: PropTypes.shape().isRequired,
     currentPath: PropTypes.string.isRequired,
     onRouteChange: PropTypes.func.isRequired,
   }
@@ -36,8 +40,6 @@ export default class Routes extends Component {
   }
 
   render() {
-    const { api } = this.props;
-
     return (
       <Router history={browserHistory}>
         <Route
@@ -69,7 +71,7 @@ export default class Routes extends Component {
             path="edit/:no"
           />
           <Route
-            component={props => (<AddCopiesContainer {...props} api={api} />)}
+            component={AddCopiesContainer}
             name="AddCopies"
             path="copies/:no"
           />

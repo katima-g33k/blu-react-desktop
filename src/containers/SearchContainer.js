@@ -10,7 +10,7 @@ import {
 } from '../actions/searchActions';
 
 const mapStateToProps = ({ appStore, searchStore }) => ({
-  api: appStore.apiCliemt,
+  api: appStore.apiClient,
   archives: searchStore.archives,
   isLoading: searchStore.isLoading,
   type: searchStore.type,
@@ -21,7 +21,7 @@ const mapDispatchToProps = dispatch => ({
   cancelSearch: () => dispatch(cancel()),
   handleArchive: () => dispatch(updateArchives()),
   handleInput: event => dispatch(updateValue(event.target.value)),
-  handleSearch: (value, type, archives, api) => dispatch(search(value, type, archives, api)),
+  handleSearch: (api, value, type, archives) => dispatch(search(api, value, type, archives)),
   handleType: event => dispatch(updateType(event.target.value)),
 });
 
@@ -36,7 +36,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   handleSearch: (event) => {
     event.preventDefault();
     const type = ownProps.type || stateProps.type;
-    dispatchProps.handleSearch(stateProps.value, type, stateProps.archives, stateProps.api);
+    dispatchProps.handleSearch(stateProps.api, stateProps.value, type, stateProps.archives);
   },
 });
 

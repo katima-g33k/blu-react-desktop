@@ -4,6 +4,7 @@ export default {
     add: 'Ajouter',
     cancel: 'Annuler',
     delete: 'Supprimer',
+    done: 'Terminer',
     login: 'Se connecter',
     logout: 'Déconnexion',
     ok: 'OK',
@@ -27,6 +28,24 @@ export default {
       end: 'Fin',
       start: 'Début',
     },
+  },
+  AddCopies: {
+    modals: {
+      copyPrice: {
+        message: 'Entrer le montant de vente souhaité',
+      },
+      reservedItem: {
+        message: 'Cet ouvrage est réservé par %{name} veuillez le mettre de côté',
+        title: 'Ouvrage réservé',
+      },
+    },
+    table: {
+      columns: {
+        price: 'Prix',
+        title: 'Titre',
+      },
+    },
+    title: 'Ajouter des exemplaires',
   },
   Admin: {
     statistics: {

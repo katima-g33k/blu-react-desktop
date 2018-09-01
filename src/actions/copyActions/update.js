@@ -1,4 +1,3 @@
-import API from '../../lib/api';
 import {
   OPEN_MODAL,
   UPDATE_COPY_FAIL,
@@ -10,41 +9,37 @@ import Copy from '../../lib/models/Copy';
 import I18n from '../../lib/i18n';
 import Modal from '../../components/general/modals/Modal';
 
-const apiUrl = localStorage.getItem('apiUrl');
-const apiKey = localStorage.getItem('apiKey');
-const apiClient = new API(apiUrl, apiKey);
-
-const updatePending = () => ({
+const pending = () => ({
   type: UPDATE_COPY_PENDING,
 });
 
-const updateFail = error => ({
-  error,
-  type: UPDATE_COPY_FAIL,
-});
-
-const updateSuccess = copy => ({
+const success = copy => ({
   copy,
   type: UPDATE_COPY_SUCCESS,
 });
 
-const update = (copy, price) => async (dispatch) => {
-  dispatch(updatePending());
+const fail = error => ({
+  error,
+  type: UPDATE_COPY_FAIL,
+});
+
+const update = (api, copy, price) => async (dispatch) => {
+  dispatch(pending());
 
   try {
-    await apiClient.member.copy.update(copy.id, price);
-    dispatch(updateSuccess(new Copy({ ...copy, price })));
+    await api.member.copy.update(copy.id, price);
+    dispatch(success(new Copy({ ...copy, price })));
     dispatch(close());
   } catch (error) {
-    dispatch(updateFail(error));
+    dispatch(fail(error));
   }
 };
 
-export default copy => (dispatch) => {
+export default (api, copy) => (dispatch) => {
   dispatch({
     actions: [{
       label: I18n('CopyTable.modals.update.action'),
-      onClick: ({ inputValue }) => dispatch(update(copy, +inputValue)),
+      onClick: ({ inputValue }) => dispatch(update(api, copy, +inputValue)),
     }],
     cancelable: true,
     inputType: Modal.INPUT_TYPES.NUMBER,

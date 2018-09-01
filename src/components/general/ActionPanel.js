@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Col, Panel, Row } from 'react-bootstrap';
+import {
+  Button,
+  Col,
+  Panel,
+  Row,
+} from 'react-bootstrap';
 
 import I18n from '../../lib/i18n';
+
+const { Body, Heading } = Panel;
 
 const DEFAULT_BS_STYLE = 'primary';
 const styles = {
@@ -41,8 +48,13 @@ export default class ActionPanel extends Component {
 
   render() {
     return (
-      <Panel header={I18n('general.actions')}>
-        {this.props.actions.map(this.renderAction)}
+      <Panel>
+        <Heading>
+          {I18n('general.actions')}
+        </Heading>
+        <Body>
+          {this.props.actions.map(this.renderAction)}
+        </Body>
       </Panel>
     );
   }

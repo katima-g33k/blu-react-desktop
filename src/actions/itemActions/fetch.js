@@ -1,12 +1,11 @@
-import I18n from '../../lib/i18n/index';
-import { Item } from '../../lib/models';
-import { setCopies } from '../copyActions/index';
-
 import {
   FETCH_ITEM_FAIL,
   FETCH_ITEM_PENDING,
   FETCH_ITEM_SUCCESS,
 } from '../actionTypes';
+import I18n from '../../lib/i18n/index';
+import { Item } from '../../lib/models';
+import { setCopies } from '../copyActions/index';
 
 const fail = error => ({
   message: error.message,
@@ -23,13 +22,16 @@ const success = item => ({
   type: FETCH_ITEM_SUCCESS,
 });
 
-export default (id, api) => async (dispatch) => {
+export default (api, id, shouldSetCopies) => async (dispatch) => {
   dispatch(pending());
 
   try {
     const item = new Item(await api.item.get(id));
     dispatch(success(item));
-    dispatch(setCopies(item.copies));
+
+    if (shouldSetCopies) {
+      dispatch(setCopies(item.copies));
+    }
   } catch (error) {
     dispatch(fail(error));
   }

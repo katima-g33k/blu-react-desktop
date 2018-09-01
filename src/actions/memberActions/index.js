@@ -2,6 +2,7 @@ import { endPrinting, startPrinting } from './printing';
 import exists from './exists';
 import fetch from './fetch';
 import fetchDuplicates from './fetchDuplicates';
+import fetchName from './fetchName';
 import insert from './insert';
 import merge from './merge';
 import {
@@ -20,6 +21,7 @@ export {
   exists,
   fetch,
   fetchDuplicates,
+  fetchName,
   insert,
   merge,
   openDeleteModal,

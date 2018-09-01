@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 
 import Routes from '../routes/Routes';
 
-const mapStateToProps = ({ appStore, historyStore }) => ({
-  api: appStore.apiClient,
+const mapStateToProps = ({ historyStore }) => ({
   currentPath: historyStore.currentPath,
 });
 
