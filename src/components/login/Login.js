@@ -13,6 +13,11 @@ import './login.css';
 import I18n from '../../lib/i18n';
 import { Input } from '../general/formInputs';
 
+const {
+  Body,
+  Heading,
+} = Panel;
+
 export default class Login extends Component {
   static propTypes = {
     onLogin: PropTypes.func.isRequired,
@@ -34,43 +39,48 @@ export default class Login extends Component {
     return (
       <Row id={this.constructor.name}>
         <Col md={6} mdOffset={3}>
-          <Panel header={I18n('Login.title')}>
-            <Row>
-              <Col md={10} mdOffset={1}>
-                <Form onSubmit={event => event.preventDefault()}>
-                  <Row>
+          <Panel>
+            <Heading>
+              {I18n('Login.title')}
+            </Heading>
+            <Body>
+              <Row>
+                <Col md={10} mdOffset={1}>
+                  <Form onSubmit={event => event.preventDefault()}>
                     <Row>
-                      <Input
-                        id="username"
-                        label={I18n('Login.fields.username')}
-                        onChange={this.handleOnChange}
-                        value={this.state.username}
-                      />
+                      <Row>
+                        <Input
+                          id="username"
+                          label={I18n('Login.fields.username')}
+                          onChange={this.handleOnChange}
+                          value={this.state.username}
+                        />
+                      </Row>
+                      <Row>
+                        <Input
+                          id="password"
+                          label={I18n('Login.fields.password')}
+                          onChange={this.handleOnChange}
+                          type={Input.TYPES.PASSWORD}
+                          value={this.state.password}
+                        />
+                      </Row>
                     </Row>
                     <Row>
-                      <Input
-                        id="password"
-                        label={I18n('Login.fields.password')}
-                        onChange={this.handleOnChange}
-                        type={Input.TYPES.PASSWORD}
-                        value={this.state.password}
-                      />
+                      <ButtonToolbar>
+                        <Button
+                          bsStyle="primary"
+                          onClick={this.handleOnLogin}
+                          type="submit"
+                        >
+                          {I18n('actions.login')}
+                        </Button>
+                      </ButtonToolbar>
                     </Row>
-                  </Row>
-                  <Row>
-                    <ButtonToolbar>
-                      <Button
-                        bsStyle="primary"
-                        onClick={this.handleOnLogin}
-                        type="submit"
-                      >
-                        {I18n('actions.login')}
-                      </Button>
-                    </ButtonToolbar>
-                  </Row>
-                </Form>
-              </Col>
-            </Row>
+                  </Form>
+                </Col>
+              </Row>
+            </Body>
           </Panel>
         </Col>
       </Row>
