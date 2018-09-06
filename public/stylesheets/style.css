@@ -1,0 +1,106 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.search-result {
+  cursor: pointer;
+}
+
+.highlight {
+  background-color: #FFFF00;
+}
+
+.removed {
+  background-color: #ABABAB;
+}
+
+.archived {
+  background-color: #BABABA;
+}
+
+.striped-row {
+  background-color: #F9F9F9;
+}
+
+h3 {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+h4 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+#receipt {
+  display: none;
+}
+
+.menu-button {
+  cursor: pointer;
+  margin-left: 15px;
+  padding: 15px;
+  width: fit-content;
+}
+
+@media print {
+  #receipt {
+    display: block;
+  }
+
+  * {
+    font-size: 9px;
+  }
+
+  h2 {
+    font-size: 16px;
+    margin: 0 0 10px 0;
+  }
+
+  h3 {
+    font-size: 12px;
+    margin: 15px 0 10px 0;
+  }
+
+  aside, header, nav, .modal, .modal-dialog, .modal-content, .panel {
+    display: none;
+  }
+
+  .userdata div {
+    display: inline-block;
+  }
+
+  .userdata div:first-of-type {
+    font-weight: bold;
+    width: 120px;
+  }
+
+  .note {
+    margin-bottom: 20px;
+  }
+
+  .autorisation {
+    margin: auto;
+    margin-bottom: 30px;
+  }
+
+  .signature {
+    border-top: 1px solid black;
+    margin-top: 40px;
+    margin-left: 65%;
+    text-align: center;
+    width: 35%;
+  }
+
+  .conditions {
+    font-size: 7px;
+  }
+}
