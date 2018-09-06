@@ -4,6 +4,7 @@ import Member from './Member';
 
 export default class Reservation {
   constructor(reservation = {}) {
+    this.id = reservation.id || 0;
     this.copy = reservation.copy ? new Copy(reservation.copy) : null;
     this.date = reservation.date;
     this.item = new Item(reservation.item);

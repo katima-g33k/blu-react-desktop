@@ -1,130 +1,160 @@
 import React, { Component } from 'react';
-import { Checkbox, Col, FormControl, Row } from 'react-bootstrap';
-import { I18n, Translate } from 'react-i18nify';
+import PropTypes from 'prop-types';
+import { Button } from 'react-bootstrap';
 
-import Table from '../../general/Table';
+import { Copy } from '../../../lib/models';
+import { formatShortDate } from '../../../lib/dateHelper';
+import I18n from '../../../lib/i18n';
+import { sortDate, sortNumber } from '../../../lib/sort';
+import { TableLayout } from '../../general';
+
+const DEFAULT_FILTER_TYPE = 'checkbox';
+const SEARCH_FILTER_TYPE = 'input';
+const STRIPED_ROW_CLASS = 'striped-row';
 
 export default class CopyTable extends Component {
-  constructor(props) {
-    super(props);
+  static propTypes = {
+    cancelReservation: PropTypes.func.isRequired,
+    columns: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    data: PropTypes.arrayOf(PropTypes.instanceOf(Copy)).isRequired,
+    deleteCopy: PropTypes.func.isRequired,
+    filters: PropTypes.shape().isRequired,
+    formatRow: PropTypes.func.isRequired,
+    refundCopy: PropTypes.func.isRequired,
+    reserveCopy: PropTypes.func.isRequired,
+    sellCopy: PropTypes.func.isRequired,
+    sellCopyHalfPrice: PropTypes.func.isRequired,
+    updateCopy: PropTypes.func.isRequired,
+    updateFilter: PropTypes.func.isRequired,
+  };
 
-    this.state = {
-      filters: {
-        added: true,
-        sold: true,
-        reserved: true,
-        paid: true,
-        search: '',
+  get filters() {
+    return Object.keys(this.props.filters).map(filter => ({
+      id: filter,
+      label: I18n(`CopyTable.filters.${filter}`),
+      onChange: this.props.updateFilter,
+      value: this.props.filters[filter],
+      type: filter === 'search' ? SEARCH_FILTER_TYPE : DEFAULT_FILTER_TYPE,
+    }));
+  }
+
+  get columns() {
+    return this.props.columns.concat([
+      {
+        dataField: 'dateAdded',
+        label: I18n('TableColumns.memberCopy.added'),
+        dataSort: true,
+        width: '120px',
+        dataFormat: formatShortDate,
+        sortFunc: (a, b, order) => sortDate(a.dateAdded, b.dateAdded, order),
       },
-    };
-
-    this.filterData = this.filterData.bind(this);
-    this.renderFilters = this.renderFilters.bind(this);
+      {
+        dataField: 'dateSold',
+        label: I18n('TableColumns.memberCopy.sold'),
+        dataSort: true,
+        width: '120px',
+        dataFormat: formatShortDate,
+        sortFunc: (a, b, order) => sortDate(a.dateSold, b.dateSold, order),
+      },
+      {
+        dataField: 'datePaid',
+        label: I18n('TableColumns.memberCopy.paid'),
+        dataSort: true,
+        width: '120px',
+        dataFormat: formatShortDate,
+        sortFunc: (a, b, order) => sortDate(a.datePaid, b.datePaid, order),
+      },
+      {
+        dataField: 'priceString',
+        label: I18n('TableColumns.memberCopy.price'),
+        dataSort: true,
+        width: '60px',
+        sortFunc: (a, b, order) => sortNumber(a.price, b.price, order),
+        dataFormat: (price, copy) => (
+          <Button
+            bsStyle="link"
+            onClick={() => this.props.updateCopy(copy)}
+            disabled={copy.isPaid || copy.isSold || copy.isReserved}
+          >
+            {price}
+          </Button>
+        ),
+      },
+    ]);
   }
 
-  static formatRow(row, index) {
-    if (row.item && row.item.status && row.item.status.REMOVED) {
-      return 'removed';
+  getRowActions = (copy) => {
+    if (copy.isPaid) {
+      return [];
     }
 
-    if ((row.member && !row.member.account.isActive) ||
-      (row.item && row.item.status && row.item.status.OUTDATED)) {
-      return 'archived';
+    if (copy.isSold) {
+      return [
+        {
+          bsStyle: 'danger',
+          glyph: 'ban-circle',
+          help: I18n('CopyTable.help.cancelSell'),
+          onClick: this.props.refundCopy,
+        },
+      ];
     }
 
-    return index % 2 === 0 ? 'striped-row' : '';
-  }
+    if (copy.isReserved) {
+      return [
+        {
+          bsStyle: 'primary',
+          glyph: 'ban-circle',
+          help: I18n('CopyTable.help.cancelReservation'),
+          onClick: this.props.cancelReservation,
+        },
+        {
+          help: I18n('CopyTable.help.sellHalfPrice'),
+          label: '$',
+          onClick: this.props.sellCopyHalfPrice,
+        },
+      ];
+    }
 
-  filterData() {
-    const { added, paid, reserved, search, sold } = this.state.filters;
-
-    return this.props.data.filter((copy) => {
-      if ((!sold && copy.isSold) || (!reserved && copy.isReserved) ||
-          (!paid && copy.isPaid) || (!added && copy.isAdded)) {
-        return false;
-      }
-
-      if (search) {
-        const regex = new RegExp(search, 'i');
-        if (copy.item) {
-          const { name, editor } = copy.item;
-          return regex.test(name) || regex.test(editor);
-        }
-
-        const { name } = copy.member;
-        return regex.test(name);
-      }
-
-      return true;
-    });
-  }
-
-  renderFilters() {
-    const { filters } = this.state;
-    const checkboxes = [
-      { key: 'added', label: 'En stock' },
-      { key: 'sold', label: 'Vendu' },
-      { key: 'paid', label: 'Argent remis' },
-      { key: 'reserved', label: 'Réservé' },
+    return [
+      {
+        bsStyle: 'primary',
+        glyph: 'user',
+        help: I18n('CopyTable.help.reserve'),
+        onClick: this.props.reserveCopy,
+      },
+      {
+        help: I18n('CopyTable.help.sellHalfPrice'),
+        label: '$',
+        onClick: this.props.sellCopyHalfPrice,
+      },
+      {
+        bsStyle: 'success',
+        help: I18n('CopyTable.help.sell'),
+        label: '$$',
+        onClick: this.props.sellCopy,
+      },
+      {
+        bsStyle: 'danger',
+        glyph: 'trash',
+        help: I18n('CopyTable.help.delete'),
+        onClick: this.props.deleteCopy,
+      },
     ];
-
-    return (
-      <Row>
-        <Col md={2}>
-          <FormControl
-            type="text"
-            placeholder={'Recherche'}
-            onChange={(event) => {
-              filters.search = event.target.value;
-              this.setState({ filters });
-            }}
-            value={filters.search}
-          />
-        </Col>
-        {checkboxes.map(({ key, label }) => (
-          <Col key={key} md={2}>
-            <Checkbox
-              onChange={(event) => {
-                filters[key] = event.target.checked;
-                this.setState({ filters });
-              }}
-              checked={filters[key]}
-            >
-              {label}
-            </Checkbox>
-          </Col>
-        ))}
-      </Row>
-    );
   }
+
+  formatRow = (copy, index) => this.props.formatRow(copy) || (index % 2 ? STRIPED_ROW_CLASS : '')
 
   render() {
     return (
-      <section>
-        <h4>
-          <Translate value="MemberView.copies.title" />
-        </h4>
-        {this.renderFilters()}
-        <Table
-          columns={this.props.columns}
-          data={this.filterData()}
-          highlight={this.state.filters.search}
-          options={{
-            defaultSortName: this.props.columns.find(column => column.defaultSort).dataField,
-            defaultSortOrder: 'asc',
-          }}
-          placeholder={I18n.t('MemberView.copies.none')}
-          sortable
-          rowClass={CopyTable.formatRow}
-        />
-        {this.props.modal}
-      </section>
+      <TableLayout
+        columns={this.columns}
+        data={this.props.data}
+        filters={this.filters}
+        noStrip
+        rowActions={this.getRowActions}
+        rowClass={this.formatRow}
+        title={I18n('MemberView.copies.title')}
+      />
     );
   }
 }
-
-CopyTable.propTypes = {
-  columns: React.PropTypes.array.isRequired,
-  data: React.PropTypes.array.isRequired,
-  modal: React.PropTypes.shape(),
-};

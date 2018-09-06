@@ -69,7 +69,8 @@ export default class APIClient {
     return {
       comment: {
         delete: id => call('DELETE', `/member/comment/${id}`),
-        insert: (memberNo, comment, employeeId) => call('POST', `/member/${memberNo}/comment`, { comment, employee: employeeId }),
+        insert: (memberNo, comment, employeeId) =>
+          call('POST', `/member/${memberNo}/comment`, { comment, employee: employeeId }),
         update: (id, comment, employeeId) => call('POST', `/member/comment/${id}`, { comment, employee: employeeId }),
       },
       copy: {
@@ -92,7 +93,8 @@ export default class APIClient {
       insert: member => call('POST', '/member', member),
       pay: no => call('GET', `/member/${no}/pay`),
       renew: no => call('GET', `/member/${no}/renew`),
-      search: (search, deactivated = false, isParent = false) => call('GET', '/member', { search, deactivated, isParent }),
+      search: (search, deactivated = false, isParent = false) =>
+        call('GET', '/member', { search, deactivated, isParent }),
       transfer: no => call('GET', `/member/${no}/transfer`),
       update: (no, member) => call('POST', `/member/${no}`, member),
     };

@@ -1,0 +1,35 @@
+#StatusButton #left {
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  width: 20%;
+}
+
+#StatusButton #center {
+  border-width: 1px 0;
+  cursor: default;
+  border-radius: 0;
+  width: 60%;
+}
+
+#StatusButton .btn-success:hover {
+  background-color: #00B642;
+  border-color: #00B642;
+}
+
+#StatusButton .btn-danger:hover {
+  background-color: #F1003A;
+  border-color: #F1003A;
+}
+
+#StatusButton .btn-warning:hover {
+  background-color: #FFC800;
+  border-color: #FFC800;
+}
+
+#StatusButton #right {
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  width: 20%;
+}

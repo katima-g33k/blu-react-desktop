@@ -1,11 +1,13 @@
 export default class Employee {
-  constructor(employee = {}) {
-    this.id = employee.id;
-    this.username = employee.username;
-    this.isAdmin = employee.isAdmin;
-    this.isActive = employee.isActive;
+  constructor(employeeData) {
+    const employee = employeeData || {};
 
-    this.setPassword = false;
-    this.confirmPassword = false;
+    this.id = employee.id || 0;
+    this.username = employee.username || '';
+    this.isAdmin = employee.isAdmin || false;
+    this.isActive = employee.isActive || true;
+    this.password = employee.password || '';
   }
+
+  clone = () => new Employee(this)
 }

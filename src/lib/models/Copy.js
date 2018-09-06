@@ -82,9 +82,7 @@ export default class Copy {
   }
 
   cancelReservation() {
-    this.transaction = this.transaction.filter(transaction =>
-      Transaction.TYPES.RESERVE !== transaction.code,
-    );
+    this.transaction = this.transaction.filter(transaction => Transaction.TYPES.RESERVE !== transaction.code);
   }
 
   donate() {
@@ -113,9 +111,7 @@ export default class Copy {
   }
 
   refund() {
-    this.transaction = this.transaction.filter(transaction =>
-      Transaction.TYPES.ALL_SELL.indexOf(transaction.code) === -1,
-    );
+    this.transaction = this.transaction.filter(({ code }) => Transaction.TYPES.ALL_SELL.indexOf(code) === -1);
   }
 
   pay() {
@@ -131,6 +127,10 @@ export default class Copy {
       date: new Date(),
       member,
     }));
+  }
+
+  clone() {
+    return new Copy(this);
   }
 
   static get STATUS() {

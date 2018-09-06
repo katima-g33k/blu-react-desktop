@@ -1,202 +1,150 @@
-import React, { Component, PropTypes } from 'react';
+/* eslint class-methods-use-this: 0 */
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Col, Panel, Row } from 'react-bootstrap';
 
-import I18n from '../../lib/i18n/i18n';
-import { InformationModal } from '../general/modals';
-import Item from '../../lib/models/Item';
+import i18n from '../../lib/i18n';
+import { Item } from '../../lib/models';
 import Spinner from '../general/Spinner';
 import statusHelper from '../../lib/statusHelper';
+import SubjectSelector from '../../containers/SubjectSelectorContainer';
 import TableLayout from '../general/TableLayout';
 
-const columns = [
-  {
-    dataField: 'id',
-    isKey: true,
-    hidden: true,
-  },
-  {
-    dataField: 'name',
-    label: 'Titre',
-    dataSort: true,
-  },
-  {
-    dataField: 'publication',
-    label: 'Publication',
-    dataSort: true,
-    width: '105px',
-  },
-  {
-    dataField: 'edition',
-    label: 'Édition',
-    dataSort: true,
-    width: '80px',
-  },
-  {
-    dataField: 'editor',
-    label: 'Éditeur',
-    dataSort: true,
-  },
-  {
-    dataField: 'author',
-    label: 'Auteur.e.s',
-    dataSort: true,
-    dataFormat: (field, item) => item.authorString,
-  },
-  {
-    dataField: 'subject',
-    label: 'Matière',
-    width: '200px',
-    dataSort: true,
-    dataFormat: ({ name }) => name.replace(/\(.+\)/, '').trim(),
-  },
-  {
-    dataField: 'inStock',
-    label: 'En Stock',
-    dataSort: true,
-    width: '100px',
-    dataFormat: (_, item) => item.stats.inStock,
-  },
-  {
-    dataField: 'status',
-    label: 'Status',
-    width: '90px',
-    dataSort: true,
-    dataFormat: (field, item) => statusHelper.getLabel(item),
-    exportDataFormat: (field, item) => item.getStatusString(),
-  },
-];
-
 export default class ItemList extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      categories: [],
-      error: null,
-      filters: {
-        valid: true,
-        outdated: true,
-        removed: true,
-        subject: null,
-      },
-      items: [],
-      loading: true,
-    };
-
-    this.columns = columns;
-    this.updateFilters = this.updateFilters.bind(this);
-    this.getFilteredData = this.getFilteredData.bind(this);
-    this.getFilters = this.getFilters.bind(this);
-    this.renderModal = this.renderModal.bind(this);
-  }
-
   static propTypes = {
-    api: PropTypes.shape(),
+    fetch: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool,
+    items: PropTypes.arrayOf(PropTypes.instanceOf(Item)),
   }
 
-  async componentWillMount() {
-    try {
-      const categories = await this.props.api.category.get();
-      const items = await this.props.api.item.list();
-      this.setState({
-        categories: categories.map(data => ({
-          label: data.name,
-          options: data.subject.map(({ id, name }) => ({ label: name, value: id })),
-        })),
-        items: items.map(data => new Item(data)),
-        loading: false,
-      });
-    } catch (error) {
-      this.setState({ error, loading: false });
-    }
+  static defaultProps = {
+    items: [],
+    isLoading: false,
   }
 
-  getFilteredData() {
-    const { items } = this.state;
-    const { outdated, removed, subject, valid } = this.state.filters;
+  state = {
+    valid: true,
+    outdated: true,
+    removed: true,
+    subject: 0,
+  };
 
-    return items.filter((item) => {
-      const { isRemoved, isOutdated, isValid } = item;
-      const status = (removed && isRemoved) || (outdated && isOutdated) || (valid && isValid);
-
-      return subject ? status && subject === item.subject.id : status;
-    });
+  componentDidMount() {
+    this.props.fetch();
   }
 
-  updateFilters(key, value) {
-    const { filters } = this.state;
-    filters[key] = value;
-    this.setState({ filters });
-  }
-
-  getFilters() {
-    const { outdated, removed, subject, valid } = this.state.filters;
-
+  get columns() {
     return [
       {
-        key: 'subject',
-        label: 'Matière',
-        type: 'select',
-        optgroups: this.state.categories,
-        value: subject || '',
-        onChange: event => this.updateFilters('subject', +event.target.value),
+        dataField: 'id',
+        isKey: true,
+        hidden: true,
       },
       {
-        key: 'valid',
-        label: 'Valide',
-        type: 'checkbox',
-        checked: valid,
-        onChange: event => this.updateFilters('valid', event.target.checked),
+        dataField: 'name',
+        label: i18n('Admin.itemList.table.columns.name'),
+        dataSort: true,
       },
       {
-        key: 'outdated',
-        label: 'Désuet',
-        type: 'checkbox',
-        checked: outdated,
-        onChange: event => this.updateFilters('outdated', event.target.checked),
+        dataField: 'publication',
+        label: i18n('Admin.itemList.table.columns.publication'),
+        dataSort: true,
+        width: '105px',
       },
       {
-        key: 'removed',
-        label: 'Retiré',
-        type: 'checkbox',
-        checked: removed,
-        onChange: event => this.updateFilters('removed', event.target.checked),
+        dataField: 'edition',
+        label: i18n('Admin.itemList.table.columns.edition'),
+        dataSort: true,
+        width: '80px',
+      },
+      {
+        dataField: 'editor',
+        label: i18n('Admin.itemList.table.columns.editor'),
+        dataSort: true,
+      },
+      {
+        dataField: 'author',
+        label: i18n('Admin.itemList.table.columns.author'),
+        dataSort: true,
+        dataFormat: (field, item) => item.authorString,
+      },
+      {
+        dataField: 'subject',
+        label: i18n('Admin.itemList.table.columns.subject'),
+        width: '200px',
+        dataSort: true,
+        dataFormat: ({ name }) => name.replace(/\(.+\)/, '').trim(),
+      },
+      {
+        dataField: 'inStock',
+        label: i18n('Admin.itemList.table.columns.inStock'),
+        dataSort: true,
+        width: '100px',
+        dataFormat: (_, item) => item.stats.inStock,
+      },
+      {
+        dataField: 'status',
+        label: i18n('Admin.itemList.table.columns.status'),
+        width: '90px',
+        dataSort: true,
+        dataFormat: (field, item) => statusHelper.getLabel(item),
+        exportDataFormat: (field, item) => item.getStatusString(),
       },
     ];
   }
 
-  renderModal() {
-    const { error } = this.state;
+  getFilteredData = () => {
+    const { outdated, removed, subject, valid } = this.state;
 
-    return error && (
-      <InformationModal
-        message={error.message}
-        onClick={() => this.setState({ error: null })}
-        title={`Erreur ${error.code}`}
-      />
-    );
+    return this.props.items.filter((item) => {
+      const statusOk = (removed && item.isRemoved) || (outdated && item.isOutdated) || (valid && item.isValid);
+      const subjectOk = !subject || subject === item.subject.id;
+
+      return subjectOk && statusOk;
+    });
   }
 
+  get filters() {
+    const checkboxFilters = ['valid', 'outdated', 'removed'];
+
+    return [
+      {
+        component: (<SubjectSelector onChange={this.handleOnSubjectChange} />),
+        key: 'subject',
+      },
+      ...checkboxFilters.map(key => ({
+        key,
+        label: i18n(`Admin.itemList.table.filters.${key}`),
+        type: 'checkbox',
+        checked: this.state[key],
+        onChange: this.handleOnFilterChange,
+      })),
+    ];
+  }
+
+  handleOnFilterChange = event => this.setState({ [event.target.id]: event.target.checked })
+
+  handleOnSubjectChange = (event, { id }) => this.setState({ subject: id })
+
   render() {
-    const { loading } = this.state;
     const items = this.getFilteredData();
 
     return (
-      <Panel header={I18n.t('Admin.itemList.title')}>
+      <Panel header={i18n('Admin.itemList.title')}>
         <Row>
           <Col md={12}>
-            {!loading ? (
+            {!this.props.isLoading ? (
               <TableLayout
                 columns={this.columns}
                 data={items}
-                filters={this.getFilters()}
+                filters={this.filters}
                 exportable
-                placeholder={'Aucun ouvrage dans le système'}
-                title={`Liste des ouvrages (${items.length})`}
+                placeholder={i18n('Admin.itemList.table.placeholder')}
+                title={i18n('Admin.itemList.table.title', { items: items.length })}
               />
             ) : (<Spinner />)}
           </Col>
         </Row>
-        {this.renderModal()}
       </Panel>
     );
   }

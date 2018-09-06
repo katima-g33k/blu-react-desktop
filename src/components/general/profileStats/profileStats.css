@@ -1,0 +1,18 @@
+#ProfileStats table {
+  border-collapse: collapse;
+  margin: auto;
+}
+
+#ProfileStats td {
+  text-align: center;
+  padding: 15px;
+  border: 1px #000 solid;
+}
+
+#ProfileStats title {
+  font-weight: bold;
+}
+
+#ProfileStats .price-stat {
+  margin-top: 15px;
+}

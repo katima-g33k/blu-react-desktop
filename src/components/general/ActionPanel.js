@@ -1,55 +1,61 @@
 import React, { Component } from 'react';
-import { Button, Col, Panel, Row } from 'react-bootstrap';
-import { Link } from 'react-router';
+import PropTypes from 'prop-types';
+import {
+  Button,
+  Col,
+  Panel,
+  Row,
+} from 'react-bootstrap';
 
-import CustomButton from './CustomButton';
+import I18n from '../../lib/i18n';
+
+const { Body, Heading } = Panel;
+
+const DEFAULT_BS_STYLE = 'primary';
+const styles = {
+  row: {
+    marginBottom: '10px',
+  },
+};
 
 export default class ActionPanel extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      actions: props.actions || [],
-    };
-  }
+  static propTypes = {
+    actions: PropTypes.arrayOf(PropTypes.shape({
+      customComponent: PropTypes.node,
+      disabled: PropTypes.bool,
+      label: PropTypes.string,
+      onClick: PropTypes.func,
+      style: PropTypes.string,
+    })).isRequired,
+  };
 
-  componentWillReceiveProps(props) {
-    this.setState({ actions: props.actions || [] });
-  }
+  renderAction = action => (
+    <Row key={action.customComponent || action.label} style={styles.row}>
+      <Col md={12}>
+        {action.customComponent ? action.customComponent : (
+          <Button
+            block
+            bsStyle={action.style || DEFAULT_BS_STYLE}
+            disabled={action.disabled}
+            onClick={action.onClick}
+          >
+            {action.label}
+          </Button>
+        )}
+      </Col>
+    </Row>
+  );
 
   render() {
-    const style = {
-      marginBottom: '10px',
-    };
-
     return (
-      <Panel header="actions">
-        {this.props.actions.map((action, index) => {
-          if (action.custom) {
-            return (<CustomButton key={`action${index}`} {...action} />);
-          }
-
-          return (
-            <Row key={`action${index}`} style={style}>
-              <Col md={12}>
-                <Link to={action.href || '#'}>
-                  <Button
-                    block
-                    bsStyle={action.style || 'default'}
-                    disabled={!!action.disabled}
-                    onClick={action.onClick}
-                  >
-                    {action.label}
-                  </Button>
-                </Link>
-              </Col>
-            </Row>
-          );
-        })}
+      <Panel>
+        <Heading>
+          {I18n('general.actions')}
+        </Heading>
+        <Body>
+          {this.props.actions.map(this.renderAction)}
+        </Body>
       </Panel>
     );
   }
 }
-
-ActionPanel.propTypes = {
-  actions: React.PropTypes.array,
-};

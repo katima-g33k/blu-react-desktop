@@ -1,66 +1,150 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { ButtonGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
-import Logger from '../../lib/Logger';
+import { Button } from '../general';
+import I18n from '../../lib/i18n';
+
+const BUTTON_WIDTH = 50;
+const DEFAULT_ACTION_COUNT = 4;
 
 export default class Table extends Component {
-  constructor(props) {
-    super(props);
-    this.logger = new Logger(this.constructor.name);
-    this.logger.trace('constructor()');
+  static propTypes = {
+    data: PropTypes.arrayOf(PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.shape()),
+      PropTypes.shape(),
+    ])).isRequired,
+    columns: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    highlight: PropTypes.string,
+    placeholder: PropTypes.string,
+    options: PropTypes.shape(),
+    rowActions: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.shape({
+        bsStyle: PropTypes.string,
+        glyph: PropTypes.string,
+        onClick: PropTypes.func,
+      })),
+      PropTypes.func,
+    ]),
+    rowClass: PropTypes.func,
+    striped: PropTypes.bool,
+  };
+
+  static defaultProps = {
+    highlight: '',
+    placeholder: I18n('table.placeholder'),
+    options: {},
+    rowActions: [],
+    rowClass: () => {},
+    striped: false,
+  };
+
+  shouldComponentUpdate(nextProps) {
+    return nextProps.data.length !== this.props.data.length;
   }
 
+  get actionColumnWidth() {
+    let actionCount = this.props.rowActions.length;
+
+    if (typeof this.props.rowActions === 'function') {
+      actionCount = DEFAULT_ACTION_COUNT;
+    }
+
+    return actionCount * BUTTON_WIDTH;
+  }
+
+  getRowActions = (row) => {
+    try {
+      return this.props.rowActions(row);
+    } catch (error) {
+      return this.props.rowActions;
+    }
+  };
+
+  renderColumn = (column) => {
+    const formatExtraData = column.formatExtraData;
+
+    if (formatExtraData && formatExtraData.props) {
+      formatExtraData.props.forEach((key) => {
+        formatExtraData[key] = this.props[key];
+      });
+    }
+
+    return (
+      <TableHeaderColumn
+        {...column}
+        key={column.dataField}
+      >
+        {column.label}
+      </TableHeaderColumn>
+    );
+  }
+
+  renderAssistiveButton = (action, row, key) => (
+    <OverlayTrigger
+      key={key}
+      overlay={<Tooltip id={action.help}>{action.help}</Tooltip>}
+      placement="bottom"
+    >
+      {this.renderActionButton(action, row)}
+    </OverlayTrigger>
+  )
+
+  renderActionButton = (action, actionData, key) => (
+    <Button
+      {...action}
+      actionData={actionData}
+      key={key}
+    />
+  )
+
+  renderActionButtonGroup = row => this.getRowActions(row).map((action) => {
+    const actionKey = action.label || action.glyph;
+
+    if (action.help) {
+      return this.renderAssistiveButton(action, row, `${row.id}${actionKey}`);
+    }
+
+    return this.renderActionButton(action, row, `${row.id}${actionKey}`);
+  })
+
+  renderActionColumn = () => this.renderColumn({
+    dataAlign: 'center',
+    dataField: 'action',
+    dataFormat: (cell, row) => (
+      <ButtonGroup>
+        {this.renderActionButtonGroup(row)}
+      </ButtonGroup>
+    ),
+    width: `${this.actionColumnWidth}px`,
+  })
+
   renderColumns = () => {
-    this.logger.trace('renderColumns()');
-    return this.props.columns.map((column, index) => {
-      const formatExtraData = column.formatExtraData;
+    const columns = this.props.columns.map(this.renderColumn);
 
-      if (formatExtraData && formatExtraData.props) {
-        formatExtraData.props.forEach((key) => {
-          formatExtraData[key] = this.props[key];
-        });
-      }
+    if (this.props.rowActions.length) {
+      columns.push(this.renderActionColumn());
+    }
 
-      return (
-        <TableHeaderColumn
-          {...column}
-          key={`${column.dataField}${index}`}
-        >
-          {column.label}
-        </TableHeaderColumn>
-      );
-    });
+    return columns;
   }
 
   render() {
-    this.logger.trace('render()');
-    const { data, options, placeholder, rowClass, striped } = this.props;
-    const columns = this.renderColumns();
-
     return (
       <BootstrapTable
         condensed
-        data={data}
+        data={this.props.data}
         hover
         options={{
-          ...options,
-          noDataText: placeholder,
+          ...this.props.options,
+          noDataText: this.props.placeholder,
         }}
-        striped={striped}
-        trClassName={rowClass}
+        striped={this.props.striped}
+        trClassName={this.props.rowClass}
       >
-        {columns}
+        {this.renderColumns()}
       </BootstrapTable>
     );
   }
 }
-
-Table.propTypes = {
-  data: React.PropTypes.array,
-  columns: React.PropTypes.array,
-  highlight: React.PropTypes.string,
-  placeholder: React.PropTypes.string,
-  options: React.PropTypes.shape(),
-  rowClass: React.PropTypes.func,
-  striped: React.PropTypes.bool,
-};

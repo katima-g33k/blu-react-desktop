@@ -1,10 +1,8 @@
-import Settings from './Settings';
-
-let SCAN_FIRST_CHAR = Settings.barcodeFirstChar;
-let SCAN_LAST_CHAR = Settings.barcodeLastChar;
-
-class Scanner {
-  constructor() {
+export default class Scanner {
+  constructor(barcodeFirstChar, barcodeLastChar, currentElementId) {
+    this.element = currentElementId ? document.getElementById(currentElementId) : window;
+    this.barcodeFirstChar = barcodeFirstChar;
+    this.barcodeLastChar = barcodeLastChar;
     this.barcode = '';
     this.listeners = {
       onScan: [],
@@ -23,31 +21,21 @@ class Scanner {
     }
   }
 
-  calibrate = (code) => {
-    SCAN_FIRST_CHAR = code.charAt(0);
-    SCAN_LAST_CHAR = code.charAt(code.length - 1);
-
-    Settings.set({
-      barcodeFirstChar: SCAN_FIRST_CHAR,
-      barcodeLastChar: SCAN_LAST_CHAR,
-    });
-  }
-
   dispatch = (listener, ...args) => {
     this.listeners[listener].forEach(func => func(...args));
   }
 
   initScanner = () => {
-    document.onkeydown = (event) => {
+    this.element.onkeydown = (event) => {
       this.dispatch('onInput', event.key);
 
-      if (event.key === SCAN_FIRST_CHAR) {
+      if (event.key === this.barcodeFirstChar) {
         this.barcode = event.key;
-      } else if (this.barcode.slice(0, 1) === SCAN_FIRST_CHAR) {
+      } else if (this.barcode.slice(0, 1) === this.barcodeFirstChar) {
         this.barcode += event.key;
       }
 
-      if (event.key === SCAN_LAST_CHAR) {
+      if (event.key === this.barcodeLastChar) {
         const code = this.barcode.replace(/\D/g, '');
         this.dispatch('onScan', code);
 
@@ -74,6 +62,9 @@ class Scanner {
   removeListener = (listener, func) => {
     this.listeners[listener] = this.listeners[listener].filter(currentFunc => currentFunc !== func);
   }
-}
 
-export default new Scanner();
+  updateScanChars = (barcodeFirstChar, barcodeLastChar) => {
+    this.barcodeFirstChar = barcodeFirstChar;
+    this.barcodeLastChar = barcodeLastChar;
+  }
+}

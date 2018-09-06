@@ -1,15 +1,13 @@
 import ConfirmModal from './ConfirmModal';
-import FormModal from './FormModal';
+import EmployeeFormModal from './employeeFormModal/EmployeeFormModal';
 import InputModal from './InputModal';
 import InformationModal from './InformationModal';
-import ScannerCalibrationModal from './ScannerCalibrationModal';
-import SearchModal from './SearchModal';
+import ScannerCalibrator from './ScannerCalibrator';
 
 export {
   ConfirmModal,
-  FormModal,
+  EmployeeFormModal,
   InputModal,
   InformationModal,
-  ScannerCalibrationModal,
-  SearchModal,
+  ScannerCalibrator,
 };

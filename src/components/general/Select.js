@@ -1,65 +1,103 @@
-import React, { Component, PropTypes } from 'react';
-import { Col, ControlLabel, FormControl, Row } from 'react-bootstrap';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import {
+  Col,
+  ControlLabel,
+  FormControl,
+} from 'react-bootstrap';
+
+const styles = {
+  label: {
+    marginTop: '7px',
+    textAlign: 'right',
+  },
+};
 
 export default class Select extends Component {
-  constructor(props) {
-    super(props);
+  static propTypes = {
+    default: PropTypes.string,
+    id: PropTypes.string,
+    inputWidth: PropTypes.shape(),
+    label: PropTypes.string.isRequired,
+    labelWidth: PropTypes.shape(),
+    onChange: PropTypes.func.isRequired,
+    optgroups: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.string,
+      options: PropTypes.arrayOf(PropTypes.shape({
+        label: PropTypes.string,
+        value: PropTypes.string,
+      })),
+    })),
+    options: PropTypes.arrayOf(PropTypes.shape({
+      label: PropTypes.string,
+      value: PropTypes.string,
+    })),
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  };
 
-    this.renderOptgroups = this.renderOptgroups.bind(this);
-    this.renderOptions = this.renderOptions.bind(this);
+  static defaultProps = {
+    default: '',
+    id: '',
+    inputWidth: { md: 9, sm: 10 },
+    labelWidth: { md: 3, sm: 2 },
+    optgroups: [],
+    options: [],
+    value: '',
   }
 
-  renderOptions(options) {
-    return options.map(({ label, value }) => (
-      <option
-        key={value}
-        value={value}
-      >
-        {label}
-      </option>
-    ));
-  }
+  onChange = event => this.props.onChange(event, event.target.value)
 
-  renderOptgroups(optgroups) {
-    return optgroups.map((optgroup, index) => (
-      <optgroup
-        key={`optgroup${index}`}
-        label={optgroup.label}
-      >
-        {this.renderOptions(optgroup.options)}
-      </optgroup>
-    ));
+  renderOption = ({ label, value }) => (
+    <option
+      key={value}
+      value={value}
+    >
+      {label}
+    </option>
+  )
+
+  renderOptions = (options = this.props.options) => options.map(this.renderOption)
+
+  renderOptgroup = ({ label, options }) => (
+    <optgroup
+      key={label}
+      label={label}
+    >
+      {this.renderOptions(options)}
+    </optgroup>
+  )
+
+  renderOptgroups = () => this.props.optgroups.map(this.renderOptgroup)
+
+  renderContent = () => {
+    if (this.props.optgroups.length) {
+      return this.renderOptgroups();
+    }
+
+    return this.renderOptions();
   }
 
   render() {
-    const { data, label, onChange, value } = this.props;
-
     return (
-      <Row>
+      <div>
         <Col
+          {...this.props.labelWidth}
           componentClass={ControlLabel}
-          md={2}
-          style={{ paddingTop: '6px' }}
+          style={styles.label}
         >
-          {label}
+          {this.props.label}
         </Col>
-        <Col md={10}>
+        <Col {...this.props.inputWidth}>
           <FormControl
             componentClass="select"
-            onChange={onChange}
-            value={value}
+            id={this.props.id}
+            onChange={this.onChange}
+            value={this.props.value || this.props.default}
           >
-            {data[0].options ? this.renderOptgroups(data) : this.renderOptions(data)}
+            {this.renderContent()}
           </FormControl>
         </Col>
-      </Row>
+      </div>
     );
   }
 }
-
-Select.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-  label: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.string,
-};

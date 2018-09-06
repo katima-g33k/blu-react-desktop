@@ -1,4 +1,5 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 import moment from 'moment';
 
@@ -111,7 +112,8 @@ export default class MemberReceipt extends Component {
   }
 
   componentDidMount() {
-    print();
+    // TODO: Fix
+    // this.print();
     return this.props.onAfterPrint && this.props.onAfterPrint();
   }
 

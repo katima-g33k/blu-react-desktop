@@ -1,82 +1,211 @@
+/* eslint react/sort-comp: 0 */
 import React, { Component } from 'react';
-import { Col, Panel, Row } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import {
+  Button,
+  Col,
+  Glyphicon,
+  Panel,
+  Row,
+} from 'react-bootstrap';
 import { Link } from 'react-router';
 
-import ActionPanel from '../../general/ActionPanel';
-import ItemFormContainer from '../../item/form/ItemFormContainer';
-import SearchContainer from '../../search/SearchContainer';
-import Table from '../../general/Table';
+import {
+  ActionPanel,
+  Table,
+} from '../../general';
+import {
+  Copy,
+  Item,
+  Member,
+} from '../../../lib/models';
+import i18n from '../../../lib/i18n';
+import ItemForm from '../../../containers/ItemFormContainer';
+import Search from '../../../containers/SearchContainer';
+
+const {
+  Body,
+  Heading,
+  Title,
+} = Panel;
+
+
+const styles = {
+  link: {
+    color: '#000',
+    textDecoration: 'none',
+  },
+};
 
 export default class AddCopies extends Component {
-  renderSearch = () => (
-    <SearchContainer
-      {...this.props}
-      noHeader
-      type="item"
-      onRowClick={item => this.props.openModal({ item })}
-      onAddButton={this.props.onAddButton}
-    />
-    )
+  static propTypes = {
+    copies: PropTypes.arrayOf(PropTypes.instanceOf(Copy)),
+    fetchItem: PropTypes.func.isRequired,
+    handleOnAddCopy: PropTypes.func.isRequired,
+    item: PropTypes.instanceOf(Item),
+    member: PropTypes.instanceOf(Member).isRequired,
+    onLoad: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
+    onUpdate: PropTypes.func.isRequired,
+    scannedItem: PropTypes.shape(),
+  };
 
-  renderForm = () => {
-    const { ean13, onFormCancel, onFormSave, params } = this.props;
-
-    return (
-      <ItemFormContainer
-        {...this.props}
-        ean13={ean13}
-        params={params}
-        onCancel={onFormCancel}
-        onSave={item => onFormSave({ item })}
-      />
-    );
+  static defaultProps = {
+    copies: [],
+    item: null,
+    scannedItem: null,
   }
 
-  render = () => (
-    <Row>
-      <Col md={10}>
-        <Panel header="Ajouter des exemplaires">
-          <h2>
-            <Link
-              to={`/member/view/${this.props.member.no}`}
-              style={{ color: '#000', textDecoration: 'none' }}
-            >
-              {this.props.member.name}
-            </Link>
-          </h2>
-          <Row>
-            <Col md={4}>
-              <Table
-                columns={this.props.columns}
-                data={this.props.data}
-                striped
-              />
-            </Col>
-          </Row>
-          <Row>
-            {this.props.isSearch ? this.renderSearch() : this.renderForm()}
-          </Row>
-        </Panel>
-      </Col>
-      <Col md={2}>
-        <ActionPanel actions={this.props.actions} />
-      </Col>
-      {this.props.modal}
-    </Row>
-    )
-}
+  state = {
+    ean13: null,
+    isSearch: true,
+  }
 
-AddCopies.propTypes = {
-  actions: React.PropTypes.array,
-  columns: React.PropTypes.array,
-  data: React.PropTypes.array,
-  ean13: React.PropTypes.string,
-  isSearch: React.PropTypes.bool,
-  member: React.PropTypes.shape(),
-  modal: React.PropTypes.shape(),
-  onAddButton: React.PropTypes.func,
-  openModal: React.PropTypes.func,
-  onFormSave: React.PropTypes.func,
-  onFormCancel: React.PropTypes.func,
-  params: React.PropTypes.shape(),
-};
+  componentDidMount() {
+    this.props.onLoad();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // TODO: Refactor
+    if (!this.props.scannedItem && nextProps.scannedItem) {
+      if (nextProps.scannedItem.id) {
+        this.props.fetchItem(nextProps.scannedItem.id);
+      } else {
+        this.setState({
+          isSearch: false,
+          ean13: nextProps.scannedItem.ean13,
+        });
+      }
+
+      return;
+    }
+
+    if (nextProps.item.id) {
+      this.props.handleOnAddCopy(nextProps.item);
+    }
+  }
+
+  get actions() {
+    return [{
+      label: i18n('actions.done'),
+      href: `/member/view/${this.props.member.no}`,
+      style: 'primary',
+    }];
+  }
+
+  get columns() {
+    return [
+      {
+        dataField: 'id',
+        isKey: true,
+        hidden: true,
+      },
+      {
+        dataField: 'title',
+        label: i18n('AddCopies.table.columns.title'),
+        tdStyle: { whiteSpace: 'normal' },
+        dataFormat: (cell, { item: { name } }) => name,
+      },
+      {
+        dataField: 'price',
+        label: i18n('AddCopies.table.columns.price'),
+        width: '40px',
+        dataFormat: price => `${price} $`,
+      },
+      {
+        dataField: 'actions',
+        label: '',
+        dataAlign: 'center',
+        width: '100px',
+        dataFormat: (cell, copy) => {
+          const actions = [(
+            <Button
+              bsStyle="default"
+              onClick={() => this.props.onUpdate(copy)}
+            >
+              <Glyphicon glyph="pencil" />
+            </Button>
+          )];
+
+          if (!copy.reservation) {
+            actions.push((
+              <Button
+                bsStyle="danger"
+                onClick={() => this.props.onRemove(copy)}
+              >
+                <Glyphicon glyph="trash" />
+              </Button>
+            ));
+          }
+
+          return (
+            <div>
+              {actions}
+            </div>
+          );
+        },
+      },
+    ];
+  }
+
+  toggleView = () => this.setState(state => ({ isSearch: !state.isSearch }))
+
+  renderSearch = () => (
+    <Search
+      disableTypeSelection
+      noHeader
+      type={Search.TYPES.ITEM}
+      onRowClick={this.props.handleOnAddCopy}
+      onAddButton={this.toggleView}
+    />
+  )
+
+  renderForm = () => (
+    <ItemForm
+      ean13={this.state.ean13}
+      onCancel={this.toggleView}
+      onSaveCallback={this.props.handleOnAddCopy}
+    />
+  )
+
+  render() {
+    return (
+      <Row>
+        <Col md={10}>
+          <Panel>
+            <Heading>{i18n('AddCopies.title')}</Heading>
+            <Body>
+              <Title>
+                <h2>
+                  <Link
+                    to={`/member/view/${this.props.member.no}`}
+                    style={styles.link}
+                  >
+                    {this.props.member.name}
+                  </Link>
+                </h2>
+              </Title>
+              <Row>
+                <Col md={4}>
+                  <Table
+                    columns={this.columns}
+                    data={this.props.copies}
+                    striped
+                  />
+                </Col>
+              </Row>
+              <Row>
+                <Col md={12}>
+                  {this.state.isSearch ? this.renderSearch() : this.renderForm()}
+                </Col>
+              </Row>
+            </Body>
+          </Panel>
+        </Col>
+        <Col md={2}>
+          <ActionPanel actions={this.actions} />
+        </Col>
+      </Row>
+    );
+  }
+}

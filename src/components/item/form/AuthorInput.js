@@ -1,108 +1,144 @@
-import React, { Component, PropTypes } from 'react';
+/* eslint react/no-did-update-set-state: 0 */
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
   Button,
   Col,
-  ControlLabel,
-  FormControl,
   FormGroup,
   Glyphicon,
 } from 'react-bootstrap';
 
+import { Author } from '../../../lib/models';
+import I18n from '../../../lib/i18n';
+import { Input } from '../../general/formInputs';
+
 const MAX_AUTHORS = 5;
-const LABELS = {
-  firstName: 'Prénom',
-  lastName: 'Nom',
+const ADD_BUTTON_GRID = {
+  md: 6,
+  mdOffset: 3,
+  sm: 8,
+  smOffset: 2,
 };
 
-
 export default class AuthorInput extends Component {
-  constructor(props) {
-    super(props);
-
-    this.renderAddAuthor = this.renderAddAuthor.bind(this);
-    this.renderAuthor = this.renderAuthor.bind(this);
-    this.renderInput = this.renderInput.bind(this);
+  static propTypes = {
+    authors: PropTypes.arrayOf(PropTypes.instanceOf(Author)),
+    id: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
   }
 
-  renderAddAuthor() {
-    const { onAddButton } = this.props;
+  static defaultProps = {
+    authors: [new Author()],
+  }
 
-    return (
+  state = {
+    authors: this.props.authors.length ? this.props.authors : [new Author()],
+    focus: null,
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      authors: nextProps.authors.length ? nextProps.authors : [new Author()],
+    });
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !(this.state.focus && !nextState.focus);
+  }
+
+  componentDidUpdate() {
+    if (this.state.focus) {
+      const { field, index } = this.state.focus;
+      const el = document.querySelector(`[data-field='${field}'][data-index='${index}']`);
+      const pos = el.value.length;
+
+      el.focus();
+      el.setSelectionRange(pos, pos);
+      this.setState({ focus: null });
+    }
+  }
+
+
+  getEvent = eventData => ({
+    ...eventData,
+    target: {
+      ...eventData.target,
+      id: this.props.id,
+    },
+  })
+
+  handleOnChange = (event) => {
+    const { authors } = this.state;
+    const { field, index } = event.target.dataset;
+
+    authors[index][field] = event.target.value;
+
+    this.setState({ focus: { field, index } });
+    this.props.onChange(this.getEvent(event), authors);
+  }
+
+  handleOnDelete = (event, index) => {
+    const authors = this.state.authors.filter((author, curIndex) => index !== curIndex);
+    this.props.onChange(this.getEvent(event), authors);
+  }
+
+  handleOnAdd = (event) => {
+    const authors = [...this.state.authors, new Author()];
+    this.props.onChange(this.getEvent(event), authors);
+  }
+
+  renderAuthorInput = (author, index) => (
+    <FormGroup key={`${author}${index}`}>
+      <Input
+        data={{
+          field: 'lastName',
+          index,
+        }}
+        inputWidth={{ md: 3, sm: 4 }}
+        label={I18n('ItemForm.fields.author.label', { index: index + 1 })}
+        onChange={this.handleOnChange}
+        placeholder={I18n('ItemForm.fields.author.placeholder.lastName')}
+        value={author.lastName}
+      />
+      <Input
+        data={{
+          field: 'firstName',
+          index,
+        }}
+        inputWidth={{ md: 3, sm: 4 }}
+        onChange={this.handleOnChange}
+        placeholder={I18n('ItemForm.fields.author.placeholder.firstName')}
+        value={author.firstName}
+      />
+      <Button
+        bsStyle={'danger'}
+        onClick={event => this.handleOnDelete(event, index)}
+      >
+        <Glyphicon glyph={'trash'} />
+      </Button>
+    </FormGroup>
+  )
+
+  renderAuthorInputs = () => this.state.authors.map(this.renderAuthorInput)
+
+  renderAddButton = () => this.props.authors.length < MAX_AUTHORS && (
+    <Col {...ADD_BUTTON_GRID}>
       <Button
         block
         bsStyle={'success'}
-        onClick={onAddButton}
+        onClick={this.handleOnAdd}
       >
         <Glyphicon glyph={'plus'} />
       </Button>
-    );
-  }
-
-  renderAuthor(author = {}, index = 1) {
-    const { data, invalid, onRemoveButton } = this.props;
-
-    return (
-      <FormGroup
-        controlId={`author${index}`}
-        key={`author${index}`}
-        validationState={invalid && author.lastName === '' && 'error'}
-      >
-        {this.renderInput(author, 'lastName', true)}
-        {this.renderInput(author, 'firstName')}
-        {data.length > 1 && (
-          <Col sm={1} md={1}>
-            <Button
-              bsStyle="danger"
-              onClick={event => onRemoveButton(event, author)}
-            >
-              <Glyphicon glyph="remove" />
-            </Button>
-          </Col>
-        )}
-      </FormGroup>
-    );
-  }
-
-  renderInput(author, field, feedback) {
-    const { onChange } = this.props;
-
-    return (
-      <Col sm={5} md={5}>
-        <Col componentClass={ControlLabel} sm={2} md={3}>
-          {LABELS[field]}
-        </Col>
-        <Col sm={9} md={8}>
-          <FormControl
-            data-field={field}
-            placeholder={LABELS[field]}
-            onChange={event => onChange(event, author)}
-            type="text"
-            value={author[field]}
-          />
-          {feedback && <FormControl.Feedback />}
-        </Col>
-      </Col>
-    );
-  }
+    </Col>
+  )
 
   render() {
-    const authors = this.props.data;
-    const inputWidth = { md: 10, mdOffset: 2, sm: 11, smOffset: 1 };
-
     return (
-      <Col {...inputWidth} componentClass="fieldset">
-        <legend>{'Auteur.e.s'}</legend>
-        {authors.map((author, index) => this.renderAuthor(author, index + 1))}
-        {authors.length < MAX_AUTHORS && this.renderAddAuthor()}
-      </Col>
+      <div>
+        {this.renderAuthorInputs()}
+        {this.renderAddButton()}
+      </div>
     );
   }
 }
-
-AuthorInput.propTypes = {
-  data: PropTypes.arrayOf(PropTypes.shape()).isRequired,
-  invalid: PropTypes.string,
-  onAddButton: PropTypes.func,
-  onChange: PropTypes.func,
-  onRemoveButton: PropTypes.func,
-};

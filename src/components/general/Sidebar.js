@@ -1,10 +1,9 @@
-/* eslint jsx-a11y/no-noninteractive-element-interactions: 0 */
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { browserHistory } from 'react-router';
 
-import { Translate } from '../../lib/i18n/i18n';
-import SidebarButton from './SidebarButton';
+import I18n from '../../lib/i18n';
+import LogoutButton from '../../containers/LogoutButtonContainer';
 
 const menuItems = [
   {
@@ -76,19 +75,24 @@ const settingsMenuItem = {
 };
 
 export default class Sidebar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      location: '/',
-    };
-  }
-
-  static propTypes = {
-    onLogout: PropTypes.func.isRequired,
+  state = {
+    location: '/',
   };
 
   componentDidMount() {
     this.handleLocation();
+  }
+
+  getMenuItems = () => {
+    const user = sessionStorage.getItem('user');
+    const data = [...menuItems];
+
+    if (user && JSON.parse(user).isAdmin) {
+      data.push(adminMenuItems);
+    }
+
+    data.push(settingsMenuItem);
+    return data;
   }
 
   handleLocation = () => {
@@ -104,34 +108,6 @@ export default class Sidebar extends Component {
     return location.includes(href) || location.includes(key.replace(/_/g, '/'));
   }
 
-  getMenuItems = () => {
-    const user = sessionStorage.getItem('user');
-    const data = [...menuItems];
-
-    if (user && JSON.parse(user).isAdmin) {
-      data.push(adminMenuItems);
-    }
-
-    data.push(settingsMenuItem);
-    return data;
-  }
-
-  renderLogoutButton = () => (
-    <SidebarButton
-      icon="log-out"
-      onClick={this.props.onLogout}
-      title="Déconnexion"
-    />
-    )
-
-  renderBackButton = () => (
-    <SidebarButton
-      icon="arrow-left"
-      onClick={browserHistory.goBack}
-      title="Page précédente"
-    />
-    )
-
   renderMenu = (data, isChild) => data.map(({ children, key, href }) => {
     if (children) {
       return (
@@ -142,7 +118,7 @@ export default class Sidebar extends Component {
             paddingLeft: '10px',
           }}
         >
-          <Translate value={`Sidebar.${key}`} />
+          {I18n(`Sidebar.${key}`)}
           <ul style={{ listStyle: 'none' }}>
             {this.renderMenu(children, true)}
           </ul>
@@ -168,7 +144,7 @@ export default class Sidebar extends Component {
           fontWeight: isCurrentLocation ? 'bold' : 'normal',
         }}
       >
-        <Translate value={`Sidebar.${key}`} />
+        {I18n(`Sidebar.${key}`)}
         {!isChild && <hr />}
       </li>
     );
@@ -180,14 +156,9 @@ export default class Sidebar extends Component {
         <Col md={12}>
           <Row>
             <Col md={12}>
-              {this.renderLogoutButton()}
+              <LogoutButton />
             </Col>
           </Row>
-          {/* <Row>
-            <Col md={12}>
-              {this.renderBackButton()}
-            </Col>
-          </Row> */}
           <Row>
             <Col
               md={12}

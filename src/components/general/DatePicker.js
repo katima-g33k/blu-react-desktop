@@ -1,34 +1,54 @@
-import React, { Component, PropTypes } from 'react';
-import { Col, ControlLabel, FormControl, Row } from 'react-bootstrap';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import {
+  Col,
+  ControlLabel,
+  FormControl,
+  Row,
+} from 'react-bootstrap';
 import ReactDatePicker from 'react-datepicker';
+import moment from 'moment';
+
+const styles = {
+  label: {
+    paddingTop: '6px',
+  },
+};
 
 export default class DatePicker extends Component {
-  render() {
-    const { label, onChange, value } = this.props;
+  static propTypes = {
+    label: PropTypes.string,
+    onChange: PropTypes.func.isRequired,
+    value: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.instanceOf(Date),
+      PropTypes.instanceOf(moment),
+    ]),
+  };
 
+  static defaultProps = {
+    label: '',
+    value: moment(),
+  }
+
+  render() {
     return (
       <Row>
         <Col
           componentClass={ControlLabel}
           md={2}
-          style={{ paddingTop: '6px' }}
+          style={styles.label}
         >
-          {label}
+          {this.props.label}
         </Col>
         <Col md={10}>
           <FormControl
             componentClass={ReactDatePicker}
-            onChange={onChange}
-            selected={value}
+            onChange={this.props.onChange}
+            selected={this.props.value}
           />
         </Col>
       </Row>
     );
   }
 }
-
-DatePicker.propTypes = {
-  label: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-  value: PropTypes.shape(),
-};

@@ -1,142 +1,124 @@
-import React, { Component, PropTypes } from 'react';
-import {
-  Checkbox,
-  Col,
-  ControlLabel,
-  FormControl,
-  Row,
-} from 'react-bootstrap';
+// TODO: Optimize for large renders
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { Col, Row } from 'react-bootstrap';
 import FileSaver from 'file-saver';
 
 import Button from './Button';
+import Checkbox from './Checkbox';
+import { createCSV } from '../../lib/csv';
+import I18n from '../../lib/i18n';
+import Input from './Input';
 import Table from './Table';
 
-const renderOptions = options => options.map(option => (
-  <option
-    key={`option${option.value}`}
-    value={option.value}
-  >
-    {option.label}
-  </option>
-  ));
-
-const renderOptgroups = optgroups => optgroups.map((optgroup, index) => (
-  <optgroup
-    key={`optgroup${index}`}
-    label={optgroup.label}
-  >
-    {renderOptions(optgroup.options)}
-  </optgroup>
-  ));
-
 export default class TableLayout extends Component {
-  constructor(props) {
-    super(props);
+  static propTypes = {
+    actions: PropTypes.arrayOf(PropTypes.shape()),
+    columns: PropTypes.arrayOf(PropTypes.shape()).isRequired,
+    data: PropTypes.arrayOf(PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.shape()),
+      PropTypes.shape(),
+    ])).isRequired,
+    filters: PropTypes.arrayOf(PropTypes.shape()),
+    exportable: PropTypes.bool,
+    exportTitle: PropTypes.string,
+    noStrip: PropTypes.bool,
+    placeholder: PropTypes.string,
+    rowActions: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.shape()),
+      PropTypes.func,
+    ]),
+    rowClass: PropTypes.func,
+    title: PropTypes.string.isRequired,
+  };
 
-    this.createCSV = this.createCSV.bind(this);
-    this.saveFile = this.saveFile.bind(this);
-    this.renderExportButton = this.renderExportButton.bind(this);
-    this.renderActions = this.renderActions.bind(this);
+  static defaultProps = {
+    actions: [],
+    filters: [],
+    exportable: false,
+    exportTitle: '',
+    noStrip: false,
+    placeholder: I18n('table.placeholder'),
+    rowActions: [],
+    rowClass: () => {},
   }
 
-  createCSV() {
-    const { columns, data } = this.props;
-    const csvColumns = columns.filter(({ hidden }) => !hidden);
-    const header = `${csvColumns.map(column => `"${column.label}"`).join(',')}\r\n`;
-    const body = data.map(row =>
-      csvColumns.map((column) => {
-        if (column.exportDataFormat) {
-          return `"${column.exportDataFormat(row[column.dataField], row)}"`;
-        }
+  getFileName = () => `${this.props.exportTitle || I18n('table.defaultFileName')}.csv`
 
-        if (column.dataFormat) {
-          return `"${column.dataFormat(row)}"`;
-        }
-
-        return `"${row[column.dataField]}"` || '""';
-      }).join(','),
-    ).join('\r\n');
-
-    return new Blob([`${header}${body}`], { type: 'csv' });
+  saveFile = () => {
+    FileSaver.saveAs(createCSV(this.props.columns, this.props.data), this.getFileName());
   }
 
-  saveFile() {
-    FileSaver.saveAs(this.createCSV(), `${this.props.exportTitle || 'data'}.csv`);
+  renderExportButton = () => {
+    if (this.props.exportable) {
+      return (
+        <Button
+          bsStyle="primary"
+          glyph="new-window"
+          label={I18n('table.export')}
+          onClick={this.saveFile}
+        />
+      );
+    }
+
+    return null;
   }
 
-  renderExportButton() {
-    return (
-      <Button
-        bsStyle="primary"
-        onClick={this.saveFile}
-        glyph="new-window"
-        label={'Exporter sélection'}
-      />
-    );
-  }
+  renderAction = action => (
+    <Button
+      bsStyle={action.bsStyle}
+      key={action.name}
+      glyph={action.icon}
+      label={action.label}
+      onClick={action.onClick}
+    />
+  )
 
-  renderActions() {
-    const { actions = [] } = this.props;
+  renderActions = () => this.props.actions.map(this.renderAction)
 
-    return actions.map(action => (
-      <Button
-        bsStyle={action.bsStyle}
-        key={action.name}
-        glyph={action.icon}
-        label={action.label}
-        onClick={action.onClick}
-      />
-    ));
-  }
-
-  renderFilters() {
+  renderFilters = () => {
     const { filters = [] } = this.props;
 
     return filters.map((filter) => {
-      switch (filter.type) {
-        case 'checkbox':
-          return (
-            <Col md={1}>
-              <Checkbox
-                key={filter.key}
-                onChange={filter.onChange}
-                checked={filter.checked}
-              >
-                {filter.label}
-              </Checkbox>
-            </Col>
-          );
-        case 'select':
-          return (
-            <Col md={2} key={`select${filter.key}`}>
-              <Row>
-                <Col componentClass={ControlLabel} md={3} style={{ marginTop: '6px' }}>
-                  {filter.label}
-                </Col>
-                <Col md={9}>
-                  <FormControl
-                    componentClass="select"
-                    value={filter.value}
-                    onChange={filter.onChange}
-                  >
-                    {filter.optgroups ?
-                      renderOptgroups(filter.optgroups) :
-                      renderOptions(filter.options || [])
-                    }
-                  </FormControl>
-                </Col>
-              </Row>
-            </Col>
-          );
-        default:
-          return null;
+      if (filter.component) {
+        return (
+          <Col key={filter.key} md={2}>
+            {filter.component}
+          </Col>
+        );
       }
+
+      if (filter.type === 'input') {
+        return (
+          <Col key={filter.key} md={2}>
+            <Input
+              id={filter.key}
+              onChange={filter.onChange}
+              placeholder={filter.label}
+              value={filter.value}
+            />
+          </Col>
+        );
+      }
+
+      if (filter.type === 'checkbox') {
+        return (
+          <Col key={filter.key} md={2}>
+            <Checkbox
+              checked={filter.checked}
+              id={filter.key}
+              label={filter.label}
+              onChange={filter.onChange}
+            />
+          </Col>
+        );
+      }
+
+      return null;
     });
   }
 
   render() {
-    const { columns, data, exportable, modal, placeholder, title } = this.props;
-
     return (
       <Row componentClass="section">
         <Col md={12}>
@@ -144,12 +126,12 @@ export default class TableLayout extends Component {
             <Col md={12}>
               <Row>
                 <Col md={12}>
-                  <h4>{title}</h4>
+                  <h4>{this.props.title}</h4>
                 </Col>
               </Row>
               <Row style={{ marginBottom: '10px' }}>
                 <Col md={12}>
-                  {exportable && this.renderExportButton()}
+                  {this.renderExportButton()}
                   {this.renderActions()}
                 </Col>
               </Row>
@@ -163,28 +145,17 @@ export default class TableLayout extends Component {
           <Row>
             <Col md={12}>
               <Table
-                columns={columns}
-                data={data}
-                placeholder={placeholder || 'Aucune donnée'}
-                striped
+                columns={this.props.columns}
+                data={this.props.data}
+                placeholder={this.props.placeholder}
+                rowActions={this.props.rowActions}
+                rowClass={this.props.rowClass}
+                striped={!this.props.noStrip}
               />
             </Col>
           </Row>
         </Col>
-        {modal}
       </Row>
     );
   }
 }
-
-TableLayout.propTypes = {
-  actions: PropTypes.array,
-  columns: PropTypes.array.isRequired,
-  data: PropTypes.array.isRequired,
-  filters: PropTypes.arrayOf(PropTypes.shape()),
-  exportable: PropTypes.bool,
-  exportTitle: PropTypes.string,
-  modal: PropTypes.shape(),
-  placeholder: PropTypes.string,
-  title: PropTypes.string.isRequired,
-};

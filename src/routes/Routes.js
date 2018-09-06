@@ -1,23 +1,30 @@
-import React, { Component, PropTypes } from 'react';
-import { Router, Route, browserHistory, IndexRedirect } from 'react-router';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import {
+  browserHistory,
+  IndexRedirect,
+  Route,
+  Router,
+} from 'react-router';
 
-import AddCopiesContainer from '../components/copy/addCopies/AddCopiesContainer';
-import DuplicateMembers from '../components/admin/DuplicateMembers';
-import EmployeesTable from '../components/admin/EmployeesTable';
-import ItemFormContainer from '../components/item/form/ItemFormContainer';
-import ItemList from '../components/admin/ItemList';
-import ItemViewContainer from '../components/item/view/ItemViewContainer';
-import MemberFormContainer from '../components/member/form/MemberFormContainer';
-import MemberViewContainer from '../components/member/view/MemberViewContainer';
-import ReservationTableView from '../components/admin/ReservationTableView';
-import SearchContainer from '../components/search/SearchContainer';
-import SettingsView from '../components/general/SettingsView';
-import Statistics from '../components/admin/Statistics';
-import StorageTableView from '../components/admin/StorageTableView';
+import AddCopiesContainer from '../containers/AddCopiesContainer';
+import DuplicateMembers from '../containers/DuplicateMembersContainer';
+import EmployeesTable from '../containers/EmployeeTableContainer';
+import ItemForm from '../containers/ItemFormContainer';
+import ItemList from '../containers/ItemListContainer';
+import ItemView from '../containers/ItemViewContainer';
+import MemberForm from '../containers/MemberFormContainer';
+import MemberView from '../containers/MemberViewContainer';
+import ReservationManagement from '../containers/ReservationManagementContainer';
+import Search from '../containers/SearchContainer';
+import SettingsView from '../containers/SettingsViewContainer';
+import Statistics from '../containers/StatisticsContainer';
+import StorageManagement from '../containers/StorageManagementContainer';
 
 export default class Routes extends Component {
   static propTypes = {
-    api: PropTypes.shape(),
+    currentPath: PropTypes.string.isRequired,
+    onRouteChange: PropTypes.func.isRequired,
   }
 
   componentDidMount() {
@@ -26,18 +33,22 @@ export default class Routes extends Component {
     }
   }
 
-  render() {
-    const { api } = this.props;
+  componentWillReceiveProps(nextProps) {
+    if (this.props.currentPath !== nextProps.currentPath) {
+      this.props.onRouteChange(nextProps.currentPath);
+    }
+  }
 
+  render() {
     return (
       <Router history={browserHistory}>
         <Route
-          component={props => (<SearchContainer {...props} api={api} />)}
+          component={Search}
           path="/"
         >
           <IndexRedirect to="/search" />
           <Route
-            component={props => (<SearchContainer {...props} api={api} />)}
+            component={Search}
             name="Search"
             path="/search"
           />
@@ -45,22 +56,22 @@ export default class Routes extends Component {
         <Route name="Member" path="/member">
           <IndexRedirect to="add" />
           <Route
-            component={props => (<MemberViewContainer {...props} api={api} />)}
+            component={MemberView}
             name="MemberView"
             path="view/:no"
           />
           <Route
-            component={props => (<MemberFormContainer {...props} api={api} />)}
+            component={MemberForm}
             name="MemberAdd"
             path="add"
           />
           <Route
-            component={props => (<MemberFormContainer {...props} api={api} />)}
+            component={MemberForm}
             name="MemberEdit"
             path="edit/:no"
           />
           <Route
-            component={props => (<AddCopiesContainer {...props} api={api} />)}
+            component={AddCopiesContainer}
             name="AddCopies"
             path="copies/:no"
           />
@@ -68,55 +79,55 @@ export default class Routes extends Component {
         <Route name="Item" path="/item">
           <IndexRedirect to="add" />
           <Route
-            component={props => (<ItemViewContainer {...props} api={api} />)}
+            component={ItemView}
             name="ItemView"
             path="view/:id"
           />
           <Route
-            component={props => (<ItemFormContainer {...props} api={api} />)}
+            component={ItemForm}
             name="ItemAdd"
             path="add"
           />
           <Route
-            component={props => (<ItemFormContainer {...props} api={api} />)}
+            component={ItemForm}
             name="ItemEdit"
             path="edit/:id"
           />
         </Route>
         <Route name="Admin" path="/admin">
           <Route
-            component={props => (<EmployeesTable {...props} api={api} />)}
+            component={EmployeesTable}
             name="employees"
             path="employees"
           />
           <Route
-            component={props => (<ReservationTableView {...props} api={api} />)}
+            component={ReservationManagement}
             name="reservations"
             path="reservations"
           />
           <Route
-            component={props => (<Statistics {...props} api={api} />)}
+            component={Statistics}
             name="statistics"
             path="statistics"
           />
           <Route
-            component={props => (<StorageTableView {...props} api={api} />)}
+            component={StorageManagement}
             name="storage"
             path="storage"
           />
           <Route
-            component={props => (<ItemList {...props} api={api} />)}
+            component={ItemList}
             name="itemList"
             path="item/list"
           />
           <Route
-            component={props => (<DuplicateMembers {...props} api={api} />)}
+            component={DuplicateMembers}
             name="duplicates"
             path="duplicates"
           />
         </Route>
         <Route
-          component={props => (<SettingsView {...props} api={api} />)}
+          component={SettingsView}
           name="settings"
           path="/settings"
         />

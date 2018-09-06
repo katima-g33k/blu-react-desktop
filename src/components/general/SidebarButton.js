@@ -1,5 +1,6 @@
 /* eslint jsx-a11y/no-noninteractive-element-interactions: 0 */
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Glyphicon } from 'react-bootstrap';
 
 export default class SidebarButton extends Component {
