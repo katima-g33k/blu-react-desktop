@@ -22,11 +22,11 @@ const fail = error => ({
   type: LOGIN_FAIL,
 });
 
-export default (username, password, api) => async (dispatch) => {
+export default (username, password, secret, api) => async (dispatch) => {
   dispatch(pending());
 
   try {
-    const user = await api.employee.login(username, encrypt(password));
+    const user = await api.employee.login(username, encrypt(password, secret));
     dispatch(success(user));
   } catch (error) {
     dispatch(fail(error));

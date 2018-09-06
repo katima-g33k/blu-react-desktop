@@ -1,11 +1,12 @@
 import createReducer from './reducerFactory';
+import { Employee } from '../lib/models';
 import {
   LOGIN_SUCCESS,
   LOGOUT_SUCCESS,
 } from '../actions/actionTypes';
 
 const initialState = {
-  user: sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : null,
+  user: new Employee(sessionStorage.getItem('user') ? JSON.parse(sessionStorage.getItem('user')) : {}),
 };
 
 const handlers = {
@@ -17,13 +18,9 @@ const handlers = {
       user,
     };
   },
-  [LOGOUT_SUCCESS]: (state) => {
+  [LOGOUT_SUCCESS]: () => {
     sessionStorage.removeItem('user');
-
-    return {
-      ...state,
-      user: null,
-    };
+    return initialState;
   },
 };
 

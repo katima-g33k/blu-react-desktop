@@ -16,6 +16,11 @@ import I18n from '../../lib/i18n/index';
 import { Input } from '../general/formInputs/index';
 import ScannerCalibrator from '../../containers/ScannerCalibratorContainer';
 
+const {
+  Body,
+  Heading,
+} = Panel;
+
 const adminFields = ['apiUrl', 'apiKey', 'secretKey'];
 
 export default class SettingsView extends Component {
@@ -59,7 +64,7 @@ export default class SettingsView extends Component {
 
   renderField = field => (
     <Row key={field}>
-      <Col md={8}>
+      <Col md={12}>
         <Input
           id={field}
           label={I18n(`SettingsView.fields.${field}`)}
@@ -71,44 +76,55 @@ export default class SettingsView extends Component {
     </Row>
   )
 
-  renderAdminFields = () => ((this.props.userIsAdmin || this.props.isInitialSetup) && adminFields.map(this.renderField))
+  renderAdminFields = () => {
+    if (!this.props.userIsAdmin && !this.props.isInitialSetup) {
+      return null;
+    }
+
+    return adminFields.map(this.renderField);
+  }
 
   render() {
     return (
       <Row id={this.constructor.name}>
         <Col md={10}>
-          <Panel header={I18n('SettingsView.title')}>
-            <Form>
-              {this.renderAdminFields()}
-              <Row id="calibrationButton">
-                <Col md={9}>
-                  <Button onClick={this.calibrateScanner}>
-                    {I18n('SettingsView.fields.calibrate')}
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={8}>
-                  <ButtonToolbar id="formButtons">
-                    {!this.props.isInitialSetup && (
-                      <Button onClick={this.handleOnCancel}>
-                        {I18n('actions.cancel')}
-                      </Button>
-                    )}
-                    <Button
-                      bsStyle="primary"
-                      onClick={this.handleOnSave}
-                    >
-                      {I18n('actions.save')}
+          <Panel>
+            <Heading>
+              {I18n('SettingsView.title')}
+            </Heading>
+            <Body>
+              <Form>
+                {this.renderAdminFields()}
+                <Row id="calibrationButton">
+                  <Col md={12}>
+                    <Button onClick={this.calibrateScanner}>
+                      {I18n('SettingsView.fields.calibrate')}
                     </Button>
-                  </ButtonToolbar>
-                </Col>
-              </Row>
-              <ScannerCalibrator
-                onHide={this.calibrateScannerDone}
-                show={this.state.calibrateScanner}
-              />
-            </Form>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12}>
+                    <ButtonToolbar id="formButtons">
+                      {!this.props.isInitialSetup && (
+                        <Button onClick={this.handleOnCancel}>
+                          {I18n('actions.cancel')}
+                        </Button>
+                      )}
+                      <Button
+                        bsStyle="primary"
+                        onClick={this.handleOnSave}
+                      >
+                        {I18n('actions.save')}
+                      </Button>
+                    </ButtonToolbar>
+                  </Col>
+                </Row>
+                <ScannerCalibrator
+                  onHide={this.calibrateScannerDone}
+                  show={this.state.calibrateScanner}
+                />
+              </Form>
+            </Body>
           </Panel>
         </Col>
       </Row>

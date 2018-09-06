@@ -1,11 +1,9 @@
+/* eslint import/prefer-default-export: 0 */
 import crypto from 'crypto';
 
-import settings from './Settings';
-
 const algorithm = 'aes-256-ctr';
-const { secretKey } = settings;
 
-export const encrypt = (text) => {
-  const cipher = crypto.createCipher(algorithm, secretKey);
+export const encrypt = (text, secret) => {
+  const cipher = crypto.createCipher(algorithm, secret);
   return `${cipher.update(text, 'utf8', 'hex')}${cipher.final('hex')}`;
 };
