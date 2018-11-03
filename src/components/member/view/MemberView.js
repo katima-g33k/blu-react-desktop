@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Col, Label, Panel, Row } from 'react-bootstrap';
+import {
+  Alert,
+  Col,
+  Label,
+  Panel,
+  Row,
+} from 'react-bootstrap';
 
 import AlignedData from '../../general/AlignedData';
 import CopyTable from './MemberCopyTable';
@@ -26,13 +32,13 @@ export default class MemberView extends Component {
     member: PropTypes.instanceOf(Member).isRequired,
     isPrinting: PropTypes.bool,
     onAfterPrint: PropTypes.func.isRequired,
-  }
+  };
 
   static defaultProps = {
     amount: 0,
     isLoading: false,
     isPrinting: false,
-  }
+  };
 
   componentDidMount() {
     this.props.fetch();
@@ -44,20 +50,20 @@ export default class MemberView extends Component {
     }
 
     return null;
-  }
+  };
 
   renderAccountState = () => {
-    const account = this.props.member.account;
+    const { account } = this.props.member;
     return (
       <section>
         <h4>{I18n('MemberView.account.title')}</h4>
         <AlignedData
           label={I18n('MemberView.account.activation')}
-          value={
+          value={(
             <Label bsStyle={account.isActive ? 'success' : 'danger'}>
               {I18n(`MemberView.account.${account.isActive ? 'active' : 'deactivated'}`)}
             </Label>
-          }
+          )}
         />
         <AlignedData
           label={I18n('MemberView.account.registration')}
@@ -73,7 +79,7 @@ export default class MemberView extends Component {
         />
       </section>
     );
-  }
+  };
 
   renderAlert = () => {
     const { transfers } = this.props.member.account;
@@ -88,7 +94,7 @@ export default class MemberView extends Component {
     }
 
     return null;
-  }
+  };
 
   renderPhone = (phone, index) => {
     if (phone.id) {
@@ -102,9 +108,9 @@ export default class MemberView extends Component {
     }
 
     return null;
-  }
+  };
 
-  renderPhones = () => this.props.member.phone.map(this.renderPhone)
+  renderPhones = () => this.props.member.phone.map(this.renderPhone);
 
   renderGeneralInformation = () => (
     <section>
@@ -123,14 +129,14 @@ export default class MemberView extends Component {
       />
       {this.renderPhones()}
     </section>
-  )
+  );
 
   renderStats = () => (
     <section>
       <h4>{I18n('MemberView.stats.title')}</h4>
       <ProfileStats copies={this.props.member.account.copies} />
     </section>
-  )
+  );
 
   renderReceipt = () => {
     if (this.props.isPrinting) {
@@ -144,7 +150,7 @@ export default class MemberView extends Component {
     }
 
     return null;
-  }
+  };
 
   render() {
     const {

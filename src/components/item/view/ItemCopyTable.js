@@ -26,7 +26,7 @@ export default class ItemCopyTable extends Component {
       sortFunc: sortString,
       tdStyle: { whiteSpace: 'normal' },
     },
-  ]
+  ];
 
   formatRow = ({ member }) => {
     if (!member.account.isActive) {
@@ -34,7 +34,7 @@ export default class ItemCopyTable extends Component {
     }
 
     return null;
-  }
+  };
 
   render() {
     return (

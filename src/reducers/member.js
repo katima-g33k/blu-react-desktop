@@ -1,5 +1,6 @@
 import {
   DELETE_COMMENT_SUCCESS,
+  DELETE_MEMBER_SUCCESS,
   FETCH_MEMBER_FAIL,
   FETCH_MEMBER_PENDING,
   FETCH_MEMBER_SUCCESS,
@@ -35,6 +36,7 @@ const handlers = {
       },
     }),
   }),
+  [DELETE_MEMBER_SUCCESS]: () => initialState,
   [FETCH_MEMBER_FAIL]: state => ({
     ...state,
     isLoading: false,

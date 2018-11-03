@@ -51,6 +51,10 @@ h4 {
   width: fit-content;
 }
 
+.form-control-feedback {
+  text-align: left !important;
+}
+
 @media print {
   #receipt {
     display: block;
@@ -87,7 +91,7 @@ h4 {
     margin-bottom: 20px;
   }
 
-  .autorisation {
+  .authorisation {
     margin: auto;
     margin-bottom: 30px;
   }

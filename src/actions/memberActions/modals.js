@@ -1,21 +1,20 @@
-import { browserHistory } from 'react-router';
-
-import { close } from '../modalActions';
-import I18n from '../../lib/i18n';
-import merge from './merge';
 import { OPEN_MODAL } from '../actionTypes';
+import i18n from '../../lib/i18n';
+import { historyPush } from '../routeActions';
+import merge from './merge';
 import pay from './pay';
+import remove from './remove';
 
-export const openPayModal = member => (dispatch) => {
+export const openPayModal = (api, member) => (dispatch) => {
   dispatch({
     actions: [
       {
-        label: I18n('MemberView.actions.printReceipt'),
-        onClick: () => dispatch(pay(member, true)),
+        label: i18n('MemberView.actions.printReceipt'),
+        onClick: () => dispatch(pay(api, member, true)),
       },
       {
-        label: I18n('MemberView.actions.pay'),
-        onClick: () => dispatch(pay(member)),
+        label: i18n('MemberView.actions.pay'),
+        onClick: () => dispatch(pay(api, member)),
       },
     ],
     cancelable: true,
@@ -25,12 +24,11 @@ export const openPayModal = member => (dispatch) => {
   });
 };
 
-// TODO: Complete open delete modal
-export const openDeleteModal = no => (dispatch) => {
+export const openDeleteModal = (api, no) => (dispatch) => {
   dispatch({
     actions: [{
-      label: I18n('MemberView.modal.delete.action'),
-      onClick: () => {},
+      label: i18n('MemberView.modal.delete.action'),
+      onClick: () => dispatch(remove(api, no)),
       style: 'danger',
     }],
     cancelable: true,
@@ -41,16 +39,17 @@ export const openDeleteModal = no => (dispatch) => {
 };
 
 // TODO: Complete open reactivation modal
+// eslint-disable-next-line
 export const openReactivateModal = member => (dispatch) => {
   dispatch({
     actions: [
       {
-        label: I18n('MemberView.modal.reactivate.actions.transfer'),
+        label: i18n('MemberView.modal.reactivate.actions.transfer'),
         onClick: () => {},
         style: 'danger',
       },
       {
-        label: I18n('MemberView.modal.reactivate.actions.reactivate'),
+        label: i18n('MemberView.modal.reactivate.actions.reactivate'),
         onClick: () => {},
       },
     ],
@@ -62,10 +61,11 @@ export const openReactivateModal = member => (dispatch) => {
 };
 
 // TODO: Complete open transfer modal
+// eslint-disable-next-line
 export const openTransferModal = member => (dispatch) => {
   dispatch({
     actions: [{
-      label: I18n('MemberView.modal.transfer.action'),
+      label: i18n('MemberView.modal.transfer.action'),
       onClick: () => {},
     }],
     cancelable: true,
@@ -81,15 +81,12 @@ export const openExistsModal = (routeNo, formNo, userIsAdmin, apiClient) => (dis
     dispatch({
       cancelable: true,
       actions: [{
-        label: I18n('MemberForm.modals.exists.goToMember.action'),
-        onClick: () => {
-          dispatch(close());
-          browserHistory.push(`/member/view/${formNo}`);
-        },
+        label: i18n('MemberForm.modals.exists.goToMember.action'),
+        onClick: () => dispatch(historyPush(`/member/view/${formNo}`)),
         style: 'primary',
       }],
-      message: I18n('MemberForm.modals.exists.goToMember.message'),
-      title: I18n('MemberForm.modals.exists.title'),
+      message: i18n('MemberForm.modals.exists.goToMember.message'),
+      title: i18n('MemberForm.modals.exists.title'),
       type: OPEN_MODAL,
     });
     return;
@@ -100,12 +97,12 @@ export const openExistsModal = (routeNo, formNo, userIsAdmin, apiClient) => (dis
     dispatch({
       cancelable: true,
       actions: [{
-        label: I18n('MemberForm.modals.exists.merge.action'),
+        label: i18n('MemberForm.modals.exists.merge.action'),
         onClick: () => dispatch(merge(routeNo, formNo, apiClient)),
         style: 'danger',
       }],
-      message: I18n('MemberForm.modals.exists.merge.message'),
-      title: I18n('MemberForm.modals.exists.title'),
+      message: i18n('MemberForm.modals.exists.merge.message'),
+      title: i18n('MemberForm.modals.exists.title'),
       type: OPEN_MODAL,
     });
     return;
@@ -113,11 +110,11 @@ export const openExistsModal = (routeNo, formNo, userIsAdmin, apiClient) => (dis
 
   dispatch({
     actions: [{
-      label: I18n('actions.ok'),
-      onClick: () => dispatch(close()),
+      label: i18n('actions.ok'),
+      onClick() {},
     }],
-    message: I18n('MemberForm.modals.exists.message'),
-    title: I18n('MemberForm.modals.exists.title'),
+    message: i18n('MemberForm.modals.exists.message'),
+    title: i18n('MemberForm.modals.exists.title'),
     type: OPEN_MODAL,
   });
 };

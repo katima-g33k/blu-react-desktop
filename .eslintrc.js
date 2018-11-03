@@ -12,6 +12,7 @@ module.exports = {
     'react/jsx-one-expression-per-line': 0,
     'react/jsx-filename-extension': 0,
     'react/destructuring-assignment': 0,
+    'react/sort-comp': 0,
     'no-plusplus': 0,
     'no-underscore-dangle': [
       'error',
@@ -27,4 +28,4 @@ module.exports = {
     'jsx-a11y/no-noninteractive-tabindex': 0,
     'no-prototype-builtins': 0,
   },
-}
+};

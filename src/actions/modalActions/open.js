@@ -1,7 +1,6 @@
 import { OPEN_MODAL } from '../actionTypes';
 
-export default (title, message) => ({
-  message,
-  title,
+export default options => ({
+  ...options,
   type: OPEN_MODAL,
 });
