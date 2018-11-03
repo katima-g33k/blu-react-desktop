@@ -1,17 +1,9 @@
 import moment from 'moment';
 
-export const formatLongDate = (date) => {
-  if (date) {
-    return moment(date).format('LL');
-  }
+const LONG_DATE_FORMAT = 'LL';
+const SHORT_DATE_FORMAT = 'YYYY-MM-DD';
 
-  return '';
-};
+const formatDate = (date, format) => (date ? moment(date).format(format) : '');
 
-export const formatShortDate = (date) => {
-  if (date) {
-    return moment(date).format('YYYY-MM-DD');
-  }
-
-  return '';
-};
+export const formatLongDate = date => formatDate(date, LONG_DATE_FORMAT);
+export const formatShortDate = date => formatDate(date, SHORT_DATE_FORMAT);

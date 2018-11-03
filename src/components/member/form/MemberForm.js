@@ -42,15 +42,14 @@ export default class MemberForm extends Component {
     onCancel: PropTypes.func.isRequired,
     fetch: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
-  }
+  };
 
   static defaultProps = {
     no: 0,
-  }
+  };
 
   state = {
     member: this.props.member,
-    states: [],
     validation: {
       email: true,
       firstName: true,
@@ -60,7 +59,7 @@ export default class MemberForm extends Component {
       phone1: true,
       zip: true,
     },
-  }
+  };
 
   componentDidMount() {
     if (!this.state.member.no && this.props.no) {
@@ -75,19 +74,20 @@ export default class MemberForm extends Component {
   }
 
   isValid = () => {
+    const { member } = this.state;
     const validation = {
-      email: emailIsValid(this.state.member.email),
-      firstName: nameIsValid(this.state.member.firstName),
-      lastName: nameIsValid(this.state.member.lastName),
-      no: memberNoIsValid(this.state.member),
-      phone0: phoneIsValid(this.state.member.phone[0].number),
-      phone1: phoneIsValid(this.state.member.phone[1].number),
-      zip: zipIsValid(this.state.member.zip),
+      email: emailIsValid(member.email),
+      firstName: nameIsValid(member.firstName),
+      lastName: nameIsValid(member.lastName),
+      no: memberNoIsValid(member),
+      phone0: phoneIsValid(member.phone[0].number),
+      phone1: phoneIsValid(member.phone[1].number),
+      zip: zipIsValid(member.zip),
     };
 
     this.setState({ validation });
     return Object.values(validation).every(value => value);
-  }
+  };
 
   memberExists = () => {
     const data = {};
@@ -101,41 +101,48 @@ export default class MemberForm extends Component {
     }
 
     return this.props.exists(data);
-  }
+  };
 
-  handleNoMemberNoOnChange = (event, value) => this.setState({
+  handleNoMemberNoOnChange = (event, value) => this.setState(state => ({
+    ...state,
     member: {
-      ...this.state.member,
+      ...state.member,
       no: 0,
       noNo: value,
     },
-  })
+  }));
 
-  handleCtyOnChange = (event, value) => this.setState({
+  handleCtyOnChange = (event, value) => this.setState(state => ({
+    ...state,
     member: {
-      ...this.state.member,
+      ...state.member,
       city: {
-        ...this.state.member.city,
+        ...state.member.city,
         id: 0,
         name: value,
       },
     },
-  })
+  }));
 
   handlePhoneOnChange = (event, value) => {
     const { field, index } = event.target.dataset;
-    const member = this.state.member;
+    const { member } = this.state;
 
     member.phone[index][field] = field === 'number' ? value.replace(/\D/g, '') : value;
     this.setState({ member });
-  }
+  };
 
-  handleOnChange = (event, value) => this.setState({
-    member: {
-      ...this.state.member,
-      [event.target.id]: value,
-    },
-  })
+  handleOnChange = (event, value) => {
+    const { id } = event.target;
+
+    this.setState(state => ({
+      ...state,
+      member: {
+        ...state.member,
+        [id]: value,
+      },
+    }));
+  }
 
   handleOnSave = async () => {
     if (!this.isValid() || await this.memberExists()) {
@@ -143,7 +150,7 @@ export default class MemberForm extends Component {
     }
 
     this.props.onSave(this.state.member);
-  }
+  };
 
   renderNoMemberNo = () => !this.props.no && (
     <Checkbox
@@ -153,7 +160,7 @@ export default class MemberForm extends Component {
       label={I18n('MemberForm.fields.noNo')}
       onChange={this.handleNoMemberNoOnChange}
     />
-  )
+  );
 
   renderPhone = index => (
     <Row
@@ -182,7 +189,7 @@ export default class MemberForm extends Component {
         value={this.state.member.phone[index].note}
       />
     </Row>
-  )
+  );
 
   render() {
     return (
@@ -269,6 +276,7 @@ export default class MemberForm extends Component {
                     label={I18n('MemberForm.fields.zip.label')}
                     onChange={this.handleOnChange}
                     placeholder={I18n('MemberForm.fields.zip.placeholder')}
+                    isValid={this.state.validation.zip}
                     value={formatZip(this.state.member.zip)}
                   />
                 </Row>

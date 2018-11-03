@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
-import { TableLayout } from '../../general';
 import { Comment } from '../../../lib/models';
 import I18n from '../../../lib/i18n';
+import { TableLayout } from '../../general';
 
 export default class MemberComment extends Component {
   static propTypes = {
@@ -12,11 +12,11 @@ export default class MemberComment extends Component {
     onDelete: PropTypes.func.isRequired,
     onInsert: PropTypes.func.isRequired,
     onUpdate: PropTypes.func.isRequired,
-  }
+  };
 
   static defaultProps = {
     comments: [],
-  }
+  };
 
   get actions() {
     return [{
@@ -28,6 +28,7 @@ export default class MemberComment extends Component {
     }];
   }
 
+  // eslint-disable-next-line class-methods-use-this
   get columns() {
     return [
       {

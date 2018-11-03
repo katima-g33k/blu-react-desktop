@@ -44,7 +44,7 @@ export default class MemberCopyTable extends Component {
       sortFunc: (a, b, order) => sortNumber(a.item.edition, b.item.edition, order),
       width: '85px',
     },
-  ]
+  ];
 
   formatRow = (row) => {
     if (row.item.status && row.item.status.REMOVED) {
@@ -52,7 +52,7 @@ export default class MemberCopyTable extends Component {
     }
 
     return null;
-  }
+  };
 
   render() {
     return (

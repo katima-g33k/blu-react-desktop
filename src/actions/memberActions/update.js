@@ -21,11 +21,11 @@ const success = () => ({
   type: UPDATE_MEMBER_SUCCESS,
 });
 
-export default (no, member, apiClient) => async (dispatch) => {
+export default (api, no, member) => async (dispatch) => {
   dispatch(pending());
 
   try {
-    await apiClient.member.update(no, member);
+    await api.member.update(no, member);
 
     dispatch(success());
     browserHistory.push(`/member/view/${member.no}`);

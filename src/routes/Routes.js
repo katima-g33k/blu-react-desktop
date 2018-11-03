@@ -25,7 +25,7 @@ export default class Routes extends Component {
   static propTypes = {
     currentPath: PropTypes.string.isRequired,
     onRouteChange: PropTypes.func.isRequired,
-  }
+  };
 
   componentDidMount() {
     if (/index\.html/.test(browserHistory.getCurrentLocation().pathname)) {
@@ -37,6 +37,10 @@ export default class Routes extends Component {
     if (this.props.currentPath !== nextProps.currentPath) {
       this.props.onRouteChange(nextProps.currentPath);
     }
+  }
+
+  shouldComponentUpdate() {
+    return false;
   }
 
   render() {

@@ -11,36 +11,37 @@ import {
   startPrinting,
 } from '../actions/memberActions';
 
-const mapStateToProps = ({ memberStore: { member }, appStore }) => ({
-  apiClient: appStore.apiClient,
-  canDelete: !!member.account.copies.length,
-  isActive: member.account.isActive,
-  member,
-  userIsAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
+const mapStateToProps = ({ appStore, memberStore, userStore }) => ({
+  api: appStore.apiClient,
+  canDelete: !!memberStore.member.account.copies.length,
+  isActive: memberStore.member.account.isActive,
+  member: memberStore.member,
+  userIsAdmin: userStore.user.isAdmin,
 });
 
 const mapDispatchToProps = dispatch => ({
   addCopies: no => browserHistory.push(`/member/copies/${no}`),
-  delete: no => dispatch(openDeleteModal(no)),
+  delete: (api, no) => dispatch(openDeleteModal(api, no)),
   modify: no => browserHistory.push(`/member/edit/${no}`),
-  pay: member => dispatch(openPayModal(member)),
+  pay: (api, member) => dispatch(openPayModal(api, member)),
   printReceipt: () => dispatch(startPrinting()),
   reactivate: member => dispatch(openReactivateModal(member)),
-  renew: (apiClient, no) => dispatch(renew(apiClient, no)),
+  renew: (api, no) => dispatch(renew(api, no)),
   transfer: member => dispatch(openTransferModal(member)),
 });
 
-const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps,
-  ...dispatchProps,
-  ...ownProps,
+const mergeProps = (stateProps, dispatchProps) => ({
   addCopies: () => dispatchProps.addCopies(stateProps.member.no),
-  delete: () => dispatchProps.delete(stateProps.member.no),
+  canDelete: stateProps.canDelete,
+  delete: () => dispatchProps.delete(stateProps.api, stateProps.member.no),
+  isActive: stateProps.isActive,
   modify: () => dispatchProps.modify(stateProps.member.no),
-  pay: () => dispatchProps.pay(stateProps.member),
+  pay: () => dispatchProps.pay(stateProps.pay, stateProps.member),
+  printReceipt: dispatchProps.printReceipt,
   reactivate: () => dispatchProps.reactivate(stateProps.member),
-  renew: () => dispatchProps.renew(stateProps.apiClient, stateProps.member.no),
+  renew: () => dispatchProps.renew(stateProps.api, stateProps.member.no),
   transfer: () => dispatchProps.transfer(stateProps.member),
+  userIsAdmin: stateProps.userIsAdmin,
 });
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(MemberActionPanel);

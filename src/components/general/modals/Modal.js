@@ -83,7 +83,12 @@ export default class Modal extends Component {
     };
   }
 
-  renderBody = () => this.body[this.props.type] || this.props.message
+  handleOnClick = () => {
+    this.props.onClick();
+    this.props.closeModal();
+  };
+
+  renderBody = () => this.body[this.props.type] || this.props.message;
 
   renderButton = action => (
     <Button
@@ -92,6 +97,7 @@ export default class Modal extends Component {
       onClick={(event) => {
         event.preventDefault();
         action.onClick(this.props);
+        this.props.closeModal();
       }}
     >
       {action.label}
@@ -118,7 +124,7 @@ export default class Modal extends Component {
     if (this.props.onClick) {
       return this.renderButton({
         label: I18n('modal.ok'),
-        onClick: this.props.onClick,
+        onClick: this.handleOnClick,
       });
     }
 

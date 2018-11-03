@@ -4,6 +4,7 @@ import {
   Col,
   ControlLabel,
   FormControl,
+  FormGroup,
 } from 'react-bootstrap';
 
 const styles = {
@@ -27,6 +28,7 @@ export default class Input extends Component {
     disabled: PropTypes.bool,
     id: PropTypes.string,
     inputWidth: PropTypes.shape(),
+    isValid: PropTypes.bool,
     label: PropTypes.string,
     labelWidth: PropTypes.shape(),
     onChange: PropTypes.func.isRequired,
@@ -41,6 +43,7 @@ export default class Input extends Component {
     disabled: false,
     id: '',
     inputWidth: { md: 9, sm: 10 },
+    isValid: true,
     label: '',
     labelWidth: { md: 3, sm: 2 },
     placeholder: '',
@@ -70,7 +73,7 @@ export default class Input extends Component {
 
   render() {
     return (
-      <div>
+      <FormGroup validationState={!this.props.isValid ? 'error' : null}>
         {this.renderLabel()}
         <Col {...this.props.inputWidth}>
           <FormControl
@@ -82,8 +85,9 @@ export default class Input extends Component {
             type={this.props.type}
             value={this.props.value}
           />
+          <FormControl.Feedback />
         </Col>
-      </div>
+      </FormGroup>
     );
   }
 }

@@ -1,15 +1,13 @@
-import { browserHistory } from 'react-router';
-
 import {
   INSERT_MEMBER_FAIL,
   INSERT_MEMBER_PENDING,
   INSERT_MEMBER_SUCCESS,
 } from '../actionTypes';
+import { historyPush } from '../routeActions';
+import { Member } from '../../lib/models';
 
 const fail = error => ({
-  message: error.message,
-  titleKey: 'modal.error',
-  titleOptions: { code: error.code || 500 },
+  error,
   type: INSERT_MEMBER_FAIL,
 });
 
@@ -22,14 +20,14 @@ const success = member => ({
   type: INSERT_MEMBER_SUCCESS,
 });
 
-export default (member, apiClient) => async (dispatch) => {
+export default (api, member) => async (dispatch) => {
   dispatch(pending());
 
   try {
-    await apiClient.member.insert(member);
+    const { no } = await api.member.insert(member);
 
-    dispatch(success(member));
-    browserHistory.push(`/member/view/${member.no}`);
+    dispatch(success(new Member({ ...member, no })));
+    dispatch(historyPush(`/member/view/${no}`));
   } catch (error) {
     dispatch(fail(error));
   }

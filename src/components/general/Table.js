@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { ButtonGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
 
-import { Button } from '../general';
+import Button from './Button';
 import I18n from '../../lib/i18n';
 
 const BUTTON_WIDTH = 50;
@@ -40,10 +40,6 @@ export default class Table extends Component {
     striped: false,
   };
 
-  shouldComponentUpdate(nextProps) {
-    return nextProps.data.length !== this.props.data.length;
-  }
-
   get actionColumnWidth() {
     let actionCount = this.props.rowActions.length;
 
@@ -63,7 +59,7 @@ export default class Table extends Component {
   };
 
   renderColumn = (column) => {
-    const formatExtraData = column.formatExtraData;
+    const { formatExtraData } = column;
 
     if (formatExtraData && formatExtraData.props) {
       formatExtraData.props.forEach((key) => {
@@ -79,7 +75,7 @@ export default class Table extends Component {
         {column.label}
       </TableHeaderColumn>
     );
-  }
+  };
 
   renderAssistiveButton = (action, row, key) => (
     <OverlayTrigger
@@ -89,7 +85,7 @@ export default class Table extends Component {
     >
       {this.renderActionButton(action, row)}
     </OverlayTrigger>
-  )
+  );
 
   renderActionButton = (action, actionData, key) => (
     <Button
@@ -97,7 +93,7 @@ export default class Table extends Component {
       actionData={actionData}
       key={key}
     />
-  )
+  );
 
   renderActionButtonGroup = row => this.getRowActions(row).map((action) => {
     const actionKey = action.label || action.glyph;
@@ -107,7 +103,7 @@ export default class Table extends Component {
     }
 
     return this.renderActionButton(action, row, `${row.id}${actionKey}`);
-  })
+  });
 
   renderActionColumn = () => this.renderColumn({
     dataAlign: 'center',
@@ -118,7 +114,7 @@ export default class Table extends Component {
       </ButtonGroup>
     ),
     width: `${this.actionColumnWidth}px`,
-  })
+  });
 
   renderColumns = () => {
     const columns = this.props.columns.map(this.renderColumn);
@@ -128,7 +124,7 @@ export default class Table extends Component {
     }
 
     return columns;
-  }
+  };
 
   render() {
     return (

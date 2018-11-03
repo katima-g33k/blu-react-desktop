@@ -20,8 +20,8 @@ const mapStateToProps = ({ appStore, memberStore }) => ({
 const mapDispatchToProps = dispatch => ({
   onExists: (no, isUpdate, userIsAdmin, api) => dispatch(openExistsModal(no, isUpdate, userIsAdmin, api)),
   fetch: (no, api) => dispatch(fetch(api, no)),
-  onInsert: (member, api) => dispatch(insert(member, api)),
-  onUpdate: (no, member, api) => dispatch(update(no, member, api)),
+  onInsert: (api, member) => dispatch(insert(api, member)),
+  onUpdate: (api, no, member) => dispatch(update(api, no, member)),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
@@ -42,9 +42,9 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
     const formattedData = formatMemberFormData(formData);
 
     if (ownProps.params.no) {
-      dispatchProps.onUpdate(ownProps.params.no, formattedData, stateProps.api);
+      dispatchProps.onUpdate(stateProps.api, ownProps.params.no, formattedData);
     } else {
-      dispatchProps.onInsert(formattedData, stateProps.api);
+      dispatchProps.onInsert(stateProps.api, formattedData);
     }
   },
 });

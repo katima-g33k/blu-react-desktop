@@ -41,13 +41,11 @@ export default class TableLayout extends Component {
     placeholder: I18n('table.placeholder'),
     rowActions: [],
     rowClass: () => {},
-  }
+  };
 
-  getFileName = () => `${this.props.exportTitle || I18n('table.defaultFileName')}.csv`
+  getFileName = () => `${this.props.exportTitle || I18n('table.defaultFileName')}.csv`;
 
-  saveFile = () => {
-    FileSaver.saveAs(createCSV(this.props.columns, this.props.data), this.getFileName());
-  }
+  saveFile = () => FileSaver.saveAs(createCSV(this.props.columns, this.props.data), this.getFileName());
 
   renderExportButton = () => {
     if (this.props.exportable) {
@@ -62,7 +60,7 @@ export default class TableLayout extends Component {
     }
 
     return null;
-  }
+  };
 
   renderAction = action => (
     <Button
@@ -72,51 +70,55 @@ export default class TableLayout extends Component {
       label={action.label}
       onClick={action.onClick}
     />
-  )
+  );
 
-  renderActions = () => this.props.actions.map(this.renderAction)
+  renderActions = () => this.props.actions.map(this.renderAction);
 
-  renderFilters = () => {
-    const { filters = [] } = this.props;
+  renderCustomFilter = (id, component) => (
+    <Col key={id} md={2}>
+      {component}
+    </Col>
+  );
 
-    return filters.map((filter) => {
-      if (filter.component) {
-        return (
-          <Col key={filter.key} md={2}>
-            {filter.component}
-          </Col>
-        );
-      }
+  renderInputFilter = filter => (
+    <Col key={filter.id} md={2}>
+      <Input
+        id={filter.id}
+        onChange={filter.onChange}
+        placeholder={filter.label}
+        value={filter.value}
+      />
+    </Col>
+  );
 
-      if (filter.type === 'input') {
-        return (
-          <Col key={filter.key} md={2}>
-            <Input
-              id={filter.key}
-              onChange={filter.onChange}
-              placeholder={filter.label}
-              value={filter.value}
-            />
-          </Col>
-        );
-      }
+  renderCheckboxFilter = filter => (
+    <Col key={filter.id} md={2}>
+      <Checkbox
+        checked={filter.checked}
+        id={filter.id}
+        label={filter.label}
+        onChange={filter.onChange}
+      />
+    </Col>
+  );
 
-      if (filter.type === 'checkbox') {
-        return (
-          <Col key={filter.key} md={2}>
-            <Checkbox
-              checked={filter.checked}
-              id={filter.key}
-              label={filter.label}
-              onChange={filter.onChange}
-            />
-          </Col>
-        );
-      }
+  renderFilter = (filter) => {
+    if (filter.component) {
+      return this.renderCustomFilter(filter.id, filter.component);
+    }
 
-      return null;
-    });
-  }
+    if (filter.type === 'input') {
+      return this.renderInputFilter(filter);
+    }
+
+    if (filter.type === 'checkbox') {
+      return this.renderCheckboxFilter(filter);
+    }
+
+    return null;
+  };
+
+  renderFilters = () => this.props.filters.map(this.renderFilter);
 
   render() {
     return (
