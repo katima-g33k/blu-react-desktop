@@ -5,10 +5,9 @@ import {
   Glyphicon,
 } from 'react-bootstrap';
 
-import I18n from '../../lib/i18n';
-import { SearchColumns } from '../../lib/TableColumns';
-import Spinner from '../general/Spinner';
-import Table from '../general/Table.js';
+import i18n from '../../lib/i18n';
+import SearchColumns from '../../lib/TableColumns';
+import { Spinner, Table } from '../general';
 
 export default class Search extends Component {
   static propTypes = {
@@ -19,50 +18,44 @@ export default class Search extends Component {
     onAddButton: PropTypes.func,
     onRowClick: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
-  }
+  };
 
   static defaultProps = {
     disableAddButton: false,
     highlight: '',
     isLoading: false,
     onAddButton() {},
-  }
+  };
 
-  rowClass = () => 'searchActions-result'
+  rowClass = () => 'searchActions-result';
 
-  renderAddButton = () => {
-    if (this.props.disableAddButton) {
-      return null;
-    }
+  renderAddButton = () => !this.props.disableAddButton && (
+    <Button
+      bsStyle="success"
+      onClick={this.props.onAddButton}
+    >
+      <Glyphicon glyph="plus" /> {i18n('Search.results.addButton')}
+    </Button>
+  );
 
-    return (
-      <Button
-        bsStyle="success"
-        onClick={this.props.onAddButton}
-      >
-        <Glyphicon glyph="plus" /> {I18n('Search.results.addButton')}
-      </Button>
-    );
-  }
-
-  renderResults = () => (
+  renderResults = () => (!this.props.isLoading ? (
     <Table
       columns={SearchColumns[this.props.type]}
       data={this.props.data}
       highlight={this.props.highlight}
-      placeholder={I18n('Search.results.none')}
+      placeholder={i18n('Search.results.none')}
       options={{ onRowClick: this.props.onRowClick }}
       rowClass={this.rowClass}
       striped
     />
-  )
+  ) : (<Spinner />));
 
   render() {
     return (
       <div>
-        <h3>{I18n('Search.results.title', { num: this.props.data.length })}</h3>
+        <h3>{i18n('Search.results.title', { num: this.props.data.length })}</h3>
         {this.renderAddButton()}
-        {this.props.isLoading ? (<Spinner />) : this.renderResults()}
+        {this.renderResults()}
       </div>
     );
   }

@@ -18,30 +18,37 @@ const mapStateToProps = ({ appStore, searchStore }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  cancelSearch: () => dispatch(cancel()),
-  handleArchive: () => dispatch(updateArchives()),
-  handleInput: event => dispatch(updateValue(event.target.value)),
-  handleSearch: (api, value, type, archives) => dispatch(search(api, value, type, archives)),
-  handleType: event => dispatch(updateType(event.target.value)),
+  onCancel: () => dispatch(cancel()),
+  onArchiveChange: () => dispatch(updateArchives()),
+  onInput: value => dispatch(updateValue(value)),
+  onSearch: (api, value, type, archives) => dispatch(search(api, value, type, archives)),
+  onTypeChange: value => dispatch(updateType(value)),
 });
 
-const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  ...stateProps,
-  ...dispatchProps,
-  ...ownProps,
-  cancelSearch: (event) => {
-    event.preventDefault();
-    dispatchProps.cancelSearch();
-  },
-  handleSearch: (event) => {
-    event.preventDefault();
-    const type = ownProps.type || stateProps.type;
-    dispatchProps.handleSearch(stateProps.api, stateProps.value, type, stateProps.archives);
-  },
-});
+const mergeProps = (stateProps, dispatchProps, ownProps) => {
+  const type = ownProps.type || stateProps.type;
+
+  return {
+    archives: stateProps.archives,
+    disableAddButton: ownProps.disableAddButton,
+    disableArchive: ownProps.disableArchive,
+    disableTypeSelection: ownProps.disableTypeSelection,
+    isLoading: stateProps.isLoading,
+    noHeader: ownProps.noHeader,
+    onAddButton: ownProps.onAddButton,
+    onArchiveChange: dispatchProps.onArchiveChange,
+    onCancel: dispatchProps.onCancel,
+    onInput: dispatchProps.onInput,
+    onRowClick: ownProps.onRowClick,
+    onSearch: () => dispatchProps.onSearch(stateProps.api, stateProps.value, type, stateProps.archives),
+    onTypeChange: dispatchProps.onTypeChange,
+    type,
+    value: stateProps.value,
+  };
+};
 
 
-const container = connect(mapStateToProps, mapDispatchToProps, mergeProps)(Search);
-container.TYPES = Search.TYPES;
+const SearchContainer = connect(mapStateToProps, mapDispatchToProps, mergeProps)(Search);
+SearchContainer.TYPES = Search.TYPES;
 
-export default container;
+export default SearchContainer;

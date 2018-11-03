@@ -1,12 +1,21 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, FormControl, Modal as RBModal } from 'react-bootstrap';
+import {
+  FormControl,
+  Modal as RBModal,
+} from 'react-bootstrap';
 
 import './modal.css';
-import I18n from '../../../lib/i18n';
+import i18n from '../../../lib/i18n';
+import ModalButton from '../../../containers/ModalButtonContainer';
 import Search from '../../../containers/SearchContainer';
 
-const { Title, Header, Body, Footer } = RBModal;
+const {
+  Body,
+  Footer,
+  Header,
+  Title,
+} = RBModal;
 
 const INPUT_TYPES = {
   NUMBER: 'number',
@@ -23,12 +32,11 @@ const TYPES = {
 export default class Modal extends Component {
   static propTypes = {
     actions: PropTypes.arrayOf(PropTypes.shape({
-      style: PropTypes.string,
       label: PropTypes.string.isRequired,
       onClick: PropTypes.func.isRequired,
+      style: PropTypes.string,
     })),
     cancelable: PropTypes.bool,
-    closeModal: PropTypes.func.isRequired,
     display: PropTypes.bool.isRequired,
     inputType: PropTypes.oneOf(Object.values(INPUT_TYPES)),
     inputValue: PropTypes.oneOfType([
@@ -40,7 +48,7 @@ export default class Modal extends Component {
     onClick: PropTypes.func,
     title: PropTypes.string.isRequired,
     type: PropTypes.oneOf(Object.values(TYPES)),
-  }
+  };
 
   static defaultProps = {
     actions: [],
@@ -50,15 +58,19 @@ export default class Modal extends Component {
     message: '',
     onClick: undefined,
     type: TYPES.INFO,
+  };
+
+  static TYPES = TYPES;
+
+  static INPUT_TYPES = INPUT_TYPES;
+
+  get id() {
+    return `${this.props.type}${this.constructor.name}`;
   }
-
-  static TYPES = TYPES
-  static INPUT_TYPES = INPUT_TYPES
-
-  getId = () => `${this.props.type}Modal`
 
   get body() {
     return {
+      [TYPES.INFO]: this.props.message,
       [TYPES.INPUT]: (
         <div>
           <p>{this.props.message}</p>
@@ -83,68 +95,50 @@ export default class Modal extends Component {
     };
   }
 
-  handleOnClick = () => {
-    this.props.onClick();
-    this.props.closeModal();
-  };
-
-  renderBody = () => this.body[this.props.type] || this.props.message;
-
   renderButton = action => (
-    <Button
-      bsStyle={action.style || 'primary'}
-      key={action.label}
-      onClick={(event) => {
-        event.preventDefault();
-        action.onClick(this.props);
-        this.props.closeModal();
-      }}
-    >
-      {action.label}
-    </Button>
-  )
+    <ModalButton
+      extraData={this.props}
+      key={action}
+      label={action.label}
+      onClick={action.onClick}
+      style={action.style}
+    />
+  );
 
-  renderCancelButton = () => {
-    if (this.props.cancelable) {
-      return this.renderButton({
-        style: 'default',
-        label: I18n('modal.cancel'),
-        onClick: this.props.closeModal,
-      });
-    }
+  renderCancelButton = () => this.props.cancelable && this.renderButton({
+    label: i18n('modal.cancel'),
+    style: 'default',
+  });
 
-    return null;
-  }
-
-  renderButtons = () => {
+  renderActionButtons = () => {
     if (this.props.actions.length) {
       return this.props.actions.map(this.renderButton);
     }
 
     if (this.props.onClick) {
       return this.renderButton({
-        label: I18n('modal.ok'),
-        onClick: this.handleOnClick,
+        label: i18n('modal.ok'),
+        onClick: this.props.onClick,
       });
     }
 
     return null;
-  }
+  };
 
   render() {
     return (
-      <RBModal id={this.getId()} show={this.props.display}>
+      <RBModal id={this.id} show={this.props.display}>
         <Header>
           <Title>
             {this.props.title}
           </Title>
         </Header>
         <Body>
-          {this.renderBody()}
+          {this.body[this.props.type]}
         </Body>
         <Footer>
           {this.renderCancelButton()}
-          {this.renderButtons()}
+          {this.renderActionButtons()}
         </Footer>
       </RBModal>
     );

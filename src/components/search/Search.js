@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   Col,
+  Form,
   FormControl,
   FormGroup,
   Panel,
@@ -12,7 +13,7 @@ import {
 } from 'react-bootstrap';
 
 import './search.css';
-import I18n from '../../lib/i18n';
+import i18n from '../../lib/i18n';
 import SearchResults from '../../containers/SearchResultsContainer';
 
 const { Body, Heading } = Panel;
@@ -26,101 +27,80 @@ const TYPES = {
 export default class Search extends Component {
   static propTypes = {
     archives: PropTypes.bool.isRequired,
-    cancelSearch: PropTypes.func.isRequired,
     disableAddButton: PropTypes.bool,
     disableArchive: PropTypes.bool,
     disableTypeSelection: PropTypes.bool,
-    handleArchive: PropTypes.func.isRequired,
-    handleInput: PropTypes.func.isRequired,
-    handleSearch: PropTypes.func.isRequired,
-    handleType: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired,
     noHeader: PropTypes.bool,
     onAddButton: PropTypes.func,
+    onArchiveChange: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onInput: PropTypes.func.isRequired,
     onRowClick: PropTypes.func,
+    onSearch: PropTypes.func.isRequired,
+    onTypeChange: PropTypes.func.isRequired,
     type: PropTypes.oneOf(Object.values(TYPES)).isRequired,
     value: PropTypes.string.isRequired,
-  }
+  };
 
   static defaultProps = {
+    onAddButton: null,
+    onRowClick: null,
     disableAddButton: false,
     disableArchive: false,
     disableTypeSelection: false,
     noHeader: false,
-    onAddButton: null,
-    onRowClick: null,
-  }
+  };
 
-  static TYPES = TYPES
+  static TYPES = TYPES;
 
-  renderSearchForm = () => (
-    <form id="searchForm">
-      <FormControl
-        type="search"
-        onChange={this.props.handleInput}
-        value={this.props.value}
-      />
-      {this.renderTypeSelection()}
-      {this.renderArchiveCheckbox()}
-      <Button
-        bsStyle={this.props.isLoading ? 'danger' : 'primary'}
-        onClick={!this.props.isLoading ? this.props.handleSearch : this.props.cancelSearch}
-        type="submit"
-      >
-        {I18n(this.props.isLoading ? 'Search.cancel' : 'Search.title')}
-      </Button>
-    </form>
-  )
+  handleOnCancel = (event) => {
+    event.preventDefault();
+    this.props.onCancel();
+  };
 
-  renderTypeSelection = () => {
-    if (this.props.disableTypeSelection) {
-      return null;
-    }
+  handleOnSearch = (event) => {
+    event.preventDefault();
+    this.props.onSearch();
+  };
 
-    return (
-      <FormGroup>
-        <Radio
-          name="type"
-          value={TYPES.MEMBER}
-          inline
-          checked={this.props.type === TYPES.MEMBER}
-          onChange={this.props.handleType}
-        >
-          {I18n('Search.filters.member')}
-        </Radio>
-        <Radio
-          name="type"
-          value={TYPES.ITEM}
-          inline
-          checked={this.props.type === TYPES.ITEM}
-          onChange={this.props.handleType}
-        >
-          {I18n('Search.filters.item')}
-        </Radio>
-      </FormGroup>
-    );
-  }
+  handleOnInput = event => this.props.onInput(event.target.value);
 
-  renderArchiveCheckbox = () => {
-    if (this.props.disableArchive) {
-      return null;
-    }
+  handleOnTypeChange = event => this.props.onTypeChange(event.target.value);
 
-    return (
-      <Checkbox
-        onChange={this.props.handleArchive}
-        checked={this.props.archives}
-      >
-        {I18n(`Search.filters.archive.${this.props.type}`)}
-      </Checkbox>
-    );
-  }
+  renderTypeSelector = type => (
+    <Radio
+      checked={this.props.type === type}
+      key={`radio-${type}`}
+      inline
+      name="type"
+      onChange={this.handleOnTypeChange}
+      value={type}
+    >
+      {i18n(`Search.filters.${type}`)}
+    </Radio>
+  );
+
+  renderTypeSelection = () => !this.props.disableTypeSelection && (
+    <FormGroup>
+      {[TYPES.MEMBER, TYPES.ITEM].map(this.renderTypeSelector)}
+    </FormGroup>
+  );
+
+  renderArchiveCheckbox = () => !this.props.disableArchive && (
+    <Checkbox
+      checked={this.props.archives}
+      onChange={this.props.onArchiveChange}
+    >
+      {i18n(`Search.filters.archive.${this.props.type}`)}
+    </Checkbox>
+  );
 
   renderHeader = () => !this.props.noHeader && (
     <Heading>
-      {I18n('Search.title')}
+      {i18n('Search.title')}
     </Heading>
-  )
+  );
 
   render() {
     return (
@@ -129,7 +109,22 @@ export default class Search extends Component {
         <Body>
           <Row>
             <Col sm={10} md={10}>
-              {this.renderSearchForm()}
+              <Form id="searchForm">
+                <FormControl
+                  type="search"
+                  onChange={this.handleOnInput}
+                  value={this.props.value}
+                />
+                {this.renderTypeSelection()}
+                {this.renderArchiveCheckbox()}
+                <Button
+                  bsStyle={this.props.isLoading ? 'danger' : 'primary'}
+                  onClick={!this.props.isLoading ? this.handleOnSearch : this.handleOnCancel}
+                  type="submit"
+                >
+                  {i18n(this.props.isLoading ? 'Search.cancel' : 'Search.title')}
+                </Button>
+              </Form>
             </Col>
           </Row>
           <Row>
