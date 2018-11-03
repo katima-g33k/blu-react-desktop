@@ -4,7 +4,7 @@ import {
   FETCH_MEMBER_SUCCESS,
 } from '../actionTypes';
 import { Member } from '../../lib/models';
-import { setCopies } from '../copyActions';
+import { set } from '../copyActions';
 
 const fail = error => ({
   message: error.message,
@@ -28,7 +28,7 @@ export default (apiClient, no) => async (dispatch) => {
   try {
     const member = new Member(await apiClient.member.get(no));
     dispatch(success(member));
-    dispatch(setCopies(member.account.copies));
+    dispatch(set(member.account.copies));
   } catch (error) {
     dispatch(fail(error));
   }

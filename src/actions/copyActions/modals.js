@@ -6,7 +6,7 @@ import { OPEN_MODAL } from '../actionTypes';
 import { reset as resetItem } from '../itemActions';
 import { resetLastItemScanned } from '../appActions';
 
-export const openCopyPriceModal = (api, member, item) => (dispatch) => {
+export const openPriceModal = (api, member, item) => (dispatch) => {
   dispatch({
     actions: [
       {

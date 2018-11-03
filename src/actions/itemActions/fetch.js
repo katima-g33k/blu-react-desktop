@@ -5,7 +5,7 @@ import {
 } from '../actionTypes';
 import I18n from '../../lib/i18n/index';
 import { Item } from '../../lib/models';
-import { setCopies } from '../copyActions/index';
+import { set } from '../copyActions/index';
 
 const fail = error => ({
   message: error.message,
@@ -30,7 +30,7 @@ export default (api, id, shouldSetCopies) => async (dispatch) => {
     dispatch(success(item));
 
     if (shouldSetCopies) {
-      dispatch(setCopies(item.copies));
+      dispatch(set(item.copies));
     }
   } catch (error) {
     dispatch(fail(error));

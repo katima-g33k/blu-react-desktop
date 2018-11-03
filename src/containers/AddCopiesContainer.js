@@ -4,7 +4,7 @@ import AddCopies from '../components/copy/addCopies/AddCopies';
 import { fetch as fetchItem } from '../actions/itemActions';
 import { fetchName } from '../actions/memberActions';
 import {
-  openCopyPriceModal,
+  openPriceModal,
   remove,
   reset,
   update,
@@ -22,7 +22,7 @@ const mapStateToProps = stores => ({
 const mapDispatchToProps = dispatch => ({
   fetchItem: (api, id) => dispatch(fetchItem(api, id)),
   fetchName: (api, no) => dispatch(fetchName(api, no)),
-  onAddCopy: (api, member, item) => dispatch(openCopyPriceModal(api, member, item)),
+  onAddCopy: (api, member, item) => dispatch(openPriceModal(api, member, item)),
   onRemove: (api, copy) => dispatch(remove(api, copy)),
   onUpdate: (api, copy) => dispatch(update(api, copy)),
   resetCopies: () => dispatch(reset()),
