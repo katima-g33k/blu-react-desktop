@@ -7,7 +7,7 @@ import {
   INSERT_COPY_PENDING,
   INSERT_COPY_SUCCESS,
 } from '../actionTypes';
-import { openReservedItemModal } from './index';
+import { openReservedItemModal } from './modals';
 
 const pending = () => ({
   type: INSERT_COPY_PENDING,

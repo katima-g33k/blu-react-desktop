@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 
 import { Copy } from '../../../lib/models';
 import { formatShortDate } from '../../../lib/dateHelper';
-import I18n from '../../../lib/i18n';
+import i18n from '../../../lib/i18n';
 import { sortDate, sortNumber } from '../../../lib/sort';
 import { TableLayout } from '../../general';
 
@@ -31,7 +31,7 @@ export default class CopyTable extends Component {
   get filters() {
     return Object.keys(this.props.filters).map(filter => ({
       id: filter,
-      label: I18n(`CopyTable.filters.${filter}`),
+      label: i18n(`CopyTable.filters.${filter}`),
       onChange: this.props.updateFilter,
       value: this.props.filters[filter],
       type: filter === 'search' ? SEARCH_FILTER_TYPE : DEFAULT_FILTER_TYPE,
@@ -42,7 +42,7 @@ export default class CopyTable extends Component {
     return this.props.columns.concat([
       {
         dataField: 'dateAdded',
-        label: I18n('TableColumns.memberCopy.added'),
+        label: i18n('TableColumns.memberCopy.added'),
         dataSort: true,
         width: '120px',
         dataFormat: formatShortDate,
@@ -50,7 +50,7 @@ export default class CopyTable extends Component {
       },
       {
         dataField: 'dateSold',
-        label: I18n('TableColumns.memberCopy.sold'),
+        label: i18n('TableColumns.memberCopy.sold'),
         dataSort: true,
         width: '120px',
         dataFormat: formatShortDate,
@@ -58,7 +58,7 @@ export default class CopyTable extends Component {
       },
       {
         dataField: 'datePaid',
-        label: I18n('TableColumns.memberCopy.paid'),
+        label: i18n('TableColumns.memberCopy.paid'),
         dataSort: true,
         width: '120px',
         dataFormat: formatShortDate,
@@ -66,7 +66,7 @@ export default class CopyTable extends Component {
       },
       {
         dataField: 'priceString',
-        label: I18n('TableColumns.memberCopy.price'),
+        label: i18n('TableColumns.memberCopy.price'),
         dataSort: true,
         width: '60px',
         sortFunc: (a, b, order) => sortNumber(a.price, b.price, order),
@@ -93,7 +93,7 @@ export default class CopyTable extends Component {
         {
           bsStyle: 'danger',
           glyph: 'ban-circle',
-          help: I18n('CopyTable.help.cancelSell'),
+          help: i18n('CopyTable.help.cancelSell'),
           onClick: this.props.refundCopy,
         },
       ];
@@ -104,11 +104,11 @@ export default class CopyTable extends Component {
         {
           bsStyle: 'primary',
           glyph: 'ban-circle',
-          help: I18n('CopyTable.help.cancelReservation'),
+          help: i18n('CopyTable.help.cancelReservation'),
           onClick: this.props.cancelReservation,
         },
         {
-          help: I18n('CopyTable.help.sellHalfPrice'),
+          help: i18n('CopyTable.help.sellHalfPrice'),
           label: '$',
           onClick: this.props.sellCopyHalfPrice,
         },
@@ -119,30 +119,30 @@ export default class CopyTable extends Component {
       {
         bsStyle: 'primary',
         glyph: 'user',
-        help: I18n('CopyTable.help.reserve'),
+        help: i18n('CopyTable.help.reserve'),
         onClick: this.props.reserveCopy,
       },
       {
-        help: I18n('CopyTable.help.sellHalfPrice'),
+        help: i18n('CopyTable.help.sellHalfPrice'),
         label: '$',
         onClick: this.props.sellCopyHalfPrice,
       },
       {
         bsStyle: 'success',
-        help: I18n('CopyTable.help.sell'),
+        help: i18n('CopyTable.help.sell'),
         label: '$$',
         onClick: this.props.sellCopy,
       },
       {
         bsStyle: 'danger',
         glyph: 'trash',
-        help: I18n('CopyTable.help.delete'),
+        help: i18n('CopyTable.help.delete'),
         onClick: this.props.deleteCopy,
       },
     ];
-  }
+  };
 
-  formatRow = (copy, index) => this.props.formatRow(copy) || (index % 2 ? STRIPED_ROW_CLASS : '')
+  formatRow = (copy, index) => this.props.formatRow(copy) || (index % 2 ? STRIPED_ROW_CLASS : '');
 
   render() {
     return (
@@ -153,7 +153,7 @@ export default class CopyTable extends Component {
         noStrip
         rowActions={this.getRowActions}
         rowClass={this.formatRow}
-        title={I18n('MemberView.copies.title')}
+        title={i18n('MemberView.copies.title')}
       />
     );
   }

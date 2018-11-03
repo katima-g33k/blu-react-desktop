@@ -1,38 +1,31 @@
-import API from '../../lib/api';
-import Copy from '../../lib/models/Copy';
 import {
   SELL_COPY_FAIL,
   SELL_COPY_PENDING,
   SELL_COPY_SUCCESS,
 } from '../actionTypes';
-import Transaction from '../../lib/models/Transaction';
+import { Copy, Transaction } from '../../lib/models';
 
-const apiUrl = localStorage.getItem('apiUrl');
-const apiKey = localStorage.getItem('apiKey');
-const apiClient = new API(apiUrl, apiKey);
-
-const sellCopyFail = error => ({
-  error,
-  type: SELL_COPY_FAIL,
-});
-
-const sellCopyPending = () => ({
+const pending = () => ({
   type: SELL_COPY_PENDING,
 });
 
-const sellCopySuccess = copy => ({
+const success = copy => ({
   copy,
   type: SELL_COPY_SUCCESS,
 });
 
-export default (copy, memberNo, halfPrice) => async (dispatch) => {
-  dispatch(sellCopyPending());
+const fail = error => ({
+  error,
+  type: SELL_COPY_FAIL,
+});
 
-  const soldCopy = new Copy(copy);
+export default (api, copy, memberNo, halfPrice) => async (dispatch) => {
+  dispatch(pending());
   const transactionType = halfPrice ? Transaction.TYPES.SELL_PARENT : Transaction.TYPES.SELL;
 
   try {
-    await apiClient.member.copy.transaction.insert(memberNo, copy.id, transactionType);
+    await api.member.copy.transaction.insert(memberNo, copy.id, transactionType);
+    const soldCopy = new Copy(copy);
 
     if (halfPrice) {
       soldCopy.sellParent();
@@ -40,8 +33,8 @@ export default (copy, memberNo, halfPrice) => async (dispatch) => {
       soldCopy.sell();
     }
 
-    dispatch(sellCopySuccess(soldCopy));
+    dispatch(success(soldCopy));
   } catch (error) {
-    dispatch(sellCopyFail(error));
+    dispatch(fail(error));
   }
 };

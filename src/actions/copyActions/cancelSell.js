@@ -1,41 +1,35 @@
-import API from '../../lib/api';
-import Copy from '../../lib/models/Copy';
 import {
   CANCEL_SELL_FAIL,
   CANCEL_SELL_PENDING,
   CANCEL_SELL_SUCCESS,
 } from '../actionTypes';
-import Transaction from '../../lib/models/Transaction';
+import { Copy, Transaction } from '../../lib/models';
 
-const apiUrl = localStorage.getItem('apiUrl');
-const apiKey = localStorage.getItem('apiKey');
-const apiClient = new API(apiUrl, apiKey);
-
-const cancelPending = () => ({
+const pending = () => ({
   type: CANCEL_SELL_PENDING,
 });
 
-const cancelFail = error => ({
-  error,
-  type: CANCEL_SELL_FAIL,
-});
-
-const cancelSuccess = copy => ({
+const success = copy => ({
   copy,
   type: CANCEL_SELL_SUCCESS,
 });
 
-export default copy => async (dispatch) => {
-  dispatch(cancelPending());
+const fail = error => ({
+  error,
+  type: CANCEL_SELL_FAIL,
+});
+
+export default (api, copy) => async (dispatch) => {
+  dispatch(pending());
 
   try {
-    await apiClient.member.copy.transaction.delete(copy.id, Transaction.TYPES.SELL);
+    await api.member.copy.transaction.delete(copy.id, Transaction.TYPES.SELL);
 
     const refundedCopy = new Copy(copy);
     refundedCopy.refund();
 
-    dispatch(cancelSuccess(refundedCopy));
+    dispatch(success(refundedCopy));
   } catch (error) {
-    dispatch(cancelFail(error));
+    dispatch(fail(error));
   }
 };

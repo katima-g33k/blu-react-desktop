@@ -1,19 +1,13 @@
-import { close } from '../modalActions';
-import I18n from '../../lib/i18n';
 import {
-  OPEN_MODAL,
   RESERVE_COPY_FAIL,
   RESERVE_COPY_PENDING,
   RESERVE_COPY_SUCCESS,
 } from '../actionTypes';
+import i18n from '../../lib/i18n';
 import Modal from '../../components/general/modals/Modal';
+import { open as openModal } from '../modalActions';
 import { setResultOnClick } from '../searchActions';
 import { Transaction } from '../../lib/models';
-
-const fail = error => ({
-  error,
-  type: RESERVE_COPY_FAIL,
-});
 
 const pending = () => ({
   type: RESERVE_COPY_PENDING,
@@ -25,8 +19,13 @@ const success = (copy, member) => ({
   type: RESERVE_COPY_SUCCESS,
 });
 
-export default (api, copy) => (dispatch) => {
-  dispatch(setResultOnClick(async (parent) => {
+const fail = error => ({
+  error,
+  type: RESERVE_COPY_FAIL,
+});
+
+export default (api, copy) => async (dispatch) => {
+  await dispatch(setResultOnClick(async (parent) => {
     dispatch(pending());
 
     try {
@@ -36,18 +35,16 @@ export default (api, copy) => (dispatch) => {
       reservedCopy.reserve(parent);
 
       dispatch(success(reservedCopy, parent));
-      dispatch(close());
     } catch (error) {
       dispatch(fail(error));
     }
   }));
 
 
-  dispatch({
+  dispatch(openModal({
     cancelable: true,
-    onClick: null,
-    title: I18n('modal.searchParent.title'),
     modalType: Modal.TYPES.SEARCH,
-    type: OPEN_MODAL,
-  });
+    onClick: null,
+    title: i18n('modal.searchParent.title'),
+  }));
 };

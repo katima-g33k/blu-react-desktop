@@ -1,29 +1,25 @@
-import cancelCopyReservation from './cancelReservation';
+import cancelReservation from './cancelReservation';
 import cancelSell from './cancelSell';
-import remove from './remove';
 import insert from './insert';
-import {
-  openCopyPriceModal,
-  openReservedItemModal,
-} from './modals';
-import reserveCopy from './reserve';
+import { openPriceModal } from './modals';
+import reserve from './reserve';
 import reset from './reset';
-import sellCopy from './sell';
-import setCopies from './set';
+import remove from './remove';
+import sell from './sell';
+import set from './set';
 import update from './update';
 import updateFilter from './filter';
 
 export {
-  cancelCopyReservation,
+  cancelReservation,
   cancelSell,
   remove,
   insert,
-  openCopyPriceModal,
-  openReservedItemModal,
-  reserveCopy,
+  openPriceModal,
+  reserve,
   reset,
-  sellCopy,
-  setCopies,
+  sell,
+  set,
   update,
   updateFilter,
 };

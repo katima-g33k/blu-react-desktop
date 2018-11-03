@@ -1,60 +1,52 @@
-import API from '../../lib/api';
-import { Copy, Transaction } from '../../lib/models';
 import {
   CANCEL_COPY_RESERVATION_FAIL,
   CANCEL_COPY_RESERVATION_PENDING,
   CANCEL_COPY_RESERVATION_SUCCESS,
-  OPEN_MODAL,
 } from '../actionTypes';
-import { close } from '../modalActions';
-import I18n from '../../lib/i18n';
+import { Copy, Transaction } from '../../lib/models';
+import i18n from '../../lib/i18n';
+import { open as openModal } from '../modalActions';
 
-const apiUrl = localStorage.getItem('apiUrl');
-const apiKey = localStorage.getItem('apiKey');
-const apiClient = new API(apiUrl, apiKey);
-
-const cancelReservationFail = error => ({
-  error,
-  type: CANCEL_COPY_RESERVATION_FAIL,
-});
-
-const cancelReservationPending = () => ({
+const pending = () => ({
   type: CANCEL_COPY_RESERVATION_PENDING,
 });
 
-const cancelReservationSuccess = copy => ({
+const success = copy => ({
   copy,
   type: CANCEL_COPY_RESERVATION_SUCCESS,
 });
 
-const cancelReservation = copy => async (dispatch) => {
-  dispatch(cancelReservationPending());
+const fail = error => ({
+  error,
+  type: CANCEL_COPY_RESERVATION_FAIL,
+});
+
+const cancelReservation = (api, copy) => async (dispatch) => {
+  dispatch(pending());
 
   try {
-    await apiClient.member.copy.transaction.delete(copy.id, Transaction.TYPES.RESERVE);
+    await api.member.copy.transaction.delete(copy.id, Transaction.TYPES.RESERVE);
 
     const updatedCopy = new Copy(copy);
     updatedCopy.cancelReservation();
 
-    dispatch(cancelReservationSuccess(updatedCopy));
-    dispatch(close());
+    dispatch(success(updatedCopy));
   } catch (error) {
-    dispatch(cancelReservationFail(error));
+    dispatch(fail(error));
   }
 };
 
-export default copy => (dispatch) => {
-  dispatch({
+export default (api, copy) => (dispatch) => {
+  dispatch(openModal({
     actions: [
       {
-        label: I18n('CopyTable.modals.cancelReservation.action'),
-        onClick: () => dispatch(cancelReservation(copy)),
+        label: i18n('CopyTable.modals.cancelReservation.action'),
+        onClick: () => dispatch(cancelReservation(api, copy)),
         style: 'primary',
       },
     ],
     cancelable: true,
-    message: I18n('CopyTable.modals.cancelReservation.message'),
-    title: I18n('CopyTable.modals.cancelReservation.title'),
-    type: OPEN_MODAL,
-  });
+    message: i18n('CopyTable.modals.cancelReservation.message'),
+    title: i18n('CopyTable.modals.cancelReservation.title'),
+  }));
 };
