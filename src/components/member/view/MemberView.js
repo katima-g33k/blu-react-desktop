@@ -8,20 +8,25 @@ import {
   Row,
 } from 'react-bootstrap';
 
-import AlignedData from '../../general/AlignedData';
+import { AlignedData, Spinner } from '../../general';
 import CopyTable from './MemberCopyTable';
 import { formatLongDate } from '../../../lib/dateHelper';
 import I18n from '../../../lib/i18n';
-import Member from '../../../lib/models/Member';
+import { Member } from '../../../lib/models';
 import MemberActionPanel from '../../../containers/MemberActionPanelContainer';
 import MemberComments from '../../../containers/MemberCommentContainer';
 import MemberReceipt from '../receipt/MemberReceipt';
 import ParentLogo from './ParentLogo';
 import ProfileStats from '../../general/profileStats/ProfileStats';
-import Spinner from '../../general/Spinner';
 
-const border = {
-  borderRight: '1px #e0e0e0 solid',
+const { Body, Heading } = Panel;
+const styles = {
+  alert: {
+    marginBottom: 0,
+  },
+  border: {
+    borderRight: '1px #e0e0e0 solid',
+  },
 };
 
 export default class MemberView extends Component {
@@ -44,13 +49,7 @@ export default class MemberView extends Component {
     this.props.fetch();
   }
 
-  renderParentLogo = () => {
-    if (this.props.member.isParent) {
-      return (<ParentLogo />);
-    }
-
-    return null;
-  };
+  renderParentLogo = () => this.props.member.isParent && (<ParentLogo />);
 
   renderAccountState = () => {
     const { account } = this.props.member;
@@ -87,7 +86,7 @@ export default class MemberView extends Component {
 
     if (transfers.length) {
       return (
-        <Alert bsStyle="warning">
+        <Alert bsStyle="warning" style={styles.alert}>
           {I18n('MemberView.transferAlert', { dates })}
         </Alert>
       );
@@ -164,32 +163,31 @@ export default class MemberView extends Component {
     return !isLoading ? (
       <Row>
         <Col md={10}>
-          <Panel
-            header={I18n('MemberView.title')}
-            bsStyle={isActive ? 'default' : 'danger'}
-          >
+          <Panel bsStyle={isActive ? 'default' : 'danger'}>
+            <Heading>
+              {I18n('MemberView.title')}
+            </Heading>
             {this.renderAlert()}
-            <h3>
-              {name}
-              {this.renderParentLogo()}
-            </h3>
-            <Row>
-              <Col sm={12} md={6} style={border}>{this.renderGeneralInformation()}</Col>
-              <Col sm={12} md={6}>{this.renderAccountState()}</Col>
-            </Row>
-            <hr />
-            <Row>
-              <Col sm={12} md={6} style={border}>{this.renderStats()}</Col>
-              <Col sm={12} md={6}>
-                <MemberComments />
-              </Col>
-            </Row>
-            <hr />
-            <Row>
-              <Col md={12}>
-                <CopyTable />
-              </Col>
-            </Row>
+            <Body>
+              <h3>{name} {this.renderParentLogo()}</h3>
+              <Row>
+                <Col sm={12} md={6} style={styles.border}>{this.renderGeneralInformation()}</Col>
+                <Col sm={12} md={6}>{this.renderAccountState()}</Col>
+              </Row>
+              <hr />
+              <Row>
+                <Col sm={12} md={6} style={styles.border}>{this.renderStats()}</Col>
+                <Col sm={12} md={6}>
+                  <MemberComments />
+                </Col>
+              </Row>
+              <hr />
+              <Row>
+                <Col md={12}>
+                  <CopyTable />
+                </Col>
+              </Row>
+            </Body>
           </Panel>
         </Col>
         <Col md={2}>
