@@ -22,37 +22,42 @@ const getPaidCopyData = copies => copies.reduce((acc, copyData) => {
   return data;
 }, { amount: 0, copies: [] });
 
-const fail = error => ({
-  message: error.message,
-  title: i18n('modal.error', { code: error.code || 500 }),
-  type: PAY_MEMBER_FAIL,
-});
-
 const pending = () => ({
   type: PAY_MEMBER_PENDING,
 });
 
-const success = copies => ({
+const fail = error => ({
+  error,
+  type: PAY_MEMBER_FAIL,
+});
+
+const success = (amount, copies) => ({
+  amount,
   copies,
   type: PAY_MEMBER_SUCCESS,
 });
 
-export default (api, member, printReceipt = false) => async (dispatch) => {
+export default (api, member, printReceipt) => async (dispatch) => {
   dispatch(pending());
 
   try {
     await api.member.pay(member.no);
     const { amount, copies } = getPaidCopyData(member.account.copies);
 
-    dispatch(success(copies));
+    dispatch(success(amount, copies));
 
     if (printReceipt) {
       dispatch(startPrinting(amount));
     }
 
     dispatch(openModal({
-      title: i18n('MemberView.modal.paySuccessful.title'),
+      actions: [{
+        label: i18n('actions.ok'),
+        onClick() {},
+        style: 'primary',
+      }],
       message: i18n('MemberView.modal.paySuccessful.message', { amount }),
+      title: i18n('MemberView.modal.paySuccessful.title'),
     }));
   } catch (error) {
     dispatch(fail(error));

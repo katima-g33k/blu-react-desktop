@@ -36,7 +36,7 @@ const mergeProps = (stateProps, dispatchProps) => ({
   delete: () => dispatchProps.delete(stateProps.api, stateProps.member.no),
   isActive: stateProps.isActive,
   modify: () => dispatchProps.modify(stateProps.member.no),
-  pay: () => dispatchProps.pay(stateProps.pay, stateProps.member),
+  pay: () => dispatchProps.pay(stateProps.api, stateProps.member),
   printReceipt: dispatchProps.printReceipt,
   reactivate: () => dispatchProps.reactivate(stateProps.member),
   renew: () => dispatchProps.renew(stateProps.api, stateProps.member.no),

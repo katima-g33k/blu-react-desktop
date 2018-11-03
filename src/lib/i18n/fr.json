@@ -438,7 +438,7 @@
       },
       "paySuccessful": {
         "title": "Argent Remis",
-        "message": "Le montant de %{amount} a été remis avec succès"
+        "message": "Le montant de %{amount} $ a été remis avec succès"
       },
       "reactivate": {
         "title": "Réactivation du compte",
