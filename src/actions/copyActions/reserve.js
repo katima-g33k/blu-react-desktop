@@ -5,7 +5,10 @@ import {
 } from '../actionTypes';
 import i18n from '../../lib/i18n';
 import Modal from '../../components/general/modals/Modal';
-import { open as openModal } from '../modalActions';
+import {
+  close as closeModal,
+  open as openModal,
+} from '../modalActions';
 import { setResultOnClick } from '../searchActions';
 import { Transaction } from '../../lib/models';
 
@@ -35,6 +38,7 @@ export default (api, copy) => async (dispatch) => {
       reservedCopy.reserve(parent);
 
       dispatch(success(reservedCopy, parent));
+      dispatch(closeModal());
     } catch (error) {
       dispatch(fail(error));
     }

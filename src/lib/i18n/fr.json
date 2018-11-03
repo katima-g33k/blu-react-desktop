@@ -559,7 +559,8 @@
       "member": {
         "no": "Numéro de membre",
         "firstName": "Prénom",
-        "lastName": "Nom"
+        "lastName": "Nom",
+        "email": "Courriel"
       },
       "item": {
         "title": "Titre",
