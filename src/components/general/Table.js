@@ -27,7 +27,7 @@ export default class Table extends Component {
       })),
       PropTypes.func,
     ]),
-    rowClass: PropTypes.func,
+    rowClass: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
     striped: PropTypes.bool,
   };
 
@@ -36,7 +36,7 @@ export default class Table extends Component {
     placeholder: I18n('table.placeholder'),
     options: {},
     rowActions: [],
-    rowClass: () => {},
+    rowClass: '',
     striped: false,
   };
 

@@ -1,14 +1,11 @@
-// TODO: Optimize for large renders
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
-import FileSaver from 'file-saver';
 
 import Button from './Button';
-import Checkbox from './Checkbox';
-import { createCSV } from '../../lib/csv';
-import I18n from '../../lib/i18n';
-import Input from './Input';
+import ExportButton from './ExportButton';
+import Filter from './Filter';
+import i18n from '../../lib/i18n';
 import Table from './Table';
 
 export default class TableLayout extends Component {
@@ -28,7 +25,7 @@ export default class TableLayout extends Component {
       PropTypes.arrayOf(PropTypes.shape()),
       PropTypes.func,
     ]),
-    rowClass: PropTypes.func,
+    rowClass: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
     title: PropTypes.string.isRequired,
   };
 
@@ -38,29 +35,18 @@ export default class TableLayout extends Component {
     exportable: false,
     exportTitle: '',
     noStrip: false,
-    placeholder: I18n('table.placeholder'),
+    placeholder: i18n('table.placeholder'),
     rowActions: [],
-    rowClass: () => {},
+    rowClass: '',
   };
 
-  getFileName = () => `${this.props.exportTitle || I18n('table.defaultFileName')}.csv`;
-
-  saveFile = () => FileSaver.saveAs(createCSV(this.props.columns, this.props.data), this.getFileName());
-
-  renderExportButton = () => {
-    if (this.props.exportable) {
-      return (
-        <Button
-          bsStyle="primary"
-          glyph="new-window"
-          label={I18n('table.export')}
-          onClick={this.saveFile}
-        />
-      );
-    }
-
-    return null;
-  };
+  renderExportButton = () => this.props.exportable && (
+    <ExportButton
+      columns={this.props.columns}
+      data={this.props.data}
+      filename={this.props.exportTitle}
+    />
+  );
 
   renderAction = action => (
     <Button
@@ -74,49 +60,12 @@ export default class TableLayout extends Component {
 
   renderActions = () => this.props.actions.map(this.renderAction);
 
-  renderCustomFilter = (id, component) => (
-    <Col key={id} md={2}>
-      {component}
-    </Col>
+  renderFilter = filter => (
+    <Filter
+      {...filter}
+      key={filter.id}
+    />
   );
-
-  renderInputFilter = filter => (
-    <Col key={filter.id} md={2}>
-      <Input
-        id={filter.id}
-        onChange={filter.onChange}
-        placeholder={filter.label}
-        value={filter.value}
-      />
-    </Col>
-  );
-
-  renderCheckboxFilter = filter => (
-    <Col key={filter.id} md={2}>
-      <Checkbox
-        checked={filter.checked}
-        id={filter.id}
-        label={filter.label}
-        onChange={filter.onChange}
-      />
-    </Col>
-  );
-
-  renderFilter = (filter) => {
-    if (filter.component) {
-      return this.renderCustomFilter(filter.id, filter.component);
-    }
-
-    if (filter.type === 'input') {
-      return this.renderInputFilter(filter);
-    }
-
-    if (filter.type === 'checkbox') {
-      return this.renderCheckboxFilter(filter);
-    }
-
-    return null;
-  };
 
   renderFilters = () => this.props.filters.map(this.renderFilter);
 
