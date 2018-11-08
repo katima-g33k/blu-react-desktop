@@ -25,9 +25,9 @@ const mapDispatchToProps = dispatch => ({
   modify: no => browserHistory.push(`/member/edit/${no}`),
   pay: (api, member) => dispatch(openPayModal(api, member)),
   printReceipt: () => dispatch(startPrinting()),
-  reactivate: member => dispatch(openReactivateModal(member)),
+  reactivate: (api, member) => dispatch(openReactivateModal(api, member)),
   renew: (api, no) => dispatch(renew(api, no)),
-  transfer: member => dispatch(openTransferModal(member)),
+  transfer: (api, member) => dispatch(openTransferModal(api, member)),
 });
 
 const mergeProps = (stateProps, dispatchProps) => ({
@@ -38,9 +38,9 @@ const mergeProps = (stateProps, dispatchProps) => ({
   modify: () => dispatchProps.modify(stateProps.member.no),
   pay: () => dispatchProps.pay(stateProps.api, stateProps.member),
   printReceipt: dispatchProps.printReceipt,
-  reactivate: () => dispatchProps.reactivate(stateProps.member),
+  reactivate: () => dispatchProps.reactivate(stateProps.api, stateProps.member),
   renew: () => dispatchProps.renew(stateProps.api, stateProps.member.no),
-  transfer: () => dispatchProps.transfer(stateProps.member),
+  transfer: () => dispatchProps.transfer(stateProps.api, stateProps.member),
   userIsAdmin: stateProps.userIsAdmin,
 });
 

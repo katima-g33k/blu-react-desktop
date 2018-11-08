@@ -1,12 +1,14 @@
-import { OPEN_MODAL } from '../actionTypes';
-import i18n from '../../lib/i18n';
 import { historyPush } from '../routeActions';
+import i18n from '../../lib/i18n';
 import merge from './merge';
+import { open as openModal } from '../modalActions';
 import pay from './pay';
 import remove from './remove';
+import renew from './renew';
+import transfer from './transfer';
 
 export const openPayModal = (api, member) => (dispatch) => {
-  dispatch({
+  dispatch(openModal({
     actions: [
       {
         label: i18n('MemberView.actions.printReceipt'),
@@ -18,67 +20,59 @@ export const openPayModal = (api, member) => (dispatch) => {
       },
     ],
     cancelable: true,
-    messageKey: 'MemberView.modal.payConfirmation.message',
-    titleKey: 'MemberView.modal.payConfirmation.title',
-    type: OPEN_MODAL,
-  });
+    message: i18n('MemberView.modal.payConfirmation.message'),
+    title: i18n('MemberView.modal.payConfirmation.title'),
+  }));
 };
 
 export const openDeleteModal = (api, no) => (dispatch) => {
-  dispatch({
+  dispatch(openModal({
     actions: [{
       label: i18n('MemberView.modal.delete.action'),
       onClick: () => dispatch(remove(api, no)),
       style: 'danger',
     }],
     cancelable: true,
-    messageKey: 'MemberView.modal.delete.message',
-    titleKey: 'MemberView.modal.delete.title',
-    type: OPEN_MODAL,
-  });
+    message: i18n('MemberView.modal.delete.message'),
+    title: i18n('MemberView.modal.delete.title'),
+  }));
 };
 
-// TODO: Complete open reactivation modal
-// eslint-disable-next-line
-export const openReactivateModal = member => (dispatch) => {
-  dispatch({
+export const openReactivateModal = (api, member) => (dispatch) => {
+  dispatch(openModal({
     actions: [
       {
         label: i18n('MemberView.modal.reactivate.actions.transfer'),
-        onClick: () => {},
+        onClick: () => dispatch(transfer(api, member, true)),
         style: 'danger',
       },
       {
         label: i18n('MemberView.modal.reactivate.actions.reactivate'),
-        onClick: () => {},
+        onClick: () => dispatch(renew(api, member.no)),
       },
     ],
     cancelable: true,
-    messageKey: 'MemberView.modal.reactivate.message',
-    titleKey: 'MemberView.modal.reactivate.title',
-    type: OPEN_MODAL,
-  });
+    message: i18n('MemberView.modal.reactivate.message'),
+    title: i18n('MemberView.modal.reactivate.title'),
+  }));
 };
 
-// TODO: Complete open transfer modal
-// eslint-disable-next-line
-export const openTransferModal = member => (dispatch) => {
-  dispatch({
+export const openTransferModal = (api, member) => (dispatch) => {
+  dispatch(openModal({
     actions: [{
       label: i18n('MemberView.modal.transfer.action'),
-      onClick: () => {},
+      onClick: () => dispatch(transfer(api, member)),
     }],
     cancelable: true,
-    messageKey: 'MemberView.modal.transfer.message',
-    titleKey: 'MemberView.modal.transfer.title',
-    type: OPEN_MODAL,
-  });
+    message: i18n('MemberView.modal.transfer.message'),
+    title: i18n('MemberView.modal.transfer.title'),
+  }));
 };
 
 export const openExistsModal = (routeNo, formNo, userIsAdmin, apiClient) => (dispatch) => {
   if (!routeNo) {
     // If inserting a new member
-    dispatch({
+    return dispatch(openModal({
       cancelable: true,
       actions: [{
         label: i18n('MemberForm.modals.exists.goToMember.action'),
@@ -87,14 +81,12 @@ export const openExistsModal = (routeNo, formNo, userIsAdmin, apiClient) => (dis
       }],
       message: i18n('MemberForm.modals.exists.goToMember.message'),
       title: i18n('MemberForm.modals.exists.title'),
-      type: OPEN_MODAL,
-    });
-    return;
+    }));
   }
 
   if (userIsAdmin) {
     // Only admins can merge
-    dispatch({
+    return dispatch(openModal({
       cancelable: true,
       actions: [{
         label: i18n('MemberForm.modals.exists.merge.action'),
@@ -103,18 +95,15 @@ export const openExistsModal = (routeNo, formNo, userIsAdmin, apiClient) => (dis
       }],
       message: i18n('MemberForm.modals.exists.merge.message'),
       title: i18n('MemberForm.modals.exists.title'),
-      type: OPEN_MODAL,
-    });
-    return;
+    }));
   }
 
-  dispatch({
+  return dispatch(openModal({
     actions: [{
       label: i18n('actions.ok'),
       onClick() {},
     }],
     message: i18n('MemberForm.modals.exists.message'),
     title: i18n('MemberForm.modals.exists.title'),
-    type: OPEN_MODAL,
-  });
+  }));
 };

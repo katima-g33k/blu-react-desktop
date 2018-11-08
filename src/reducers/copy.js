@@ -9,6 +9,7 @@ import {
   RESET_COPIES,
   SELL_COPY_SUCCESS,
   SET_COPIES,
+  TRANSFER_MEMBER_ACCOUNT_SUCCESS,
   UPDATE_COPY_SUCCESS,
   UPDATE_COPY_TABLE_FILTER,
 } from '../actions/actionTypes';
@@ -100,7 +101,12 @@ const handlers = {
     filteredCopies: updateCopiesList(state.filteredCopies, action.copy),
   }),
   [SET_COPIES]: (state, action) => ({
-    ...state,
+    ...initialState,
+    copies: action.copies,
+    filteredCopies: action.copies,
+  }),
+  [TRANSFER_MEMBER_ACCOUNT_SUCCESS]: (state, action) => ({
+    ...initialState,
     copies: action.copies,
     filteredCopies: action.copies,
   }),
