@@ -98,7 +98,7 @@ export default class Modal extends Component {
   renderButton = action => (
     <ModalButton
       extraData={this.props}
-      key={action}
+      key={action.label}
       label={action.label}
       onClick={action.onClick}
       style={action.style}

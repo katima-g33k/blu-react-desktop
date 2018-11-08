@@ -1,3 +1,5 @@
+/* eslint no-unused-vars: 0 */
+
 import { endPrinting, startPrinting } from './printing';
 import exists from './exists';
 import fetch from './fetch';
@@ -14,6 +16,7 @@ import {
 } from './modals';
 import pay from './pay';
 import renew from './renew';
+import transfer from './transfer';
 import update from './update';
 
 export {
@@ -32,5 +35,6 @@ export {
   pay,
   renew,
   startPrinting,
+  transfer,
   update,
 };
