@@ -1,4 +1,3 @@
-/* eslint react/sort-comp: 0 */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -54,35 +53,36 @@ export default class AddCopies extends Component {
     copies: [],
     item: null,
     scannedItem: null,
-  }
+  };
 
   state = {
     ean13: null,
     isSearch: true,
-  }
+  };
 
   componentDidMount() {
     this.props.onLoad();
   }
 
   componentWillReceiveProps(nextProps) {
-    // TODO: Refactor
-    if (!this.props.scannedItem && nextProps.scannedItem) {
-      if (nextProps.scannedItem.id) {
-        this.props.fetchItem(nextProps.scannedItem.id);
-      } else {
-        this.setState({
-          isSearch: false,
-          ean13: nextProps.scannedItem.ean13,
-        });
-      }
-
+    if (nextProps.item.id) {
+      this.props.handleOnAddCopy(nextProps.item);
       return;
     }
 
-    if (nextProps.item.id) {
-      this.props.handleOnAddCopy(nextProps.item);
+    if (this.props.scannedItem && !nextProps.scannedItem) {
+      return;
     }
+
+    if (nextProps.scannedItem.id) {
+      this.props.fetchItem(nextProps.scannedItem.id);
+      return;
+    }
+
+    this.setState({
+      isSearch: false,
+      ean13: nextProps.scannedItem.ean13,
+    });
   }
 
   get actions() {
@@ -93,62 +93,60 @@ export default class AddCopies extends Component {
     }];
   }
 
-  get columns() {
-    return [
-      {
-        dataField: 'id',
-        isKey: true,
-        hidden: true,
-      },
-      {
-        dataField: 'title',
-        label: i18n('AddCopies.table.columns.title'),
-        tdStyle: { whiteSpace: 'normal' },
-        dataFormat: (cell, { item: { name } }) => name,
-      },
-      {
-        dataField: 'price',
-        label: i18n('AddCopies.table.columns.price'),
-        width: '40px',
-        dataFormat: price => `${price} $`,
-      },
-      {
-        dataField: 'actions',
-        label: '',
-        dataAlign: 'center',
-        width: '100px',
-        dataFormat: (cell, copy) => {
-          const actions = [(
+  columns = [
+    {
+      dataField: 'id',
+      isKey: true,
+      hidden: true,
+    },
+    {
+      dataField: 'title',
+      label: i18n('AddCopies.table.columns.title'),
+      tdStyle: { whiteSpace: 'normal' },
+      dataFormat: (cell, { item: { name } }) => name,
+    },
+    {
+      dataField: 'price',
+      label: i18n('AddCopies.table.columns.price'),
+      width: '40px',
+      dataFormat: price => `${price} $`,
+    },
+    {
+      dataField: 'actions',
+      label: '',
+      dataAlign: 'center',
+      width: '100px',
+      dataFormat: (cell, copy) => {
+        const actions = [(
+          <Button
+            bsStyle="default"
+            onClick={() => this.props.onUpdate(copy)}
+          >
+            <Glyphicon glyph="pencil" />
+          </Button>
+        )];
+
+        if (!copy.reservation) {
+          actions.push((
             <Button
-              bsStyle="default"
-              onClick={() => this.props.onUpdate(copy)}
+              bsStyle="danger"
+              onClick={() => this.props.onRemove(copy)}
             >
-              <Glyphicon glyph="pencil" />
+              <Glyphicon glyph="trash" />
             </Button>
-          )];
+          ));
+        }
 
-          if (!copy.reservation) {
-            actions.push((
-              <Button
-                bsStyle="danger"
-                onClick={() => this.props.onRemove(copy)}
-              >
-                <Glyphicon glyph="trash" />
-              </Button>
-            ));
-          }
-
-          return (
-            <div>
-              {actions}
-            </div>
-          );
-        },
+        return (
+          <div>
+            {actions}
+          </div>
+        );
       },
-    ];
-  }
+    },
+  ];
 
-  toggleView = () => this.setState(state => ({ isSearch: !state.isSearch }))
+  toggleView = () => this.setState(state => ({ isSearch: !state.isSearch }));
 
   renderSearch = () => (
     <Search
@@ -158,7 +156,7 @@ export default class AddCopies extends Component {
       onRowClick={this.props.handleOnAddCopy}
       onAddButton={this.toggleView}
     />
-  )
+  );
 
   renderForm = () => (
     <ItemForm
@@ -166,7 +164,7 @@ export default class AddCopies extends Component {
       onCancel={this.toggleView}
       onSaveCallback={this.props.handleOnAddCopy}
     />
-  )
+  );
 
   render() {
     return (

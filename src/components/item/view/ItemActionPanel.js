@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 
-import ActionPanel from '../../general/ActionPanel';
-import I18n from '../../../lib/i18n';
+import { ActionPanel } from '../../general';
+import i18n from '../../../lib/i18n';
 import StatusButton from '../../../containers/StatusButtonContainer';
 
 export default class ItemActionPanel extends Component {
@@ -13,44 +13,39 @@ export default class ItemActionPanel extends Component {
     handleUpdateStorage: PropTypes.func.isRequired,
     modify: PropTypes.func.isRequired,
     userIsAdmin: PropTypes.bool.isRequired,
-  }
+  };
 
-  static defaultProps = {
-    isRemoved: false,
-    isValid: true,
-  }
-
-  getActions = () => [
-    ...this.actions,
-    ...(this.props.userIsAdmin ? this.adminActions : []),
-  ]
-
-  actions = [
+  userActions = [
     {
-      label: I18n('ItemView.actions.modify'),
+      label: i18n('ItemView.actions.modify'),
       onClick: this.props.modify,
     },
     {
       customComponent: (<StatusButton />),
     },
     {
-      label: I18n('ItemView.actions.storage'),
+      label: i18n('ItemView.actions.storage'),
       onClick: this.props.handleUpdateStorage,
     },
     {
-      label: I18n('ItemView.actions.reserve'),
+      label: i18n('ItemView.actions.reserve'),
       onClick: this.props.handleReserve,
     },
   ];
 
   adminActions = [{
     disabled: this.props.canDelete,
-    label: I18n('ItemView.actions.delete'),
+    label: i18n('ItemView.actions.delete'),
     onClick: this.props.handleDelete,
     style: 'danger',
   }];
 
+  actions = [
+    ...this.userActions,
+    ...(this.props.userIsAdmin ? this.adminActions : []),
+  ];
+
   render() {
-    return (<ActionPanel actions={this.getActions()} />);
+    return (<ActionPanel actions={this.actions} />);
   }
 }

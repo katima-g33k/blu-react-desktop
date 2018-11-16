@@ -1,34 +1,36 @@
 import { connect } from 'react-redux';
-import { browserHistory } from 'react-router';
 
-import ItemActionPanel from '../components/item/view/ItemActionPanel';
+import { historyPush } from '../actions/routeActions';
 import {
   remove,
   reserve,
   updateStorage,
 } from '../actions/itemActions';
+import ItemActionPanel from '../components/item/view/ItemActionPanel';
 
-const mapStateToProps = ({ itemStore: { item }, appStore }) => ({
-  apiClient: appStore.apiClient,
+
+const mapStateToProps = ({ itemStore: { item }, appStore, userStore }) => ({
+  api: appStore.apiClient,
   canDelete: !!item.copies.length,
   id: item.id,
   isInStock: item.isInStock,
   storage: item.storage,
-  userIsAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
+  userIsAdmin: userStore.user.isAdmin,
 });
 
 const mapDispatchToProps = dispatch => ({
-  handleDelete: (apiClient, id) => dispatch(remove(apiClient, id)),
-  handleReserve: (apiClient, id, isInStock) => dispatch(reserve(apiClient, id, isInStock)),
-  handleUpdateStorage: (apiClient, id, storage) => dispatch(updateStorage(apiClient, id, storage)),
+  handleDelete: (api, id) => dispatch(remove(api, id)),
+  handleReserve: (api, id, isInStock) => dispatch(reserve(api, id, isInStock)),
+  handleUpdateStorage: (api, id, storage) => dispatch(updateStorage(api, id, storage)),
+  onModify: id => dispatch(historyPush(`/item/edit/${id}`)),
 });
 
 const mergeProps = (stateProps, dispatchProps) => ({
   canDelete: stateProps.canDelete,
-  handleDelete: () => dispatchProps.handleDelete(stateProps.apiClient, stateProps.id),
-  handleReserve: () => dispatchProps.handleReserve(stateProps.apiClient, stateProps.id, stateProps.isInStock),
-  handleUpdateStorage: () => dispatchProps.handleUpdateStorage(stateProps.apiClient, stateProps.id, stateProps.storage),
-  modify: () => browserHistory.push(`/item/edit/${stateProps.id}`),
+  handleDelete: () => dispatchProps.handleDelete(stateProps.api, stateProps.id),
+  handleReserve: () => dispatchProps.handleReserve(stateProps.api, stateProps.id, stateProps.isInStock),
+  handleUpdateStorage: () => dispatchProps.handleUpdateStorage(stateProps.api, stateProps.id, stateProps.storage),
+  modify: () => dispatchProps.onModify(stateProps.id),
   userIsAdmin: stateProps.userIsAdmin,
 });
 

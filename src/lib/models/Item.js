@@ -2,6 +2,11 @@ import Author from './Author';
 import Copy from './Copy';
 import Reservation from './Reservation';
 
+const types = {
+  BOOK: 'book',
+  ITEM: 'item',
+};
+
 export default class Item {
   constructor(item = {}) {
     this.id = item.id || 0;
@@ -86,7 +91,13 @@ export default class Item {
     return this.storage.length ? this.storage.join('; ') : '';
   }
 
+  get type() {
+    return this.isBook ? types.BOOK : types.ITEM;
+  }
+
   clone = () => new Item(this);
+
+  static TYPES = types;
 
   static get STATUS() {
     return {
