@@ -1,11 +1,10 @@
-import { browserHistory } from 'react-router';
-
-import { Item } from '../../lib/models';
 import {
   INSERT_ITEM_FAIL,
   INSERT_ITEM_PENDING,
   INSERT_ITEM_SUCCESS,
 } from '../actionTypes';
+import { historyPush } from '../routeActions';
+import { Item } from '../../lib/models';
 
 const pending = () => ({
   type: INSERT_ITEM_PENDING,
@@ -35,7 +34,7 @@ export default (api, item, callback) => async (dispatch) => {
       return;
     }
 
-    browserHistory.push(`/item/view/${id}`);
+    dispatch(historyPush(`/item/view/${id}`));
   } catch (error) {
     fail(error);
   }
