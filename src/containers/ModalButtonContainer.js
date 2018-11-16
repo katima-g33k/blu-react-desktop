@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 
-import { close } from '../actions/modalActions';
+import close from '../actions/modalActions/close';
 import ModalButton from '../components/general/modals/ModalButton';
 
 const mapStateToProps = () => ({});

@@ -3,11 +3,9 @@ import {
   RESERVE_COPY_PENDING,
   RESERVE_COPY_SUCCESS,
 } from '../actionTypes';
-import i18n from '../../lib/i18n';
-import Modal from '../../components/general/modals/Modal';
 import {
   close as closeModal,
-  open as openModal,
+  openSearch as openSearchModal,
 } from '../modalActions';
 import { setResultOnClick } from '../searchActions';
 import { Transaction } from '../../lib/models';
@@ -27,8 +25,8 @@ const fail = error => ({
   type: RESERVE_COPY_FAIL,
 });
 
-export default (api, copy) => async (dispatch) => {
-  await dispatch(setResultOnClick(async (parent) => {
+const onResultClick = (api, copy) => (dispatch) => {
+  async function onClick(parent) {
     dispatch(pending());
 
     try {
@@ -42,13 +40,12 @@ export default (api, copy) => async (dispatch) => {
     } catch (error) {
       dispatch(fail(error));
     }
-  }));
+  }
 
+  dispatch(setResultOnClick(onClick));
+};
 
-  dispatch(openModal({
-    cancelable: true,
-    modalType: Modal.TYPES.SEARCH,
-    onClick: null,
-    title: i18n('modal.searchParent.title'),
-  }));
+export default (api, copy) => async (dispatch) => {
+  await dispatch(onResultClick(api, copy));
+  dispatch(openSearchModal());
 };

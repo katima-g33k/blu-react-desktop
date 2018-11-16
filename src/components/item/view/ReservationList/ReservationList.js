@@ -3,22 +3,23 @@ import PropTypes from 'prop-types';
 import { Button, Glyphicon } from 'react-bootstrap';
 
 import { formatShortDate } from '../../../../lib/dateHelper';
-import I18n from '../../../../lib/i18n';
+import i18n from '../../../../lib/i18n';
 import { link } from '../../../../lib/link';
-import TableLayout from '../../../general/TableLayout';
 import { Reservation } from '../../../../lib/models';
+import { TableLayout } from '../../../general';
 
 import './reservationList.css';
 
+// TODO: Fix copy reservations
 export default class ReservationList extends Component {
   static propTypes = {
     onDelete: PropTypes.func.isRequired,
     reservations: PropTypes.arrayOf(PropTypes.instanceOf(Reservation)),
-  }
+  };
 
   static defaultProps = {
     reservations: [],
-  }
+  };
 
   columns = [
     {
@@ -28,7 +29,7 @@ export default class ReservationList extends Component {
     },
     {
       dataField: 'parent',
-      label: I18n('ReservationList.table.parent'),
+      label: i18n('ReservationList.table.parent'),
       dataFormat(parent, { copy }) {
         const member = copy ? copy.reservee : parent;
         return link(`/member/view/${member.no}`, member.name);
@@ -36,13 +37,13 @@ export default class ReservationList extends Component {
     },
     {
       dataField: 'date',
-      label: I18n('ReservationList.table.date'),
+      label: i18n('ReservationList.table.date'),
       width: '150px',
-      dataFormat: (date, reservation) => formatShortDate(date || reservation.copy.dateReserved),
+      dataFormat: date => formatShortDate(date),
     },
     {
       dataField: 'received',
-      label: I18n('ReservationList.table.received'),
+      label: i18n('ReservationList.table.received'),
       width: '70px',
       dataAlign: 'center',
       dataFormat: (cell, { copy }) => copy && (
@@ -51,22 +52,22 @@ export default class ReservationList extends Component {
         </Button>
       ),
     },
-  ]
+  ];
 
-  rowActions = () => [{
+  rowActions = [{
     bsStyle: 'danger',
     glyph: 'trash',
     help: 'Supprimer',
     onClick: this.props.onDelete,
-  }]
+  }];
 
   render() {
     return (
       <TableLayout
         columns={this.columns}
         data={this.props.reservations}
-        rowActions={this.rowActions()}
-        title={I18n('ReservationList.title')}
+        rowActions={this.rowActions}
+        title={i18n('ReservationList.title')}
       />
     );
   }
