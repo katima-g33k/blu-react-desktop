@@ -7,9 +7,9 @@ import {
   Row,
 } from 'react-bootstrap';
 
-import I18n from '../../lib/i18n';
+import i18n from '../../lib/i18n';
 
-const { Body, Heading } = Panel;
+const { Body, Heading, Title } = Panel;
 
 const DEFAULT_BS_STYLE = 'primary';
 const styles = {
@@ -50,7 +50,7 @@ export default class ActionPanel extends Component {
     return (
       <Panel>
         <Heading>
-          {I18n('general.actions')}
+          <Title>{i18n('general.actions')}</Title>
         </Heading>
         <Body>
           {this.props.actions.map(this.renderAction)}

@@ -1,5 +1,4 @@
 import { connect } from 'react-redux';
-import { browserHistory } from 'react-router';
 
 import ItemForm from '../components/item/form/ItemForm';
 import {
@@ -10,6 +9,7 @@ import {
   update,
 } from '../actions/itemActions';
 import { formatItemFormData } from '../lib/itemHelper';
+import historyPush from '../actions/routeActions/historyPush';
 
 const mapStateToProps = ({ appStore, itemStore }) => ({
   api: appStore.apiClient,
@@ -18,16 +18,15 @@ const mapStateToProps = ({ appStore, itemStore }) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  onExists: (id, existingItemId, userIsAdmin, api) => {
-    dispatch(openExistsModal(id, existingItemId, userIsAdmin, api))
-  },
+  onCancel: id => dispatch(historyPush(id ? `/item/view/${id}` : '/')),
+  onExists: (id, existingItemId, userIsAdmin, api) => dispatch(openExistsModal(id, existingItemId, userIsAdmin, api)),
   fetch: (id, api) => dispatch(fetch(api, id)),
   onInsert: (api, item, callback) => dispatch(insert(api, item, callback)),
   onUpdate: (id, item, api) => dispatch(update(id, item, api)),
 });
 
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  ean13: ownProps.ean13, // || ownProps.params ? ownProps.params.ean13 : '',
+  ean13: ownProps.ean13 || ownProps.params.ean13 || '',
   exists: async (ean13) => {
     const itemExists = await exists(ean13, stateProps.api);
 
@@ -39,12 +38,12 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   },
   item: stateProps.item,
   id: ownProps.params ? +ownProps.params.id : 0,
-  onCancel: () => browserHistory.push(ownProps.params.id ? `/item/view/${ownProps.params.id}` : '/'),
+  onCancel: () => (ownProps.onCancel ? ownProps.onCancel() : dispatchProps.onCancel(ownProps.params.id)),
   fetch: () => dispatchProps.fetch(ownProps.params.id, stateProps.api),
   onSave: (formData) => {
     const formattedData = formatItemFormData(formData);
 
-    if (ownProps.params && ownProps.params.id) {
+    if (ownProps.params.id) {
       dispatchProps.onUpdate(ownProps.params.id, formattedData, stateProps.api);
     } else {
       dispatchProps.onInsert(stateProps.api, formattedData, ownProps.onSaveCallback);

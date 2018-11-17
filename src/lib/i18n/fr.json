@@ -10,6 +10,7 @@
     "save": "Enregistrer"
   },
   "general": {
+    "actions": "Actions",
     "item": {
       "status": {
         "OUTDATED": "Désuet",

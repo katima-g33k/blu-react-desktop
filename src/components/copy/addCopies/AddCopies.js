@@ -1,56 +1,31 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button,
   Col,
-  Glyphicon,
   Panel,
   Row,
 } from 'react-bootstrap';
-import { Link } from 'react-router';
 
-import {
-  ActionPanel,
-  Table,
-} from '../../general';
-import {
-  Copy,
-  Item,
-  Member,
-} from '../../../lib/models';
+import { Item } from '../../../lib/models';
 import i18n from '../../../lib/i18n';
+import ActionPanel from '../../../containers/AddCopiesActionPanelContainer';
+import AddedCopiesTable from '../../../containers/AddedCopiesTableContainer';
 import ItemForm from '../../../containers/ItemFormContainer';
 import Search from '../../../containers/SearchContainer';
 
-const {
-  Body,
-  Heading,
-  Title,
-} = Panel;
-
-
-const styles = {
-  link: {
-    color: '#000',
-    textDecoration: 'none',
-  },
-};
+const { Body, Heading, Title } = Panel;
 
 export default class AddCopies extends Component {
   static propTypes = {
-    copies: PropTypes.arrayOf(PropTypes.instanceOf(Copy)),
     fetchItem: PropTypes.func.isRequired,
     handleOnAddCopy: PropTypes.func.isRequired,
     item: PropTypes.instanceOf(Item),
-    member: PropTypes.instanceOf(Member).isRequired,
+    memberName: PropTypes.string.isRequired,
     onLoad: PropTypes.func.isRequired,
-    onRemove: PropTypes.func.isRequired,
-    onUpdate: PropTypes.func.isRequired,
     scannedItem: PropTypes.shape(),
   };
 
   static defaultProps = {
-    copies: [],
     item: null,
     scannedItem: null,
   };
@@ -70,7 +45,7 @@ export default class AddCopies extends Component {
       return;
     }
 
-    if (this.props.scannedItem && !nextProps.scannedItem) {
+    if (!nextProps.scannedItem) {
       return;
     }
 
@@ -85,82 +60,21 @@ export default class AddCopies extends Component {
     });
   }
 
-  get actions() {
-    return [{
-      label: i18n('actions.done'),
-      href: `/member/view/${this.props.member.no}`,
-      style: 'primary',
-    }];
-  }
-
-  columns = [
-    {
-      dataField: 'id',
-      isKey: true,
-      hidden: true,
-    },
-    {
-      dataField: 'title',
-      label: i18n('AddCopies.table.columns.title'),
-      tdStyle: { whiteSpace: 'normal' },
-      dataFormat: (cell, { item: { name } }) => name,
-    },
-    {
-      dataField: 'price',
-      label: i18n('AddCopies.table.columns.price'),
-      width: '40px',
-      dataFormat: price => `${price} $`,
-    },
-    {
-      dataField: 'actions',
-      label: '',
-      dataAlign: 'center',
-      width: '100px',
-      dataFormat: (cell, copy) => {
-        const actions = [(
-          <Button
-            bsStyle="default"
-            onClick={() => this.props.onUpdate(copy)}
-          >
-            <Glyphicon glyph="pencil" />
-          </Button>
-        )];
-
-        if (!copy.reservation) {
-          actions.push((
-            <Button
-              bsStyle="danger"
-              onClick={() => this.props.onRemove(copy)}
-            >
-              <Glyphicon glyph="trash" />
-            </Button>
-          ));
-        }
-
-        return (
-          <div>
-            {actions}
-          </div>
-        );
-      },
-    },
-  ];
-
   toggleView = () => this.setState(state => ({ isSearch: !state.isSearch }));
 
   renderSearch = () => (
     <Search
       disableTypeSelection
       noHeader
-      type={Search.TYPES.ITEM}
-      onRowClick={this.props.handleOnAddCopy}
       onAddButton={this.toggleView}
+      onRowClick={this.props.handleOnAddCopy}
+      type={Search.TYPES.ITEM}
     />
   );
 
   renderForm = () => (
     <ItemForm
-      ean13={this.state.ean13}
+      ean13={this.state.ean13 || ''}
       onCancel={this.toggleView}
       onSaveCallback={this.props.handleOnAddCopy}
     />
@@ -171,25 +85,16 @@ export default class AddCopies extends Component {
       <Row>
         <Col md={10}>
           <Panel>
-            <Heading>{i18n('AddCopies.title')}</Heading>
+            <Heading>
+              <Title>{i18n('AddCopies.title')}</Title>
+            </Heading>
             <Body>
-              <Title>
-                <h2>
-                  <Link
-                    to={`/member/view/${this.props.member.no}`}
-                    style={styles.link}
-                  >
-                    {this.props.member.name}
-                  </Link>
-                </h2>
-              </Title>
+              <h2>
+                {this.props.memberName}
+              </h2>
               <Row>
                 <Col md={4}>
-                  <Table
-                    columns={this.columns}
-                    data={this.props.copies}
-                    striped
-                  />
+                  <AddedCopiesTable />
                 </Col>
               </Row>
               <Row>
@@ -201,7 +106,7 @@ export default class AddCopies extends Component {
           </Panel>
         </Col>
         <Col md={2}>
-          <ActionPanel actions={this.actions} />
+          <ActionPanel />
         </Col>
       </Row>
     );
