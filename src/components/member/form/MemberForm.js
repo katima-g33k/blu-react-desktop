@@ -23,11 +23,18 @@ import {
   phoneIsValid,
   zipIsValid,
 } from '../../../lib/memberHelper';
-import I18n from '../../../lib/i18n';
+import i18n from '../../../lib/i18n';
 import { Member } from '../../../lib/models';
 import StateSelector from '../../../containers/StateSelectorContainer';
 
 import './memberForm.css';
+
+const {
+  Body,
+  Footer,
+  Heading,
+  Title,
+} = Panel;
 
 const classNames = {
   row: 'form-row',
@@ -142,7 +149,7 @@ export default class MemberForm extends Component {
         [id]: value,
       },
     }));
-  }
+  };
 
   handleOnSave = async () => {
     if (!this.isValid() || await this.memberExists()) {
@@ -157,8 +164,9 @@ export default class MemberForm extends Component {
       checked={this.state.member.noNo}
       id="noNo"
       inputWidth={{ md: 3 }}
-      label={I18n('MemberForm.fields.noNo')}
+      label={i18n('MemberForm.fields.noNo')}
       onChange={this.handleNoMemberNoOnChange}
+      style={{ marginTop: -15 }}
     />
   );
 
@@ -172,10 +180,10 @@ export default class MemberForm extends Component {
         data={{ field: 'number', index }}
         id={`phone${index}`}
         inputWidth={{ md: 3 }}
-        label={I18n('MemberForm.fields.phone.label', { index: index + 1 })}
+        label={i18n('MemberForm.fields.phone.label', { index: index + 1 })}
         labelWidth={{ md: 3 }}
         onChange={this.handlePhoneOnChange}
-        placeholder={I18n('MemberForm.fields.phone.placeholder')}
+        placeholder={i18n('MemberForm.fields.phone.placeholder')}
         type={Input.TYPES.PHONE}
         value={formatPhoneNumber(this.state.member.phone[index].number)}
       />
@@ -183,9 +191,10 @@ export default class MemberForm extends Component {
         data={{ field: 'note', index }}
         id={`note${index}`}
         inputWidth={{ md: 3 }}
-        label={I18n('MemberForm.fields.phone.note')}
+        label={i18n('MemberForm.fields.phone.note')}
         labelWidth={{ md: 1 }}
         onChange={this.handlePhoneOnChange}
+        style={{ marginTop: -15 }}
         value={this.state.member.phone[index].note}
       />
     </Row>
@@ -193,19 +202,24 @@ export default class MemberForm extends Component {
 
   render() {
     return (
-      <Col md={12}>
-        <Panel header={I18n('MemberForm.title')}>
+      <Panel>
+        <Heading>
+          <Title>
+            {i18n('MemberForm.title')}
+          </Title>
+        </Heading>
+        <Body>
           <Col md={8}>
             <Form>
               <Row componentClass="h3">
-                {I18n(`MemberForm.subtitle.${this.props.no ? 'edit' : 'add'}`)}
+                {i18n(`MemberForm.subtitle.${this.props.no ? 'edit' : 'add'}`)}
               </Row>
               <Row>
                 <Row className={classNames.row}>
                   <Checkbox
                     checked={this.state.member.isParent}
                     id="isParent"
-                    label={I18n('MemberForm.fields.isParent')}
+                    label={i18n('MemberForm.fields.isParent')}
                     onChange={this.handleOnChange}
                   />
                 </Row>
@@ -216,9 +230,9 @@ export default class MemberForm extends Component {
                 >
                   <Input
                     id="firstName"
-                    label={I18n('MemberForm.fields.firstName')}
+                    label={i18n('MemberForm.fields.firstName')}
                     onChange={this.handleOnChange}
-                    placeholder={I18n('MemberForm.fields.firstName')}
+                    placeholder={i18n('MemberForm.fields.firstName')}
                     required
                     value={this.state.member.firstName}
                   />
@@ -230,9 +244,9 @@ export default class MemberForm extends Component {
                 >
                   <Input
                     id="lastName"
-                    label={I18n('MemberForm.fields.lastName')}
+                    label={i18n('MemberForm.fields.lastName')}
                     onChange={this.handleOnChange}
-                    placeholder={I18n('MemberForm.fields.lastName')}
+                    placeholder={i18n('MemberForm.fields.lastName')}
                     required
                     value={this.state.member.lastName}
                   />
@@ -246,10 +260,10 @@ export default class MemberForm extends Component {
                     disabled={this.state.member.noNo}
                     id="no"
                     inputWidth={{ md: 3 }}
-                    label={I18n('MemberForm.fields.no.label')}
+                    label={i18n('MemberForm.fields.no.label')}
                     labelWidth={{ md: 3 }}
                     onChange={this.handleOnChange}
-                    placeholder={I18n('MemberForm.fields.no.placeholder')}
+                    placeholder={i18n('MemberForm.fields.no.placeholder')}
                     required
                     type={Input.TYPES.NUMBER}
                     value={this.state.member.no ? `${this.state.member.no}` : ''}
@@ -259,23 +273,23 @@ export default class MemberForm extends Component {
               </Row>
               <Row>
                 <Col componentClass="h4">
-                  {I18n('MemberForm.subtitle.contact')}
+                  {i18n('MemberForm.subtitle.contact')}
                 </Col>
                 <Row className={classNames.row}>
                   <Input
                     id="address"
-                    label={I18n('MemberForm.fields.address')}
+                    label={i18n('MemberForm.fields.address')}
                     onChange={this.handleOnChange}
-                    placeholder={I18n('MemberForm.fields.address')}
+                    placeholder={i18n('MemberForm.fields.address')}
                     value={this.state.member.address}
                   />
                 </Row>
                 <Row className={classNames.row}>
                   <Input
                     id="zip"
-                    label={I18n('MemberForm.fields.zip.label')}
+                    label={i18n('MemberForm.fields.zip.label')}
                     onChange={this.handleOnChange}
-                    placeholder={I18n('MemberForm.fields.zip.placeholder')}
+                    placeholder={i18n('MemberForm.fields.zip.placeholder')}
                     isValid={this.state.validation.zip}
                     value={formatZip(this.state.member.zip)}
                   />
@@ -283,9 +297,9 @@ export default class MemberForm extends Component {
                 <Row className={classNames.row}>
                   <Input
                     id="city"
-                    label={I18n('MemberForm.fields.city')}
+                    label={i18n('MemberForm.fields.city')}
                     onChange={this.handleCtyOnChange}
-                    placeholder={I18n('MemberForm.fields.city')}
+                    placeholder={i18n('MemberForm.fields.city')}
                     value={this.state.member.city.name}
                   />
                 </Row>
@@ -302,9 +316,9 @@ export default class MemberForm extends Component {
                 >
                   <Input
                     id="email"
-                    label={I18n('MemberForm.fields.email.label')}
+                    label={i18n('MemberForm.fields.email.label')}
                     onChange={this.handleOnChange}
-                    placeholder={I18n('MemberForm.fields.email.placeholder')}
+                    placeholder={i18n('MemberForm.fields.email.placeholder')}
                     required
                     type={Input.TYPES.EMAIL}
                     value={this.state.member.email}
@@ -313,23 +327,27 @@ export default class MemberForm extends Component {
                 {this.renderPhone(0)}
                 {this.renderPhone(1)}
               </Row>
-              <Row>
-                <ButtonToolbar className={classNames.buttonGroup}>
-                  <Button onClick={this.props.onCancel}>
-                    {I18n('actions.cancel')}
-                  </Button>
-                  <Button
-                    bsStyle="primary"
-                    onClick={this.handleOnSave}
-                  >
-                    {I18n('actions.save')}
-                  </Button>
-                </ButtonToolbar>
-              </Row>
             </Form>
           </Col>
-        </Panel>
-      </Col>
+        </Body>
+        <Footer>
+          <Row>
+            <Col md={12}>
+              <ButtonToolbar className={classNames.buttonGroup}>
+                <Button onClick={this.props.onCancel}>
+                  {i18n('actions.cancel')}
+                </Button>
+                <Button
+                  bsStyle="primary"
+                  onClick={this.handleOnSave}
+                >
+                  {i18n('actions.save')}
+                </Button>
+              </ButtonToolbar>
+            </Col>
+          </Row>
+        </Footer>
+      </Panel>
     );
   }
 }

@@ -1,8 +1,6 @@
-import { canChangeLocation } from '../../lib/scannerHelpers';
-import {
-  HISTORY_PUSH,
-  SCAN_FAIL,
-} from '../actionTypes';
+import { canChangeLocation } from '../../lib/helpers/scanner';
+import { historyPush } from '../routeActions';
+import { SCAN_FAIL } from '../actionTypes';
 
 export default (scannedNo, api) => async (dispatch) => {
   if (!canChangeLocation()) {
@@ -10,12 +8,9 @@ export default (scannedNo, api) => async (dispatch) => {
   }
 
   try {
-    const { no } = await api.member.exists(scannedNo);
+    const { no } = await api.member.exists({ no: scannedNo });
 
-    dispatch({
-      path: `/member/${no ? `view/${no}` : `add?no=${scannedNo}`}`,
-      type: HISTORY_PUSH,
-    });
+    dispatch(historyPush(`/member/${no ? `view/${no}` : `add?no=${scannedNo}`}`));
   } catch (error) {
     dispatch({
       error,

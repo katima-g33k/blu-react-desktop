@@ -11,6 +11,7 @@ import {
   PRINT_END,
   PRINT_START,
   RENEW_MEMBER_SUCCESS,
+  RESET_STORES,
   UPDATE_COMMENT_SUCCESS,
 } from '../actions/actionTypes';
 import createReducer from './reducerFactory';
@@ -101,6 +102,7 @@ const handlers = {
       },
     }),
   }),
+  [RESET_STORES]: () => initialState,
   [UPDATE_COMMENT_SUCCESS]: (state, action) => ({
     ...state,
     member: new Member({

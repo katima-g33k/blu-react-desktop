@@ -11,44 +11,49 @@ import {
 import { formatItemFormData } from '../lib/itemHelper';
 import historyPush from '../actions/routeActions/historyPush';
 
-const mapStateToProps = ({ appStore, itemStore }) => ({
+const mapStateToProps = ({ appStore, itemStore, userStore }) => ({
   api: appStore.apiClient,
   item: itemStore.item,
-  userIsAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
+  userIsAdmin: userStore.user.isAdmin,
 });
 
 const mapDispatchToProps = dispatch => ({
   onCancel: id => dispatch(historyPush(id ? `/item/view/${id}` : '/')),
-  onExists: (id, existingItemId, userIsAdmin, api) => dispatch(openExistsModal(id, existingItemId, userIsAdmin, api)),
-  fetch: (id, api) => dispatch(fetch(api, id)),
+  onExists: (api, id, existingItemId, userIsAdmin) => dispatch(openExistsModal(id, existingItemId, userIsAdmin, api)),
+  fetch: (api, id) => dispatch(fetch(api, id)),
   onInsert: (api, item, callback) => dispatch(insert(api, item, callback)),
-  onUpdate: (id, item, api) => dispatch(update(id, item, api)),
+  onUpdate: (api, id, item) => dispatch(update(id, item, api)),
 });
 
-const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  ean13: ownProps.ean13 || ownProps.params.ean13 || '',
-  exists: async (ean13) => {
-    const itemExists = await exists(ean13, stateProps.api);
+const mergeProps = (stateProps, dispatchProps, ownProps) => {
+  const params = ownProps.params || {};
+  const id = +(params.id || 0);
 
-    if (itemExists) {
-      dispatchProps.onExists(ownProps.params.id, itemExists, stateProps.userIsAdmin, stateProps.api);
-    }
+  return {
+    ean13: ownProps.ean13 || ownProps.location.query.ean13 || '',
+    exists: async (ean13) => {
+      const itemExists = await exists(ean13, stateProps.api);
 
-    return itemExists;
-  },
-  item: stateProps.item,
-  id: ownProps.params ? +ownProps.params.id : 0,
-  onCancel: () => (ownProps.onCancel ? ownProps.onCancel() : dispatchProps.onCancel(ownProps.params.id)),
-  fetch: () => dispatchProps.fetch(ownProps.params.id, stateProps.api),
-  onSave: (formData) => {
-    const formattedData = formatItemFormData(formData);
+      if (itemExists) {
+        dispatchProps.onExists(stateProps.api, id, itemExists, stateProps.userIsAdmin);
+      }
 
-    if (ownProps.params.id) {
-      dispatchProps.onUpdate(ownProps.params.id, formattedData, stateProps.api);
-    } else {
-      dispatchProps.onInsert(stateProps.api, formattedData, ownProps.onSaveCallback);
-    }
-  },
-});
+      return itemExists;
+    },
+    fetch: () => dispatchProps.fetch(stateProps.api, id),
+    id,
+    item: stateProps.item,
+    onCancel: () => (ownProps.onCancel ? ownProps.onCancel() : dispatchProps.onCancel(id)),
+    onSave: (formData) => {
+      const formattedData = formatItemFormData(formData);
+
+      if (id) {
+        dispatchProps.onUpdate(stateProps.api, id, formattedData);
+      } else {
+        dispatchProps.onInsert(stateProps.api, formattedData, ownProps.onSaveCallback);
+      }
+    },
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(ItemForm);

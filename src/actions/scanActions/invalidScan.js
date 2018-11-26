@@ -1,14 +1,13 @@
-import { canChangeLocation } from '../../lib/scannerHelpers';
+import { canChangeLocation } from '../../lib/helpers/scanner';
 import i18n from '../../lib/i18n';
-import { OPEN_MODAL } from '../actionTypes';
+import { open as openModal } from '../modalActions';
 
 export default () => (dispatch) => {
   if (canChangeLocation()) {
-    dispatch({
+    dispatch(openModal({
       cancelable: false,
       message: i18n('general.scanner.invalid.message'),
       title: i18n('general.scanner.invalid.title'),
-      type: OPEN_MODAL,
-    });
+    }));
   }
 };
