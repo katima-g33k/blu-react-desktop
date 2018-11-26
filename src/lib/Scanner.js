@@ -1,6 +1,13 @@
+const formatMemberCode = (code) => {
+  if (/^009/.test(code)) {
+    return 199 + code.slice(3, 9);
+  }
+
+  return 2 + code.slice(1, 9);
+};
+
 export default class Scanner {
   constructor(barcodeFirstChar, barcodeLastChar, currentElementId) {
-    this.element = currentElementId ? document.getElementById(currentElementId) : window;
     this.barcodeFirstChar = barcodeFirstChar;
     this.barcodeLastChar = barcodeLastChar;
     this.barcode = '';
@@ -12,18 +19,21 @@ export default class Scanner {
       onInvalidScan: [],
     };
 
-    this.initScanner();
+    setTimeout(() => {
+      this.element = document.getElementById(currentElementId) || window;
+      this.initScanner();
+    }, 500);
   }
 
   addListener = (listener, func) => {
     if (this.listeners[listener]) {
       this.listeners[listener].push(func);
     }
-  }
+  };
 
   dispatch = (listener, ...args) => {
     this.listeners[listener].forEach(func => func(...args));
-  }
+  };
 
   initScanner = () => {
     this.element.onkeydown = (event) => {
@@ -41,7 +51,7 @@ export default class Scanner {
 
         switch (code.length) {
           case 10:
-            this.dispatch('onMemberScan', 2 + code.slice(1, 9));
+            this.dispatch('onMemberScan', formatMemberCode(code));
             break;
           case 13:
             this.dispatch('onItemScan', code);
@@ -57,14 +67,14 @@ export default class Scanner {
         this.barcode = '';
       }
     };
-  }
+  };
 
   removeListener = (listener, func) => {
     this.listeners[listener] = this.listeners[listener].filter(currentFunc => currentFunc !== func);
-  }
+  };
 
   updateScanChars = (barcodeFirstChar, barcodeLastChar) => {
     this.barcodeFirstChar = barcodeFirstChar;
     this.barcodeLastChar = barcodeLastChar;
-  }
+  };
 }

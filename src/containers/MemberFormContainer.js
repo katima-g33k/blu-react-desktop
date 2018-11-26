@@ -11,42 +11,50 @@ import {
 import MemberForm from '../components/member/form/MemberForm';
 import { formatMemberFormData } from '../lib/memberHelper';
 
-const mapStateToProps = ({ appStore, memberStore }) => ({
+const mapStateToProps = ({ appStore, memberStore, userStore }) => ({
   api: appStore.apiClient,
   member: memberStore.member,
-  userIsAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
+  userIsAdmin: userStore.user.isAdmin,
 });
 
 const mapDispatchToProps = dispatch => ({
-  onExists: (no, isUpdate, userIsAdmin, api) => dispatch(openExistsModal(no, isUpdate, userIsAdmin, api)),
-  fetch: (no, api) => dispatch(fetch(api, no)),
+  onExists: (api, no, isUpdate, userIsAdmin) => dispatch(openExistsModal(no, isUpdate, userIsAdmin, api)),
+  fetch: (api, no) => dispatch(fetch(api, no)),
   onInsert: (api, member) => dispatch(insert(api, member)),
   onUpdate: (api, no, member) => dispatch(update(api, no, member)),
 });
 
-const mergeProps = (stateProps, dispatchProps, ownProps) => ({
-  exists: async (data) => {
-    const memberExists = await exists(data, stateProps.api);
+const mergeProps = (stateProps, dispatchProps, ownProps) => {
+  const { member } = stateProps;
 
-    if (memberExists) {
-      dispatchProps.onExists(ownProps.params.no, memberExists, stateProps.userIsAdmin, stateProps.api);
-    }
+  if (ownProps.location.query.no) {
+    member.no = +ownProps.location.query.no;
+  }
 
-    return memberExists;
-  },
-  member: stateProps.member,
-  no: +ownProps.params.no,
-  onCancel: () => browserHistory.push(ownProps.params.no ? `/member/view/${ownProps.params.no}` : '/'),
-  fetch: () => dispatchProps.fetch(ownProps.params.no, stateProps.api),
-  onSave: (formData) => {
-    const formattedData = formatMemberFormData(formData);
+  return {
+    exists: async (data) => {
+      const memberExists = await exists(data, stateProps.api);
 
-    if (ownProps.params.no) {
-      dispatchProps.onUpdate(stateProps.api, ownProps.params.no, formattedData);
-    } else {
-      dispatchProps.onInsert(stateProps.api, formattedData);
-    }
-  },
-});
+      if (memberExists) {
+        dispatchProps.onExists(stateProps.api, ownProps.params.no, memberExists, stateProps.userIsAdmin);
+      }
+
+      return memberExists;
+    },
+    member,
+    no: +ownProps.params.no,
+    onCancel: () => browserHistory.push(ownProps.params.no ? `/member/view/${ownProps.params.no}` : '/'),
+    fetch: () => ownProps.params.no && dispatchProps.fetch(stateProps.api, ownProps.params.no),
+    onSave: (formData) => {
+      const formattedData = formatMemberFormData(formData);
+
+      if (ownProps.params.no) {
+        dispatchProps.onUpdate(stateProps.api, ownProps.params.no, formattedData);
+      } else {
+        dispatchProps.onInsert(stateProps.api, formattedData);
+      }
+    },
+  };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps, mergeProps)(MemberForm);

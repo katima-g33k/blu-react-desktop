@@ -1,6 +1,7 @@
 import {
   CANCEL_SEARCH,
   RESET_SEARCH,
+  RESET_STORES,
   SEARCH_FAIL,
   SEARCH_PENDING,
   SEARCH_SUCCESS,
@@ -31,6 +32,7 @@ export default function searchReducer(state = initialState, action = {}) {
         isLoading: false,
       };
     case RESET_SEARCH:
+    case RESET_STORES:
       return initialState;
     case SEARCH_FAIL:
       return {

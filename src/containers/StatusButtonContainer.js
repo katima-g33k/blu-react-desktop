@@ -4,17 +4,17 @@ import { Item } from '../lib/models';
 import StatusButton from '../components/general/StatusButton';
 import { updateStatus } from '../actions/itemActions';
 
-const mapStateToProps = ({ itemStore: { item }, appStore }) => ({
-  apiClient: appStore.apiClient,
-  id: item.id,
-  isRemoved: item.isRemoved,
-  isValid: item.isValid,
-  status: item.getStatus(),
-  userIsAdmin: JSON.parse(sessionStorage.getItem('user')).isAdmin,
+const mapStateToProps = ({ appStore, itemStore, userStore }) => ({
+  api: appStore.apiClient,
+  id: itemStore.item.id,
+  isRemoved: itemStore.item.isRemoved,
+  isValid: itemStore.item.isValid,
+  status: itemStore.item.getStatus(),
+  userIsAdmin: userStore.user.isAdmin,
 });
 
 const mapDispatchToProps = dispatch => ({
-  updateStatus: (apiClient, id, status) => dispatch(updateStatus(apiClient, id, status)),
+  updateStatus: (api, id, status) => dispatch(updateStatus(api, id, status)),
 });
 
 const mergeProps = (stateProps, dispatchProps) => ({
@@ -22,11 +22,11 @@ const mergeProps = (stateProps, dispatchProps) => ({
   disableRight: stateProps.isValid || (!stateProps.userIsAdmin && stateProps.isRemoved),
   onClickLeft: () => {
     const status = stateProps.isValid ? Item.STATUS.OUTDATED : Item.STATUS.REMOVED;
-    dispatchProps.updateStatus(stateProps.apiClient, stateProps.id, status);
+    dispatchProps.updateStatus(stateProps.api, stateProps.id, status);
   },
   onClickRight: () => {
     const status = stateProps.isRemoved ? Item.STATUS.OUTDATED : Item.STATUS.VALID;
-    dispatchProps.updateStatus(stateProps.apiClient, stateProps.id, status);
+    dispatchProps.updateStatus(stateProps.api, stateProps.id, status);
   },
   status: stateProps.status,
 });

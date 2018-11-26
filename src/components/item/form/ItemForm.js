@@ -27,6 +27,13 @@ import {
   publicationIsValid,
 } from '../../../lib/itemHelper';
 
+const {
+  Body,
+  Footer,
+  Heading,
+  Title,
+} = Panel;
+
 const classNames = {
   row: 'form-row',
   buttonGroup: 'form-buttons',
@@ -41,12 +48,12 @@ export default class ItemForm extends Component {
     onCancel: PropTypes.func.isRequired,
     fetch: PropTypes.func.isRequired,
     onSave: PropTypes.func.isRequired,
-  }
+  };
 
   static defaultProps = {
     ean13: '',
     id: 0,
-  }
+  };
 
   state = {
     ean13: this.props.item.ean13,
@@ -58,7 +65,7 @@ export default class ItemForm extends Component {
       name: true,
       publication: true,
     },
-  }
+  };
 
   componentDidMount() {
     if (!this.state.item.id && this.props.id) {
@@ -76,17 +83,18 @@ export default class ItemForm extends Component {
   }
 
   isValid = () => {
+    const { item } = this.state;
     const validation = {
-      author: authorIsValid(this.state.item),
-      ean13: !!this.props.ean13 || ean13IsValid(this.state.item),
-      editor: editorIsValid(this.state.item),
-      name: nameIsValid(this.state.item),
-      publication: publicationIsValid(this.state.item),
+      author: authorIsValid(item),
+      ean13: !!this.props.ean13 || ean13IsValid(item),
+      editor: editorIsValid(item),
+      name: nameIsValid(item),
+      publication: publicationIsValid(item),
     };
 
     this.setState({ validation });
     return Object.values(validation).every(value => value);
-  }
+  };
 
   itemExists = () => {
     if (this.state.item.ean13 === this.state.ean13) {
@@ -94,7 +102,7 @@ export default class ItemForm extends Component {
     }
 
     return this.props.exists(this.state.item.ean13);
-  }
+  };
 
   handleOnChange = (event, value) => {
     const property = event.target.id;
@@ -105,7 +113,7 @@ export default class ItemForm extends Component {
         [property]: value,
       },
     }));
-  }
+  };
 
   handleIsBook = (event, value) => this.setState(state => ({
     item: {
@@ -116,7 +124,7 @@ export default class ItemForm extends Component {
       publication: '',
       author: [],
     },
-  }))
+  }));
 
   handleNoEan13 = (event, value) => this.setState(state => ({
     item: {
@@ -124,7 +132,7 @@ export default class ItemForm extends Component {
       ean13: '',
       noEan13: value,
     },
-  }))
+  }));
 
   handleOnSave = async () => {
     if (!this.isValid() || await this.itemExists()) {
@@ -135,7 +143,7 @@ export default class ItemForm extends Component {
       ...this.state.item,
       ean13: this.props.ean13 || this.state.item.ean13,
     });
-  }
+  };
 
   renderIsBook = () => !this.props.id && (
     <Row>
@@ -146,7 +154,7 @@ export default class ItemForm extends Component {
         onChange={this.handleIsBook}
       />
     </Row>
-  )
+  );
 
   renderNoEan13 = () => {
     if (this.props.id || this.props.ean13) {
@@ -162,7 +170,7 @@ export default class ItemForm extends Component {
         onChange={this.handleNoEan13}
       />
     );
-  }
+  };
 
   renderBookFields = () => this.state.item.isBook && (
     <div>
@@ -211,7 +219,7 @@ export default class ItemForm extends Component {
         />
       </Row>
     </div>
-  )
+  );
 
   render() {
     const { id } = this.props;
@@ -219,65 +227,76 @@ export default class ItemForm extends Component {
     const type = isBook ? 'book' : 'item';
 
     return (
-      <Panel header={I18n('ItemForm.title')}>
-        <Col md={8}>
-          <Form>
-            <Row componentClass="h3">
-              {I18n(`ItemForm.subtitle.${type}.${id ? 'edit' : 'add'}`)}
-            </Row>
-            <Row>
-              {this.renderIsBook()}
-              <Row
-                componentClass={FormGroup}
-                className={classNames.row}
-                validationState={this.state.validation.name ? null : 'error'}
-              >
-                <Input
-                  id="name"
-                  label={I18n('ItemForm.fields.name')}
-                  onChange={this.handleOnChange}
-                  placeholder={I18n('ItemForm.fields.name')}
-                  required
-                  value={this.state.item.name}
-                />
+      <Panel>
+        <Heading>
+          <Title>
+            {I18n('ItemForm.title')}
+          </Title>
+        </Heading>
+        <Body>
+          <Col md={8}>
+            <Form>
+              <Row componentClass="h3">
+                {I18n(`ItemForm.subtitle.${type}.${id ? 'edit' : 'add'}`)}
               </Row>
-              {this.renderBookFields()}
-              <Row className={classNames.row}>
-                <SubjectSelector
-                  onChange={this.handleOnChange}
-                  value={this.state.item.subject.id}
-                />
+              <Row>
+                {this.renderIsBook()}
+                <Row
+                  componentClass={FormGroup}
+                  className={classNames.row}
+                  validationState={this.state.validation.name ? null : 'error'}
+                >
+                  <Input
+                    id="name"
+                    label={I18n('ItemForm.fields.name')}
+                    onChange={this.handleOnChange}
+                    placeholder={I18n('ItemForm.fields.name')}
+                    required
+                    value={this.state.item.name}
+                  />
+                </Row>
+                {this.renderBookFields()}
+                <Row className={classNames.row}>
+                  <SubjectSelector
+                    onChange={this.handleOnChange}
+                    value={this.state.item.subject.id}
+                  />
+                </Row>
+                <Row
+                  componentClass={FormGroup}
+                  className={classNames.row}
+                  validationState={this.state.validation.ean13 ? null : 'error'}
+                >
+                  <Input
+                    disabled={!!(this.props.ean13 || this.state.item.noEan13)}
+                    id="ean13"
+                    inputWidth={{ md: 3 }}
+                    label={I18n('ItemForm.fields.ean13')}
+                    labelWidth={{ md: 3 }}
+                    onChange={this.handleOnChange}
+                    placeholder={I18n('ItemForm.fields.ean13')}
+                    required
+                    type={Input.TYPES.NUMBER}
+                    value={this.state.item.ean13 ? `${this.state.item.ean13}` : this.props.ean13}
+                  />
+                  {this.renderNoEan13()}
+                </Row>
+                <Row className={classNames.row}>
+                  <TextArea
+                    id="comment"
+                    label={I18n(`ItemForm.fields.comment.${type}`)}
+                    onChange={this.handleOnChange}
+                    placeholder={I18n(`ItemForm.fields.comment.${type}`)}
+                    value={this.state.item.comment}
+                  />
+                </Row>
               </Row>
-              <Row
-                componentClass={FormGroup}
-                className={classNames.row}
-                validationState={this.state.validation.ean13 ? null : 'error'}
-              >
-                <Input
-                  disabled={!!(this.props.ean13 || this.state.item.noEan13)}
-                  id="ean13"
-                  inputWidth={{ md: 3 }}
-                  label={I18n('ItemForm.fields.ean13')}
-                  labelWidth={{ md: 3 }}
-                  onChange={this.handleOnChange}
-                  placeholder={I18n('ItemForm.fields.ean13')}
-                  required
-                  type={Input.TYPES.NUMBER}
-                  value={this.state.item.ean13 ? `${this.state.item.ean13}` : this.props.ean13}
-                />
-                {this.renderNoEan13()}
-              </Row>
-              <Row className={classNames.row}>
-                <TextArea
-                  id="comment"
-                  label={I18n(`ItemForm.fields.comment.${type}`)}
-                  onChange={this.handleOnChange}
-                  placeholder={I18n(`ItemForm.fields.comment.${type}`)}
-                  value={this.state.item.comment}
-                />
-              </Row>
-            </Row>
-            <Row>
+            </Form>
+          </Col>
+        </Body>
+        <Footer>
+          <Row>
+            <Col md={12}>
               <ButtonToolbar className={classNames.buttonGroup}>
                 <Button onClick={this.props.onCancel}>
                   {I18n('actions.cancel')}
@@ -289,9 +308,9 @@ export default class ItemForm extends Component {
                   {I18n('actions.save')}
                 </Button>
               </ButtonToolbar>
-            </Row>
-          </Form>
-        </Col>
+            </Col>
+          </Row>
+        </Footer>
       </Panel>
     );
   }

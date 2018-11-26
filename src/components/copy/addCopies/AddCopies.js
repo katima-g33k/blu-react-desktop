@@ -40,24 +40,23 @@ export default class AddCopies extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    // TODO: Fix
+    if (!this.props.scannedItem && nextProps.scannedItem) {
+      if (nextProps.scannedItem.id) {
+        this.props.fetchItem(nextProps.scannedItem.id);
+      } else {
+        this.setState({
+          isSearch: false,
+          ean13: nextProps.scannedItem.ean13,
+        });
+      }
+
+      return;
+    }
+
     if (nextProps.item.id) {
       this.props.handleOnAddCopy(nextProps.item);
-      return;
     }
-
-    if (!nextProps.scannedItem) {
-      return;
-    }
-
-    if (nextProps.scannedItem.id) {
-      this.props.fetchItem(nextProps.scannedItem.id);
-      return;
-    }
-
-    this.setState({
-      isSearch: false,
-      ean13: nextProps.scannedItem.ean13,
-    });
   }
 
   toggleView = () => this.setState(state => ({ isSearch: !state.isSearch }));

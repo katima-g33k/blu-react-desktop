@@ -34,9 +34,10 @@ export default class Input extends Component {
     onChange: PropTypes.func.isRequired,
     placeholder: PropTypes.string,
     required: PropTypes.bool,
+    style: PropTypes.shape(),
     type: PropTypes.oneOf(Object.values(types)),
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  }
+  };
 
   static defaultProps = {
     data: {},
@@ -48,18 +49,19 @@ export default class Input extends Component {
     labelWidth: { md: 3, sm: 2 },
     placeholder: '',
     required: false,
+    style: {},
     type: types.TEXT,
     value: '',
-  }
+  };
 
-  static TYPES = types
+  static TYPES = types;
 
-  onChange = event => this.props.onChange(event, event.target.value)
+  onChange = event => this.props.onChange(event, event.target.value);
 
   getDataAttributes = () => Object.keys(this.props.data).reduce((acc, cur) => ({
     ...acc,
     [`data-${cur}`]: this.props.data[cur],
-  }), {})
+  }), {});
 
   renderLabel = () => this.props.label && (
     <Col
@@ -69,11 +71,14 @@ export default class Input extends Component {
     >
       {this.props.label}{this.props.required && '*'}
     </Col>
-  )
+  );
 
   render() {
     return (
-      <FormGroup validationState={!this.props.isValid ? 'error' : null}>
+      <FormGroup
+        style={this.props.style}
+        validationState={!this.props.isValid ? 'error' : null}
+      >
         {this.renderLabel()}
         <Col {...this.props.inputWidth}>
           <FormControl

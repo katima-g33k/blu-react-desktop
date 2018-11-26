@@ -9,19 +9,29 @@ export default class Checkbox extends Component {
     inputWidth: PropTypes.shape(),
     label: PropTypes.string.isRequired,
     onChange: PropTypes.func.isRequired,
-  }
+    style: PropTypes.shape(),
+  };
 
   static defaultProps = {
     checked: false,
     id: '',
-    inputWidth: { md: 9, mdOffset: 3, sm: 10, smOffset: 2 },
-  }
+    inputWidth: {
+      md: 9,
+      mdOffset: 3,
+      sm: 10,
+      smOffset: 2,
+    },
+    style: {},
+  };
 
-  onChange = event => this.props.onChange(event, !this.props.checked)
+  onChange = event => this.props.onChange(event, !this.props.checked);
 
   render() {
     return (
-      <Col {...this.props.inputWidth}>
+      <Col
+        {...this.props.inputWidth}
+        style={this.props.style}
+      >
         <RBCheckbox
           checked={this.props.checked}
           id={this.props.id}
