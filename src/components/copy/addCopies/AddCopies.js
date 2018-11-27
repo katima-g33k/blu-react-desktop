@@ -40,26 +40,28 @@ export default class AddCopies extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    // TODO: Fix
-    if (!this.props.scannedItem && nextProps.scannedItem) {
-      if (nextProps.scannedItem.id) {
-        this.props.fetchItem(nextProps.scannedItem.id);
-      } else {
-        this.setState({
-          isSearch: false,
-          ean13: nextProps.scannedItem.ean13,
-        });
+    // TODO: Find a way to handle scanning same item twice in a row
+    if (!this.state.isSearch) {
+      return;
+    }
+
+    if ((this.props.scannedItem || {}).ean13 === (nextProps.scannedItem || {}).ean13) {
+      if (nextProps.item.id) {
+        this.props.handleOnAddCopy(nextProps.item);
       }
 
       return;
     }
 
-    if (nextProps.item.id) {
-      this.props.handleOnAddCopy(nextProps.item);
+    if (nextProps.scannedItem.id) {
+      this.props.fetchItem(nextProps.scannedItem.id);
+      return;
     }
+
+    this.toggleView(nextProps.scannedItem.ean13);
   }
 
-  toggleView = () => this.setState(state => ({ isSearch: !state.isSearch }));
+  toggleView = (ean13 = null) => this.setState(state => ({ ean13, isSearch: !state.isSearch }));
 
   renderSearch = () => (
     <Search
