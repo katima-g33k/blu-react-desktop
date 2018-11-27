@@ -3,6 +3,7 @@ import API from '../lib/api';
 import {
   RESET_LAST_ITEM_SCANNED,
   SET_LAST_ITEM_SCANNED,
+  RESET_STORES,
 } from '../actions/actionTypes';
 
 const apiUrl = localStorage.getItem('apiUrl');
@@ -21,6 +22,10 @@ const handlers = {
   [SET_LAST_ITEM_SCANNED]: (state, action) => ({
     ...state,
     lastItemScanned: action.lastItemScanned,
+  }),
+  [RESET_STORES]: state => ({
+    ...initialState,
+    apiClient: state.apiClient,
   }),
 };
 
