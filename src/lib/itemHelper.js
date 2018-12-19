@@ -21,7 +21,7 @@ export const formatItemFormData = (item) => {
     data.publication = item.publication;
   }
 
-  if (!data.noEan13) {
+  if (!item.noEan13) {
     data.ean13 = item.ean13;
   }
 
