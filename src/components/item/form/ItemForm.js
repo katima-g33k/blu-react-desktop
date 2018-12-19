@@ -168,6 +168,7 @@ export default class ItemForm extends Component {
         inputWidth={{ md: 3 }}
         label={I18n('ItemForm.fields.noEan13')}
         onChange={this.handleNoEan13}
+        style={{ marginTop: -15 }}
       />
     );
   };
