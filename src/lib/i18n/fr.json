@@ -484,12 +484,16 @@
     }
   },
   "ProfileStats": {
-    "books": "livres",
     "added": "Mis en vente",
+    "avgPrice": "Prix moyen: %{total}$ (%{inStock}$ en stock)",
+    "books": "%{count} livres",
+    "maxPrice": "Prix maximum: %{total}$ (%{inStock}$ en stock)",
+    "minPrice": "Prix minimum: %{total}$ (%{inStock}$ en stock)",
+    "paid": "Remboursés",
+    "price": "(%{price} $)",
     "sold": "Vendus",
     "toSell": "À vendre",
-    "toPay": "À rembourser",
-    "paid": "Remboursés"
+    "toPay": "À rembourser"
   },
   "ReservationList": {
     "title": "Liste des réservation",
