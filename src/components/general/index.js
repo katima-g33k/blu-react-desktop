@@ -5,7 +5,7 @@ import Checkbox from './Checkbox';
 import CustomButton from './StatusButton';
 import DatePicker from './DatePicker';
 import Input from './Input';
-import ProfileStats from './profileStats/ProfileStats';
+import ProfileStats from './ProfileStats';
 import Select from './Select';
 import SemesterSelector from './SemesterSelector';
 import Spinner from './Spinner';

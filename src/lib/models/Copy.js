@@ -7,8 +7,8 @@ export default class Copy {
     this.id = id;
     this.price = +price;
     this.transaction = transaction.map(t => new Transaction(t));
-    this.item = item ? new Item(item) : null;
-    this.member = member ? new Member(member) : null;
+    this.item = new Item(item);
+    this.member = new Member(member);
   }
 
   get priceString() {

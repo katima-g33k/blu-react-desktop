@@ -12,7 +12,7 @@ import AlignedData from '../../general/AlignedData';
 import CopyTable from './ItemCopyTable';
 import i18n from '../../../lib/i18n';
 import { INFORMATION_FIELDS, LABEL_STYLE, PANEL_STYLE } from './constant';
-import ProfileStats from '../../general/profileStats/ProfileStats';
+import ProfileStats from '../../../containers/ProfileStatsContainer';
 import ReservationList from '../../../containers/ReservationListContainer';
 import { Item } from '../../../lib/models';
 import Spinner from '../../general/Spinner';
@@ -133,7 +133,7 @@ export default class ItemView extends Component {
                 </Col>
                 <Col sm={12} md={6}>
                   <h4>{i18n('ItemView.stats.title')}</h4>
-                  <ProfileStats copies={item.copies} priceStats />
+                  <ProfileStats priceStats />
                 </Col>
               </Row>
               {this.renderReservations()}

@@ -11,21 +11,21 @@ import {
 import { AlignedData, Spinner } from '../../general';
 import CopyTable from './MemberCopyTable';
 import { formatLongDate } from '../../../lib/dateHelper';
-import I18n from '../../../lib/i18n';
+import i18n from '../../../lib/i18n';
 import { Member } from '../../../lib/models';
 import MemberActionPanel from '../../../containers/MemberActionPanelContainer';
 import MemberComments from '../../../containers/MemberCommentContainer';
 import MemberReceipt from '../receipt/MemberReceipt';
 import ParentLogo from './ParentLogo';
-import ProfileStats from '../../general/profileStats/ProfileStats';
+import ProfileStats from '../../../containers/ProfileStatsContainer';
 
-const { Body, Heading } = Panel;
+const { Body, Heading, Title } = Panel;
 const styles = {
   alert: {
     marginBottom: 0,
   },
   border: {
-    borderRight: '1px #e0e0e0 solid',
+    borderRight: '1px #E0E0E0 solid',
   },
 };
 
@@ -55,25 +55,25 @@ export default class MemberView extends Component {
     const { account } = this.props.member;
     return (
       <section>
-        <h4>{I18n('MemberView.account.title')}</h4>
+        <h4>{i18n('MemberView.account.title')}</h4>
         <AlignedData
-          label={I18n('MemberView.account.activation')}
+          label={i18n('MemberView.account.activation')}
           value={(
             <Label bsStyle={account.isActive ? 'success' : 'danger'}>
-              {I18n(`MemberView.account.${account.isActive ? 'active' : 'deactivated'}`)}
+              {i18n(`MemberView.account.${account.isActive ? 'active' : 'deactivated'}`)}
             </Label>
           )}
         />
         <AlignedData
-          label={I18n('MemberView.account.registration')}
+          label={i18n('MemberView.account.registration')}
           value={formatLongDate(account.registration)}
         />
         <AlignedData
-          label={I18n('MemberView.account.lastActivity')}
+          label={i18n('MemberView.account.lastActivity')}
           value={formatLongDate(account.lastActivity)}
         />
         <AlignedData
-          label={I18n('MemberView.account.deactivation')}
+          label={i18n('MemberView.account.deactivation')}
           value={formatLongDate(account.deactivationDate)}
         />
       </section>
@@ -87,7 +87,7 @@ export default class MemberView extends Component {
     if (transfers.length) {
       return (
         <Alert bsStyle="warning" style={styles.alert}>
-          {I18n('MemberView.transferAlert', { dates })}
+          {i18n('MemberView.transferAlert', { dates })}
         </Alert>
       );
     }
@@ -100,7 +100,7 @@ export default class MemberView extends Component {
       return (
         <AlignedData
           key={`phone-${phone.id}`}
-          label={I18n('MemberView.general.phone', { index: index + 1 })}
+          label={i18n('MemberView.general.phone', { index: index + 1 })}
           value={phone.toString()}
         />
       );
@@ -113,17 +113,17 @@ export default class MemberView extends Component {
 
   renderGeneralInformation = () => (
     <section>
-      <h4>{I18n('MemberView.general.title')}</h4>
+      <h4>{i18n('MemberView.general.title')}</h4>
       <AlignedData
-        label={I18n('MemberView.general.no')}
+        label={i18n('MemberView.general.no')}
         value={`${this.props.member.no}`}
       />
       <AlignedData
-        label={I18n('MemberView.general.address')}
+        label={i18n('MemberView.general.address')}
         value={this.props.member.addressString}
       />
       <AlignedData
-        label={I18n('MemberView.general.email')}
+        label={i18n('MemberView.general.email')}
         value={this.props.member.email}
       />
       {this.renderPhones()}
@@ -132,19 +132,21 @@ export default class MemberView extends Component {
 
   renderStats = () => (
     <section>
-      <h4>{I18n('MemberView.stats.title')}</h4>
-      <ProfileStats copies={this.props.member.account.copies} />
+      <h4>{i18n('MemberView.stats.title')}</h4>
+      <ProfileStats />
     </section>
   );
 
   renderReceipt = () => {
     if (this.props.isPrinting) {
       return (
-        <MemberReceipt
-          amount={this.props.amount}
-          member={this.props.member}
-          onAfterPrint={this.props.onAfterPrint}
-        />
+        <Col md={12}>
+          <MemberReceipt
+            amount={this.props.amount}
+            member={this.props.member}
+            onAfterPrint={this.props.onAfterPrint}
+          />
+        </Col>
       );
     }
 
@@ -165,7 +167,9 @@ export default class MemberView extends Component {
         <Col md={10}>
           <Panel bsStyle={isActive ? 'default' : 'danger'}>
             <Heading>
-              {I18n('MemberView.title')}
+              <Title>
+                {i18n('MemberView.title')}
+              </Title>
             </Heading>
             {this.renderAlert()}
             <Body>
