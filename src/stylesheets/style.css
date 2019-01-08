@@ -6,6 +6,11 @@ html, body {
   overflow-x: hidden;
 }
 
+body {
+  width: 98%;
+  margin: auto;
+}
+
 .table {
   margin-bottom: 0;
 }
@@ -40,8 +45,88 @@ h4 {
   font-weight: bold;
 }
 
+.form-buttons {
+  float: right;
+}
+
+.form-row {
+  margin-bottom: 15px;
+}
+
 #receipt {
   display: none;
+}
+
+#searchModal .modal-dialog {
+  min-width: 900px;
+  width: 50%;
+}
+
+#StatusButton #left {
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  width: 20%;
+}
+
+#StatusButton #center {
+  border-width: 1px 0;
+  cursor: default;
+  border-radius: 0;
+  width: 60%;
+}
+
+#StatusButton .btn-success:hover {
+  background-color: #00B642;
+  border-color: #00B642;
+}
+
+#StatusButton .btn-danger:hover {
+  background-color: #F1003A;
+  border-color: #F1003A;
+}
+
+#StatusButton .btn-warning:hover {
+  background-color: #FFC800;
+  border-color: #FFC800;
+}
+
+#StatusButton #right {
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  width: 20%;
+}
+
+#Login form .row {
+  margin-bottom: 15px;
+}
+
+#Login button {
+  float: right;
+}
+
+#EmployeeFormModal input[type=text],
+#EmployeeFormModal input[type=password] {
+  margin-bottom: 10px;
+}
+
+#EmployeeFormModal .btn-toolbar {
+  float: right;
+  margin-top: 20px;
+  margin-right: 15px;
+}
+
+#SettingsView form .row {
+  margin-top: 15px;
+}
+
+#SettingsView #calibrationButton {
+  text-align: center;
+}
+
+#SettingsView #formButtons {
+  float: right;
 }
 
 .menu-button {

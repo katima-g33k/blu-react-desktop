@@ -27,8 +27,6 @@ import i18n from '../../../lib/i18n';
 import { Member } from '../../../lib/models';
 import StateSelector from '../../../containers/StateSelectorContainer';
 
-import './memberForm.css';
-
 const {
   Body,
   Footer,

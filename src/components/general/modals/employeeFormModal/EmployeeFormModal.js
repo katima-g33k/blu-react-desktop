@@ -9,8 +9,6 @@ import {
   Row,
 } from 'react-bootstrap';
 
-import '../employeeFormModal.css';
-
 import { Checkbox, Input } from '../../formInputs';
 import { Employee } from '../../../../lib/models';
 import i18n from '../../../../lib/i18n';

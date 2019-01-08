@@ -82,7 +82,7 @@ export default class MemberView extends Component {
     const { transfers } = this.props.member.account;
     const dates = transfers.map(date => formatLongDate(date)).join(', ');
 
-    return transfers.length && (
+    return !!transfers.length && (
       <Alert label={i18n('MemberView.transferAlert', { dates })} />
     );
   };

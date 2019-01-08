@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { PulseLoader } from 'halogen';
+import ReactLoading from 'react-loading';
 
 const styles = {
   spinner: {
     color: '#7D8364',
-    size: '16px',
+    height: 64,
+    margin: 'auto',
+    width: 64,
   },
   wrapper: {
     textAlign: 'center',
@@ -15,7 +17,7 @@ export default class Spinner extends Component {
   render() {
     return (
       <div style={styles.wrapper}>
-        <PulseLoader {...styles.spinner} />
+        <ReactLoading style={styles.spinner} type="bubbles" />
       </div>
     );
   }

@@ -9,7 +9,6 @@ import {
   Row,
 } from 'react-bootstrap';
 
-import './login.css';
 import I18n from '../../lib/i18n';
 import { Input } from '../general/formInputs';
 
