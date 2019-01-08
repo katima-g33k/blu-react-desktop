@@ -8,20 +8,24 @@ import {
 export default class Button extends Component {
   static defaultProps = {
     actionData: {},
-    onClick() {},
-  }
+    bsStyle: 'default',
+    glyph: null,
+    hint: null,
+    label: '',
+    style: {},
+  };
 
   static propTypes = {
-    actionData: PropTypes.shape().isRequired,
+    actionData: PropTypes.shape(),
     bsStyle: PropTypes.string,
     glyph: PropTypes.string,
+    hint: PropTypes.string,
     label: PropTypes.string,
     onClick: PropTypes.func.isRequired,
-  }
+    style: PropTypes.shape(),
+  };
 
-  onClick = () => {
-    this.props.onClick(this.props.actionData);
-  }
+  onClick = () => this.props.onClick(this.props.actionData);
 
   render() {
     const { bsStyle, glyph, label } = this.props;
@@ -30,6 +34,8 @@ export default class Button extends Component {
       <BootstrapButton
         bsStyle={bsStyle}
         onClick={this.onClick}
+        title={this.props.hint}
+        style={this.props.style}
       >
         {glyph && (<Glyphicon glyph={glyph} />)} {label}
       </BootstrapButton>

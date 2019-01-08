@@ -118,7 +118,7 @@ export default class ItemView extends Component {
 
     return !isLoading && item.id ? (
       <Row>
-        <Col md={10}>
+        <Col md={9} lg={10}>
           <Panel bsStyle={PANEL_STYLE[item.getStatus()]}>
             <Heading>
               {i18n('ItemView.title')}
@@ -141,7 +141,7 @@ export default class ItemView extends Component {
             </Body>
           </Panel>
         </Col>
-        <Col md={2}>
+        <Col md={3} lg={2}>
           <ActionPanel />
         </Col>
       </Row>

@@ -1,4 +1,5 @@
 import ActionPanel from './ActionPanel';
+import Alert from './Alert';
 import AlignedData from './AlignedData';
 import Button from './Button';
 import Checkbox from './Checkbox';
@@ -14,6 +15,7 @@ import TableLayout from './TableLayout';
 
 export {
   ActionPanel,
+  Alert,
   AlignedData,
   Button,
   Checkbox,
