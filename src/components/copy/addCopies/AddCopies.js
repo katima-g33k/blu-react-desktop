@@ -6,10 +6,12 @@ import {
   Row,
 } from 'react-bootstrap';
 
-import { Item } from '../../../lib/models';
 import i18n from '../../../lib/i18n';
+import { Item } from '../../../lib/models';
+
 import ActionPanel from '../../../containers/AddCopiesActionPanelContainer';
 import AddedCopiesTable from '../../../containers/AddedCopiesTableContainer';
+import { Alert } from '../../general';
 import ItemForm from '../../../containers/ItemFormContainer';
 import Search from '../../../containers/SearchContainer';
 
@@ -89,6 +91,7 @@ export default class AddCopies extends Component {
             <Heading>
               <Title>{i18n('AddCopies.title')}</Title>
             </Heading>
+            <Alert label={i18n('AddCopies.warning')} />
             <Body>
               <h2>
                 {this.props.memberName}

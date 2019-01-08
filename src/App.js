@@ -2,41 +2,35 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Row } from 'react-bootstrap';
 
-import Header from './components/general/Header';
+import Header from './containers/HeaderContainer';
 import Login from './containers/LoginContainer';
 import Modal from './containers/ModalContainer';
 import Routes from './containers/RoutesContainer';
 import Scanner from './containers/ScannerContainer';
 import SettingsView from './containers/SettingsViewContainer';
-import Sidebar from './components/general/Sidebar';
 
 export default class App extends Component {
   static propTypes = {
     isConnected: PropTypes.bool,
     isInitialSetup: PropTypes.bool,
-  }
+  };
 
   static defaultProps = {
     isConnected: false,
     isInitialSetup: true,
-  }
+  };
 
   renderSetup = () => (
     <Col md={6} mdOffset={3}>
       <SettingsView />
     </Col>
-  )
+  );
 
   renderRoutes = () => (
-    <div>
-      <Col componentClass="aside" sm={0} md={2}>
-        <Sidebar />
-      </Col>
-      <Col sm={12} md={10}>
-        <Routes />
-      </Col>
-    </div>
-  )
+    <Col md={12}>
+      <Routes />
+    </Col>
+  );
 
   renderMain = () => {
     if (this.props.isInitialSetup) {
@@ -48,7 +42,7 @@ export default class App extends Component {
     }
 
     return this.renderRoutes();
-  }
+  };
 
   render() {
     return (

@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert,
   Col,
   Label,
   Panel,
   Row,
 } from 'react-bootstrap';
 
-import { AlignedData, Spinner } from '../../general';
+import { Alert, AlignedData, Spinner } from '../../general';
 import CopyTable from './MemberCopyTable';
 import { formatLongDate } from '../../../lib/dateHelper';
 import i18n from '../../../lib/i18n';
@@ -21,11 +20,10 @@ import ProfileStats from '../../../containers/ProfileStatsContainer';
 
 const { Body, Heading, Title } = Panel;
 const styles = {
-  alert: {
-    marginBottom: 0,
-  },
   border: {
-    borderRight: '1px #E0E0E0 solid',
+    borderRightColor: '#E0E0E0',
+    borderRightStyle: 'solid',
+    borderRightWidth: 1,
   },
 };
 
@@ -84,15 +82,9 @@ export default class MemberView extends Component {
     const { transfers } = this.props.member.account;
     const dates = transfers.map(date => formatLongDate(date)).join(', ');
 
-    if (transfers.length) {
-      return (
-        <Alert bsStyle="warning" style={styles.alert}>
-          {i18n('MemberView.transferAlert', { dates })}
-        </Alert>
-      );
-    }
-
-    return null;
+    return transfers.length && (
+      <Alert label={i18n('MemberView.transferAlert', { dates })} />
+    );
   };
 
   renderPhone = (phone, index) => {
@@ -164,7 +156,7 @@ export default class MemberView extends Component {
 
     return !isLoading ? (
       <Row>
-        <Col md={10}>
+        <Col md={9} lg={10}>
           <Panel bsStyle={isActive ? 'default' : 'danger'}>
             <Heading>
               <Title>
@@ -194,7 +186,7 @@ export default class MemberView extends Component {
             </Body>
           </Panel>
         </Col>
-        <Col md={2}>
+        <Col md={3} lg={2}>
           <MemberActionPanel />
         </Col>
         {this.renderReceipt()}

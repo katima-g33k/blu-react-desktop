@@ -45,7 +45,8 @@
         "title": "Titre"
       }
     },
-    "title": "Ajouter des exemplaires"
+    "title": "Ajouter des exemplaires",
+    "warning": "Attention, prendre note que parfois, scanner 2 fois le même ouvrage de suite ne fonctionnera pas. Ceci est un problème connu et sera corrigé dans une mise à jour ultérieure. Pour le moment, veuillez alterner avec un autre ouvrage ou revenir à la fiche de membre et ensuite réouvrir cette page afin de continuer la saisie. Désolé des inconvénients que cela peut occasionner."
   },
   "Admin": {
     "statistics": {
@@ -588,8 +589,8 @@
     },
     "memberCopy": {
       "title": "Titre",
-      "editor": "Éditeur",
-      "edition": "Édition",
+      "editor": "Éditeur : %{editor}",
+      "edition": "Édition : %{edition}",
       "added": "Mis en vente",
       "sold": "Vendu",
       "paid": "Argent remis",
