@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Glyphicon } from 'react-bootstrap';
 
-import './statusButton.css';
 import I18n from '../../../lib/i18n';
 
 const bsStyles = {

@@ -10,8 +10,6 @@ import {
   Row,
 } from 'react-bootstrap';
 
-import './settingsView.css';
-
 import I18n from '../../lib/i18n/index';
 import { Input } from '../general/formInputs/index';
 import ScannerCalibrator from '../../containers/ScannerCalibratorContainer';

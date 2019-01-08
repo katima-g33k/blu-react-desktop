@@ -5,7 +5,6 @@ import {
   Modal as RBModal,
 } from 'react-bootstrap';
 
-import './modal.css';
 import i18n from '../../../lib/i18n';
 import ModalButton from '../../../containers/ModalButtonContainer';
 import Search from '../../../containers/SearchContainer';

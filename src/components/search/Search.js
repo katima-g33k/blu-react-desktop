@@ -12,7 +12,6 @@ import {
   Row,
 } from 'react-bootstrap';
 
-import './search.css';
 import i18n from '../../lib/i18n';
 import SearchResults from '../../containers/SearchResultsContainer';
 
@@ -22,6 +21,12 @@ const TYPES = {
   ITEM: 'item',
   MEMBER: 'member',
   PARENT: 'parent',
+};
+
+const styles = {
+  input: {
+    marginBottom: 10,
+  },
 };
 
 export default class Search extends Component {
@@ -113,6 +118,7 @@ export default class Search extends Component {
                 <FormControl
                   type="search"
                   onChange={this.handleOnInput}
+                  style={styles.input}
                   value={this.props.value}
                 />
                 {this.renderTypeSelection()}

@@ -8,7 +8,12 @@ import { link } from '../../../../lib/link';
 import { Reservation } from '../../../../lib/models';
 import { TableLayout } from '../../../general';
 
-import './reservationList.css';
+const styles = {
+  button: {
+    backgroundColor: '#00C73E',
+    cursor: 'default',
+  },
+};
 
 // TODO: Fix copy reservations
 export default class ReservationList extends Component {
@@ -47,7 +52,7 @@ export default class ReservationList extends Component {
       width: '70px',
       dataAlign: 'center',
       dataFormat: (cell, { copy }) => copy && (
-        <Button id="labelButton" bsStyle="success" disabled>
+        <Button bsStyle="success" disabled style={styles.button}>
           <Glyphicon glyph="ok-sign" />
         </Button>
       ),
