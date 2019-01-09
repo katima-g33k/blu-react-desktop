@@ -6,4 +6,5 @@ export const PHONE_NUMBER_REGEX = /^(\d{3})[ -]?(\d{3})[ -]?(\d{4})$/;
 export const POSTAL_CODE_REGEX = /^([a-z]\d[a-z]) ?(\d[a-z]\d)$/i;
 export const ASSETS = {
   LOGO: 'logo_blu.svg',
+  STUDENT_PARENT_LOGO: 'logo_parents_etudiants.png',
 };

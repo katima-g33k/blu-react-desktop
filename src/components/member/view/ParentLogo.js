@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { Image } from 'react-bootstrap';
 
-const dir = __dirname;
-const path = '../../assets/images/logo_parents_etudiants.png';
+import { ASSETS } from '../../../lib/constants';
+import { getAssetPath } from '../../../lib/helpers/assets';
+
 const styles = {
   image: {
     border: 'none',
@@ -16,7 +17,7 @@ export default class ParentLogo extends Component {
   render() {
     return (
       <Image
-        src={`${dir === '/' ? '' : `${dir}/`}${path}`}
+        src={getAssetPath(ASSETS.STUDENT_PARENT_LOGO)}
         style={styles.image}
       />
     );
