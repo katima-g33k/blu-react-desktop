@@ -114,14 +114,10 @@ export default class Modal extends Component {
       return this.props.actions.map(this.renderButton);
     }
 
-    if (this.props.onClick) {
-      return this.renderButton({
-        label: i18n('modal.ok'),
-        onClick: this.props.onClick,
-      });
-    }
-
-    return null;
+    return this.renderButton({
+      label: i18n('modal.ok'),
+      onClick: this.props.onClick,
+    });
   };
 
   render() {
