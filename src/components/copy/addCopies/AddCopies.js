@@ -55,12 +55,16 @@ export default class AddCopies extends Component {
       return;
     }
 
-    if (nextProps.scannedItem.id) {
+    if (nextProps.scannedItem && nextProps.scannedItem.id) {
       this.props.fetchItem(nextProps.scannedItem.id);
       return;
     }
 
-    this.toggleView(nextProps.scannedItem.ean13);
+    if (!this.state.isSearch) {
+      this.toggleView();
+    } else if (nextProps.scannedItem && nextProps.scannedItem.ean13) {
+      this.toggleView(nextProps.scannedItem.ean13);
+    }
   }
 
   toggleView = (ean13 = null) => this.setState(state => ({ ean13, isSearch: !state.isSearch }));
