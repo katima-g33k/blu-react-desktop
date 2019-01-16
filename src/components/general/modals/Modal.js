@@ -74,6 +74,7 @@ export default class Modal extends Component {
         <div>
           <p>{this.props.message}</p>
           <FormControl
+            autoFocus
             componentClass={this.props.inputType === INPUT_TYPES.TEXTAREA ? 'textarea' : 'input'}
             id="inputModalField"
             onChange={this.props.onInput}
@@ -94,13 +95,24 @@ export default class Modal extends Component {
     };
   }
 
+  handleOnSubmit = (event) => {
+    event.preventDefault();
+    const action = this.props.actions.find(button => button.type === 'submit');
+
+    if (action && action.id) {
+      document.getElementById(action.id).click();
+    }
+  };
+
   renderButton = action => (
     <ModalButton
       extraData={this.props}
+      id={action.id}
       key={action.label}
       label={action.label}
       onClick={action.onClick}
       style={action.style}
+      type={action.type}
     />
   );
 
@@ -117,24 +129,27 @@ export default class Modal extends Component {
     return this.renderButton({
       label: i18n('modal.ok'),
       onClick: this.props.onClick,
+      type: 'submit',
     });
   };
 
   render() {
     return (
       <RBModal id={this.id} show={this.props.display}>
-        <Header>
-          <Title>
-            {this.props.title}
-          </Title>
-        </Header>
-        <Body>
-          {this.body[this.props.type]}
-        </Body>
-        <Footer>
-          {this.renderCancelButton()}
-          {this.renderActionButtons()}
-        </Footer>
+        <form onSubmit={this.handleOnSubmit}>
+          <Header>
+            <Title>
+              {this.props.title}
+            </Title>
+          </Header>
+          <Body>
+            {this.body[this.props.type]}
+          </Body>
+          <Footer>
+            {this.renderCancelButton()}
+            {this.renderActionButtons()}
+          </Footer>
+        </form>
       </RBModal>
     );
   }

@@ -12,6 +12,7 @@ const mapDispatchToProps = dispatch => ({
 const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   closeModal: dispatchProps.closeModal,
   extraData: ownProps.extraData,
+  id: ownProps.id,
   label: ownProps.label,
   onClick: ownProps.onClick,
   style: ownProps.style,
