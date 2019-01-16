@@ -6,18 +6,24 @@ export default class ModalButton extends Component {
   static propTypes = {
     closeModal: PropTypes.func.isRequired,
     extraData: PropTypes.shape(),
+    id: PropTypes.string,
     label: PropTypes.string.isRequired,
     onClick: PropTypes.func,
     style: PropTypes.string,
+    type: PropTypes.string,
   };
 
   static defaultProps = {
     extraData: {},
+    id: undefined,
     onClick() {},
     style: 'primary',
+    type: 'button',
   };
 
-  handleOnClick = () => {
+  handleOnClick = (event) => {
+    event.preventDefault();
+
     this.props.onClick(this.props.extraData);
     this.props.closeModal();
   };
@@ -26,8 +32,10 @@ export default class ModalButton extends Component {
     return (
       <Button
         bsStyle={this.props.style}
+        id={this.props.id}
         key={this.props.label}
         onClick={this.handleOnClick}
+        type={this.props.type}
       >
         {this.props.label}
       </Button>

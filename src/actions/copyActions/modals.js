@@ -10,6 +10,7 @@ export const openPriceModal = (api, member, item) => (dispatch) => {
   dispatch({
     actions: [
       {
+        id: 'saveCopy',
         label: i18n('actions.save'),
         onClick: async ({ inputValue }) => {
           await dispatch(closeModal());
@@ -17,6 +18,7 @@ export const openPriceModal = (api, member, item) => (dispatch) => {
           dispatch(resetLastItemScanned());
           dispatch(insert(api, member, item, inputValue));
         },
+        type: 'submit',
       },
     ],
     cancelable: true,
