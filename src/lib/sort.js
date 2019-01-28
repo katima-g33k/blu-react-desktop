@@ -13,15 +13,11 @@ export const sortDate = (a, b, order) => {
 };
 
 export const sortString = (a, b, order) => {
-  if (a < b) {
-    return order === 'asc' ? -1 : 1;
+  if (order === 'asc') {
+    return `${a}`.localeCompare(`${b}`);
   }
 
-  if (a > b) {
-    return order === 'asc' ? 1 : -1;
-  }
-
-  return 0;
+  return `${b}`.localeCompare(`${a}`);
 };
 
 export const sortNumber = (a, b, order) => {

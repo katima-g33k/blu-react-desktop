@@ -39,6 +39,7 @@ export default function call(method, path, data) {
 
     request(options, (err, res) => {
       if (err) {
+        console.error(err);
         reject(err);
         return;
       }
@@ -48,12 +49,15 @@ export default function call(method, path, data) {
 
         if (!/^2/.test(res.statusCode)) {
           const error = { status: res.statusCode, ...json };
+          console.error(error);
           reject(error);
           return;
         }
 
+        console.log(json);
         resolve(json);
       } catch (error) {
+        console.error(error);
         reject(err);
       }
     });

@@ -10,8 +10,9 @@ export default class ItemCopyTable extends Component {
   columns = [
     {
       dataField: 'id',
+      dataFormat: () => (<input type="checkbox" />),
       isKey: true,
-      hidden: true,
+      width: '40px',
     },
     {
       dataField: 'member',
@@ -23,7 +24,7 @@ export default class ItemCopyTable extends Component {
         const label = `${copy.isDonated ? 'BLU - ' : ''}${member.name}`;
         return link(`/member/view/${member.no}`, highlightSearchResults(label, extra.highlight));
       },
-      sortFunc: sortString,
+      sortFunc: (copyA, copyB, order) => sortString(copyA.member.name, copyB.member.name, order),
       tdStyle: { whiteSpace: 'normal' },
     },
   ];
