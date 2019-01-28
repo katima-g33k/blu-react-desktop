@@ -37,8 +37,8 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => ({
   formatRow: ownProps.formatRow,
   refundCopy: copy => dispatchProps.refundCopy(stateProps.api, copy),
   reserveCopy: copy => dispatchProps.reserveCopy(stateProps.api, copy),
-  sellCopy: copy => dispatchProps.sellCopy(stateProps.api, copy, stateProps.memberNo),
-  sellCopyHalfPrice: copy => dispatchProps.sellCopy(stateProps.api, copy, stateProps.memberNo, true),
+  sellCopy: copy => dispatchProps.sellCopy(stateProps.api, copy, stateProps.memberNo || copy.member.no),
+  sellCopyHalfPrice: copy => dispatchProps.sellCopy(stateProps.api, copy, stateProps.memberNo || copy.member.no, true),
   updateCopy: copy => dispatchProps.onUpdate(stateProps.api, copy),
   updateFilter: (event) => {
     const filter = event.target.id;
